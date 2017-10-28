@@ -1,0 +1,18 @@
+{
+    "name": "Article Summarizer",
+    "version": "0.1",
+    "description": "Summarizes web pages using the Text Rank algorithm.",
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "ext/require.min.js",
+                "build/main.js",
+                "ext/bootstrap.js"
+            ]
+        }
+    ],
+    "manifest_version": 2
+}
