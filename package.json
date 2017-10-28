@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@types/chrome": "0.0.51"
+    "@types/chrome": "0.0.51",
+    "@types/jquery": "^3.2.15",
+    "@types/underscore": "^1.8.4",
+    "jquery": "^3.2.1",
+    "underscore": "^1.8.3"
   }
 }
