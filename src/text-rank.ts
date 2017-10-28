@@ -144,6 +144,15 @@ class SummarizerResult {
         return sentences.sort((a, b) => a.index - b.index)
             .map(s => s.sentence);
     }
+
+    getStatsText(maxSentences: number): string {
+        const sentences = this.prResultArr.splice(0, maxSentences);
+        const pageranks = sentences.sort((a, b) => a.index - b.index)
+            .map(s => s.pagerank);
+
+        return `${this.prResultArr.length} sentences reduced down to ${maxSentences}
+with PageRanks : ${pageranks.join(', ')}`;
+    }
 }
 
 // Single iteration of Page Rank.

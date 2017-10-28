@@ -3,25 +3,37 @@ import { calculatePageRank, makeGraph } from "text-rank";
 
 export function getPageText() {
     const rootDiv = document.createElement('div');
+    rootDiv.style.padding = '50px';
     const textBlocks = findNodesWithNWords(10);
 
-    const summarizedSentences = summarizeSentences(textBlocks, 5);
+    const NUM_SUMMARY_SENTENCES = 5;
+    const result = summarizeSentences(textBlocks);
     let i = 1;
-    for (const text of summarizedSentences) {
-        const p = document.createElement('p');
-        p.textContent = `Block ${i}: ${text}`;
-        // Font styling modeled off of nytimes
-        p.style.fontFamily = `georgia, "times new roman", times, serif`;
-        p.style.fontSize = '16px';
-        p.style.color = 'black';
+    for (const text of result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES)) {
+        let p = _createParagraph(text);
         rootDiv.appendChild(p);
         i += 1;
     }
 
+    // Add stats text
+    const p = _createParagraph(result.getStatsText(NUM_SUMMARY_SENTENCES))
+    p.style.fontWeight = 'bold';
+    rootDiv.appendChild(p)
+
     return rootDiv;
 }
 
-function summarizeSentences(sentences: Array<string>, numSummarySentences: number) {
+function _createParagraph(text) {
+    const p = document.createElement('p');
+    p.textContent = text;
+    // Font styling modeled off of nytimes
+    p.style.fontFamily = `georgia, "times new roman", times, serif`;
+    p.style.fontSize = '16px';
+    p.style.color = 'black';
+    return p
+}
+
+function summarizeSentences(sentences: Array<string>) {
     const textRankConfig = {
         "maxIter": 100,
         "dampingFactor": 0.85,
@@ -31,7 +43,7 @@ function summarizeSentences(sentences: Array<string>, numSummarySentences: numbe
     const graph = makeGraph(sentences);
     const result = calculatePageRank(graph, textRankConfig.maxIter,
         textRankConfig.dampingFactor, textRankConfig.delta);
-    return result.getSentencesOrderedByOccurence(numSummarySentences);
+    return result;
 }
 
 // Skip these element types and all their children

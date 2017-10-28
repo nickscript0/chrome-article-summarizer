@@ -2,6 +2,12 @@
  * Article Summarizer Chrome Extension
  */
 
+/**
+ * TODOs:
+ * 1. I'm not splitting on sentences, resulting in 5 large blocks sometimes. Recombine the text and use a period splitter
+ * 2. 
+ */
+
 import { getPageText } from "summarize";
 
 const ORIGINAL_PAGE = document.body.innerHTML;
