@@ -6,6 +6,10 @@ export function getPageText() {
     for (const text of textBlock) {
         const p = document.createElement('p');
         p.textContent = `Block ${i}: ${text}`;
+        // Font styling modeled off of nytimes
+        p.style.fontFamily = `georgia, "times new roman", times, serif`;
+        p.style.fontSize = '16px';
+        p.style.color = 'black';
         rootDiv.appendChild(p);
         i += 1;
     }
