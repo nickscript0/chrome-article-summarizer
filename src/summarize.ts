@@ -16,7 +16,7 @@ export function getPageText() {
 }
 
 // Skip these element types and all their children
-const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav'];
+const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav', 'img', 'noscript'];
 
 class StringCounter {
     private stringCounts: Map<string, number>;
@@ -24,7 +24,8 @@ class StringCounter {
         this.stringCounts = new Map();
     }
 
-    incr(s: string) {
+    incr(s: string | null) {
+        if (s === null) s = '<<null>>';
         const last = this.stringCounts.get(s);
         const next = (last) ? last + 1 : 1;
         this.stringCounts.set(s, next);
@@ -39,17 +40,19 @@ class StringCounter {
 
 function findNodesWithNWords(minWords: number): Array<string> {
     const rejectCounter = new StringCounter();
+    const acceptCounter = new StringCounter();
+    const skipCounter = new StringCounter();
 
     const filter_by_word: NodeFilter = {
         acceptNode: n => {
-            const parentNode = n.parentNode;
-            // if (parentNode && parentNode.nodeName !== '#text') console.log(`parentNode.nodeName is ${parentNode.nodeName}`);
-            if (parentNode && ELEMENT_REJECT_BLACKLIST.includes(parentNode.nodeName.toLowerCase())) {
-                rejectCounter.incr(parentNode.nodeName.toLocaleLowerCase());
+            if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
+                rejectCounter.incr(n.parentNode.nodeName.toLocaleLowerCase());
                 return NodeFilter.FILTER_REJECT;
             } else if (_wordCount(n.textContent) >= minWords) {
+                acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                 return NodeFilter.FILTER_ACCEPT;
             } else {
+                skipCounter.incr(n.parentNode && n.parentNode.nodeName);
                 return NodeFilter.FILTER_SKIP;
             }
         }
@@ -69,7 +72,9 @@ function findNodesWithNWords(minWords: number): Array<string> {
         matched_nodes.push(n.textContent);
     }
 
-    console.log(`Rejected Nodes: ${rejectCounter.toString()}`);
+    console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
+    // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
+    console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
     return matched_nodes;
 }
 
