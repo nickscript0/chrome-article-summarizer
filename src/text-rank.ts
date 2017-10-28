@@ -3,8 +3,6 @@
  * modeled off of https://github.com/arnavroy/text-summarizer/blob/master/summarizer.js
  */
 
-import *  as _ from "underscore";
-
 // var Summarizer = {};
 // Summarizer.Utility = {};
 
@@ -30,13 +28,13 @@ import *  as _ from "underscore";
 // Calculate similarity between 2 sentences.
 function calculateSimilarity(sentence1, sentence2) {
     const words1 = sentence1.split(" ");
-    const words2 = sentence2.split(" ");
-    const intersection = _.intersection(words1, words2);
-    const sumOfLengths = Math.log(words1.length) + Math.log(words2.length);
+    const words2set = new Set(sentence2.split(" "));
+    const intersection = new Set(words1.filter(x => words2set.has(x)));
+    const sumOfLengths = Math.log(words1.length) + Math.log(words2set.size);
     if (sumOfLengths === 0) {
         return 0;
     } else {
-        return intersection.length / sumOfLengths; // JS uses floating point arithmetic by default.
+        return intersection.size / sumOfLengths; // JS uses floating point arithmetic by default.
     }
 }
 
@@ -89,7 +87,7 @@ export function calculatePageRank(graph, maxIterations,
         }
         // The adjacency list is an array containg objects that contain the neighbours' index as
         // key and similarity score as the weight.
-        _.each(adjacencyList, function (item) {
+        adjacencyList.forEach(function (item) {
             totalWeight[idx] += item["weight"];
         });
     }
@@ -102,14 +100,14 @@ export function calculatePageRank(graph, maxIterations,
             break;
         }
     }
-    const pageRankResults: Array <PageRankResult> = [];
+    const pageRankResults: Array<PageRankResult> = [];
     for (let idx = 0; idx < totalNumNodes; ++idx) {
 
         // pageRankResults[idx] = {
         //     "PR": pageRankStruct[idx]["oldPR"] / totalNumNodes,
         //     "sentence": graph.sentenceIdLookup[idx]
         // };
-        pageRankResults.push( new PageRankResult(
+        pageRankResults.push(new PageRankResult(
             pageRankStruct[idx]["oldPR"] / totalNumNodes,
             graph.sentenceIdLookup[idx],
             idx
@@ -143,7 +141,7 @@ class SummarizerResult {
 
     getSentencesOrderedByOccurence(maxSentences: number): Array<string> {
         const sentences = this.prResultArr.splice(0, maxSentences);
-        return sentences.sort( (a, b) => a.index - b.index)
+        return sentences.sort((a, b) => a.index - b.index)
             .map(s => s.sentence);
     }
 }
@@ -160,7 +158,7 @@ function runPageRankOnce(graph, pageRankStruct,
         }
         let wt = 0.0;
         // Now iterate over all the nodes that are pointing to this node.
-        _.each(graph[idx], function (adjNode) {
+        graph[idx].forEach(function (adjNode) {
             const node = adjNode["node"];
             // Get the total weight shared by this adjacent node and its neighbours.
             const sharedWt = totalWeight[node];
