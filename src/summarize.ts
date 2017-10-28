@@ -10,9 +10,7 @@ export function getPageText() {
         i += 1;
     }
 
-    document.body.innerHTML = "";
-    document.body.appendChild(rootDiv);
-    console.log(`Wrote document body!`);
+    return rootDiv;
 }
 
 // Skip these element types and all their children

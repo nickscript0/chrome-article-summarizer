@@ -14,5 +14,22 @@
             ]
         }
     ],
+    "background": {
+        "scripts": [
+            "src/background.js"
+        ]
+    },
+    "permissions": [
+        "contextMenus"
+    ],
+    "commands": {
+        "toggle-page-summary": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S",
+                "mac": "Command+Shift+S"
+            },
+            "description": "Toggle Page Summary"
+        }
+    },
     "manifest_version": 2
 }

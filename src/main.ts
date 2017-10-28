@@ -3,11 +3,31 @@
  */
 
 import { getPageText } from "summarize";
-// import { highlight_op, TextHighlight, Highlight } from "highlight";
 
-function main() {
-    console.log(`Welcome to chrome-article-summarizer!`);
-    getPageText();
+const ORIGINAL_PAGE = document.body.innerHTML;
+let SUMMARIZE_ON = false;
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    // console.log(sender.tab ?
+    //     "from a content script:" + sender.tab.url :
+    //     "from the extension");
+    if (request.command === "summarize") {
+        toggleSummarizeView();
+    }
+});
+
+function toggleSummarizeView() {
+    if (SUMMARIZE_ON) {
+        document.body.innerHTML = ORIGINAL_PAGE;
+        console.log(`Wrote original document body!`);
+        SUMMARIZE_ON = false;
+    } else {
+        const rootDiv = getPageText();
+        document.body.innerHTML = "";
+        document.body.appendChild(rootDiv);
+        console.log(`Wrote summarized document body!`);
+        SUMMARIZE_ON = true;
+    }
 }
 
-main();
+console.log(`Content Script loaded!`);
