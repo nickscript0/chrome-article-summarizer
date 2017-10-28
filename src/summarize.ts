@@ -1,9 +1,13 @@
 
+import { calculatePageRank, makeGraph } from "text-rank";
+
 export function getPageText() {
     const rootDiv = document.createElement('div');
-    const textBlock = findNodesWithNWords(10);
+    const textBlocks = findNodesWithNWords(10);
+
+    const summarizedSentences = summarizeSentences(textBlocks, 5);
     let i = 1;
-    for (const text of textBlock) {
+    for (const text of summarizedSentences) {
         const p = document.createElement('p');
         p.textContent = `Block ${i}: ${text}`;
         // Font styling modeled off of nytimes
@@ -15,6 +19,19 @@ export function getPageText() {
     }
 
     return rootDiv;
+}
+
+function summarizeSentences(sentences: Array<string>, numSummarySentences: number) {
+    const textRankConfig = {
+        "maxIter": 100,
+        "dampingFactor": 0.85,
+        "delta": 0.5
+    };
+
+    const graph = makeGraph(sentences);
+    const result = calculatePageRank(graph, textRankConfig.maxIter,
+        textRankConfig.dampingFactor, textRankConfig.delta);
+    return result.getSentencesOrderedByOccurence(numSummarySentences);
 }
 
 // Skip these element types and all their children

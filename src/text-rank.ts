@@ -3,7 +3,6 @@
  * modeled off of https://github.com/arnavroy/text-summarizer/blob/master/summarizer.js
  */
 
-import *  as $ from "jquery";
 import *  as _ from "underscore";
 
 // var Summarizer = {};
@@ -72,7 +71,7 @@ export function makeGraph(sentences) {
 
 // Page Rank calculation driver.
 export function calculatePageRank(graph, maxIterations,
-    dampingFactor, delta) {
+    dampingFactor, delta): SummarizerResult {
     const pageRankStruct = {};
     const totalWeight = {};
     const totalNumNodes = graph.sentenceIdLookup.length; // Number of nodes.
@@ -103,16 +102,51 @@ export function calculatePageRank(graph, maxIterations,
             break;
         }
     }
-    const pageRankResults = {};
+    const pageRankResults: Array <PageRankResult> = [];
     for (let idx = 0; idx < totalNumNodes; ++idx) {
-        pageRankResults[idx] = {
-            "PR": pageRankStruct[idx]["oldPR"] / totalNumNodes,
-            "sentence": graph.sentenceIdLookup[idx]
-        };
+
+        // pageRankResults[idx] = {
+        //     "PR": pageRankStruct[idx]["oldPR"] / totalNumNodes,
+        //     "sentence": graph.sentenceIdLookup[idx]
+        // };
+        pageRankResults.push( new PageRankResult(
+            pageRankStruct[idx]["oldPR"] / totalNumNodes,
+            graph.sentenceIdLookup[idx],
+            idx
+        ));
     }
-    return pageRankResults;
+    return new SummarizerResult(pageRankResults);
 }
 
+class PageRankResult {
+    pagerank: number;
+    sentence: string;
+    index: number;
+    constructor(pagerank, sentence, idx) {
+        this.pagerank = pagerank;
+        this.sentence = sentence;
+        this.index = idx;
+    }
+}
+
+class SummarizerResult {
+    private prResultArr: Array<PageRankResult>;
+
+    constructor(prResultArr: Array<PageRankResult>) {
+        this.prResultArr = this._sortByPR(prResultArr);
+    }
+
+    private _sortByPR(arr: Array<PageRankResult>): Array<PageRankResult> {
+        // Sort descending pagerank order
+        return arr.sort((a, b) => b.pagerank - a.pagerank);
+    }
+
+    getSentencesOrderedByOccurence(maxSentences: number): Array<string> {
+        const sentences = this.prResultArr.splice(0, maxSentences);
+        return sentences.sort( (a, b) => a.index - b.index)
+            .map(s => s.sentence);
+    }
+}
 
 // Single iteration of Page Rank.
 function runPageRankOnce(graph, pageRankStruct,
