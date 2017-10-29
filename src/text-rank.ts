@@ -144,18 +144,18 @@ class SummarizerResult {
         return sentences.sort((a, b) => a.index - b.index);
     }
 
+    allPageRanks() {
+        return this.prResultArr.slice(0, this.prResultArr.length)
+            .map(s => s.pagerank);
+    }
+
     getStatsText(maxSentences: number): string {
         // const sentences = this.prResultArr.slice(0, maxSentences);
         const topPRs = this._getTopPrResultOrderedByOccurence(maxSentences)
             .map(s => s.pagerank);
 
-        const allPageranks = this.prResultArr.slice(0, this.prResultArr.length)
-            // .sort((a, b) => a.index - b.index)
-            .map(s => s.pagerank);
-
         return `${this.prResultArr.length} sentences reduced down to ${maxSentences}
-with PageRanks: ${topPRs.join(', ')}
-all PageRanks:\n${allPageranks.join('\n')}`;
+with PageRanks: ${topPRs.join(', ')}`;
     }
 }
 
