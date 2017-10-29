@@ -4,8 +4,11 @@
 
 /**
  * TODOs:
- * 1. I'm not splitting on sentences, resulting in 5 large blocks sometimes. Recombine the text and use a period splitter
- * 2. 
+ * 1. Make num sentences easily adjustable in the UI
+ * 2. Add the PR of each sentence on hover or something slick
+ * 3. Add a summary at the bottom including a bar chart of all the PRs
+ * 4. Show feedback when processing (e.g. a large page just hangs for a while)
+ * 5. Add unit tests for things like split sentences edge cases, and TextRank
  */
 
 import { getPageText } from "summarize";

@@ -13,17 +13,12 @@
 //     return tmp.textContent || tmp.innerText;
 // }
 
-// // Get sentences from text.
-// export function getSentences(text) {
-//     let sentences = text.split(/\. |\.|\?|!|\n/g);
-//     $(sentences).each(function (idx) {
-//         sentences[idx] = $.trim(sentences[idx]);
-//     });
-//     sentences = $(sentences).filter(function (idx) {
-//         return sentences[idx].length > 0;
-//     });
-//     return sentences;
-// }
+// Get sentences from text.
+export function getSentences(text: string): Array<string> {
+    const sentences = text.split(/\. |\.|\?|!|\n/g);
+    return sentences.map(s => s.trim())
+        .filter(s => s.length > 0);
+}
 
 // Calculate similarity between 2 sentences.
 function calculateSimilarity(sentence1, sentence2) {
@@ -140,18 +135,27 @@ class SummarizerResult {
     }
 
     getSentencesOrderedByOccurence(maxSentences: number): Array<string> {
-        const sentences = this.prResultArr.splice(0, maxSentences);
-        return sentences.sort((a, b) => a.index - b.index)
+        return this._getTopPrResultOrderedByOccurence(maxSentences)
             .map(s => s.sentence);
     }
 
+    _getTopPrResultOrderedByOccurence(maxSentences: number): Array<PageRankResult> {
+        const sentences = this.prResultArr.slice(0, maxSentences);
+        return sentences.sort((a, b) => a.index - b.index);
+    }
+
     getStatsText(maxSentences: number): string {
-        const sentences = this.prResultArr.splice(0, maxSentences);
-        const pageranks = sentences.sort((a, b) => a.index - b.index)
+        // const sentences = this.prResultArr.slice(0, maxSentences);
+        const topPRs = this._getTopPrResultOrderedByOccurence(maxSentences)
+            .map(s => s.pagerank);
+
+        const allPageranks = this.prResultArr.slice(0, this.prResultArr.length)
+            // .sort((a, b) => a.index - b.index)
             .map(s => s.pagerank);
 
         return `${this.prResultArr.length} sentences reduced down to ${maxSentences}
-with PageRanks : ${pageranks.join(', ')}`;
+with PageRanks: ${topPRs.join(', ')}
+all PageRanks:\n${allPageranks.join('\n')}`;
     }
 }
 

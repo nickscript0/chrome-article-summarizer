@@ -1,13 +1,15 @@
 
-import { calculatePageRank, makeGraph } from "text-rank";
+import { calculatePageRank, makeGraph, getSentences } from "text-rank";
+
+const NUM_SUMMARY_SENTENCES = 5;
 
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
     const textBlocks = findNodesWithNWords(10);
+    const sentences = getSentences(textBlocks.join(' '));
 
-    const NUM_SUMMARY_SENTENCES = 5;
-    const result = summarizeSentences(textBlocks);
+    const result = summarizeSentences(sentences);
     let i = 1;
     for (const text of result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES)) {
         let p = _createParagraph(text);
@@ -16,12 +18,14 @@ export function getPageText() {
     }
 
     // Add stats text
-    const p = _createParagraph(result.getStatsText(NUM_SUMMARY_SENTENCES))
-    p.style.fontWeight = 'bold';
-    rootDiv.appendChild(p)
+    const pre = document.createElement('pre');
+    pre.textContent = result.getStatsText(NUM_SUMMARY_SENTENCES);
+    //pre.style.fontWeight = 'bold';
+    rootDiv.appendChild(pre);
 
     return rootDiv;
 }
+
 
 function _createParagraph(text) {
     const p = document.createElement('p');
