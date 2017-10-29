@@ -11,7 +11,7 @@
  * 5. Add unit tests for things like split sentences edge cases, and TextRank
  */
 
-import { getPageText } from "summarize";
+import { getPageText } from "./summarize";
 
 const ORIGINAL_PAGE = document.body.innerHTML;
 let SUMMARIZE_ON = false;
