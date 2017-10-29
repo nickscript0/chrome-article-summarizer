@@ -68,7 +68,7 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
             // ],
         }]
     };
-    const myChart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: barChartData,
         options: {

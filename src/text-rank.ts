@@ -124,9 +124,12 @@ class PageRankResult {
 
 class SummarizerResult {
     private prResultArr: Array<PageRankResult>;
+    private orderIndexToPRMap: Map<number, number>;
 
     constructor(prResultArr: Array<PageRankResult>) {
         this.prResultArr = this._sortByPR(prResultArr);
+        this.orderIndexToPRMap = new Map();
+        this.prResultArr.forEach((el, i) => this.orderIndexToPRMap.set(el.index, i + 1));
     }
 
     private _sortByPR(arr: Array<PageRankResult>): Array<PageRankResult> {
@@ -136,7 +139,7 @@ class SummarizerResult {
 
     getSentencesOrderedByOccurence(maxSentences: number): Array<string> {
         return this._getTopPrResultOrderedByOccurence(maxSentences)
-            .map(s => s.sentence);
+            .map(s => `${s.sentence} [Rank: ${this.orderIndexToPRMap.get(s.index)}]`);
     }
 
     _getTopPrResultOrderedByOccurence(maxSentences: number): Array<PageRankResult> {
@@ -154,8 +157,7 @@ class SummarizerResult {
         const topPRs = this._getTopPrResultOrderedByOccurence(maxSentences)
             .map(s => s.pagerank);
 
-        return `${this.prResultArr.length} sentences reduced down to ${maxSentences}
-with PageRanks: ${topPRs.join(', ')}`;
+        return `${this.prResultArr.length} sentences reduced to ${maxSentences}`;
     }
 }
 
