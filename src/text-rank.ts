@@ -154,8 +154,8 @@ class SummarizerResult {
 
     getStatsText(maxSentences: number): string {
         // const sentences = this.prResultArr.slice(0, maxSentences);
-        const topPRs = this._getTopPrResultOrderedByOccurence(maxSentences)
-            .map(s => s.pagerank);
+        // const topPRs = this._getTopPrResultOrderedByOccurence(maxSentences)
+        //     .map(s => s.pagerank);
 
         return `${this.prResultArr.length} sentences reduced to ${maxSentences}`;
     }

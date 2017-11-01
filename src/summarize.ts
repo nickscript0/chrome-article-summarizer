@@ -8,6 +8,8 @@ export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
     const textBlocks = findNodesWithNWords(10);
+    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of 
+    // blocks that don't end in punctuation it will join them together in a sentence
     const sentences = getSentences(textBlocks.join(' '));
 
     const result = summarizeSentences(sentences);
@@ -140,7 +142,7 @@ function findNodesWithNWords(minWords: number): Array<string> {
     const filter_by_word: NodeFilter = {
         acceptNode: n => {
             if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
-                rejectCounter.incr(n.parentNode.nodeName.toLocaleLowerCase());
+                rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return NodeFilter.FILTER_REJECT;
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
