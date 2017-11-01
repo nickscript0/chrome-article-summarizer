@@ -7,7 +7,7 @@ const NUM_SUMMARY_SENTENCES = 5;
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
-    const textBlocks = findNodesWithNWords(10);
+    const textBlocks = findNodesWithNWords(10, document);
     // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of 
     // blocks that don't end in punctuation it will join them together in a sentence
     const sentences = getSentences(textBlocks.join(' '));
@@ -134,7 +134,7 @@ class StringCounter {
     }
 }
 
-function findNodesWithNWords(minWords: number): Array<string> {
+export function findNodesWithNWords(minWords: number, theDocument: Document): Array<string> {
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
     const skipCounter = new StringCounter();
@@ -154,8 +154,8 @@ function findNodesWithNWords(minWords: number): Array<string> {
         }
 
     };
-    const walker = document.createTreeWalker(
-        document.body,
+    const walker = theDocument.createTreeWalker(
+        theDocument.body,
         NodeFilter.SHOW_TEXT,
         // NodeFilter.SHOW_ALL,
         filter_by_word,
