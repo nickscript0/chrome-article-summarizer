@@ -3,6 +3,16 @@ import { launch, Browser, Page } from 'puppeteer';
 import { findNodesWithNWords } from "../summarize";
 import { expect } from 'chai';
 
+/**
+ * REFERENCES
+ * Puppeteer docs: https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
+ *  -- JSHandle and page.evaluate both sound promising
+ * Good example of async/await in Mocha https://zaiste.net/posts/modern_node_js_async_await_based_testing_with_mocha_chai/
+ * 
+ * The following may have hints at how to access to the DOM:
+ * https://github.com/GoogleChrome/puppeteer/issues/111
+ * https://github.com/GoogleChrome/puppeteer/issues/613
+ */
 
 
 
