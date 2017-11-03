@@ -105,6 +105,12 @@ describe('summarize', () => {
             // expect(nodes[1]).to.equal(linkText);
             // expect(nodes[2]).to.equal(fourSentence);
         });
+
+        it('complicated test with a element and single text period', () => {
+            // TODO: parse the following line correctly
+            //<p>Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are <a href="http://www.forbes.com/sites/wadeshepard/2017/09/27/amazon-com-the-place-where-american-dreams-are-stolen-by-chinese-counterfeiters/" target="_self">having their products knocked-off</a> on major e-commerce platforms by foreign counterfeiters <a href="http://www.forbes.com/sites/wadeshepard/2017/01/12/why-amazon-is-losing-its-battle-against-chinese-counterfeiters/" target="_self">who seemingly operate with impunity</a>.</p>
+            expect(1).to.equal(2);
+        });
     });
 });
 
