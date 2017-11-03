@@ -8,7 +8,7 @@ export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
     const textBlocks = findNodesWithNWords(10, document);
-    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of 
+    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
     // blocks that don't end in punctuation it will join them together in a sentence
     const sentences = getSentences(textBlocks.join(' '));
 
@@ -51,23 +51,7 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
             borderWidth: 1,
             data: prArr,
             backgroundColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 0.2)'),
-            borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)'),
-            // backgroundColor:  [
-            //     'rgba(255, 99, 132, 0.2)',
-            //     'rgba(54, 162, 235, 0.2)',
-            //     'rgba(255, 206, 86, 0.2)',
-            //     'rgba(75, 192, 192, 0.2)',
-            //     'rgba(153, 102, 255, 0.2)',
-            //     'rgba(255, 159, 64, 0.2)'
-            // ],
-            // borderColor: [
-            //     'rgba(255,99,132,1)',
-            //     'rgba(54, 162, 235, 1)',
-            //     'rgba(255, 206, 86, 1)',
-            //     'rgba(75, 192, 192, 1)',
-            //     'rgba(153, 102, 255, 1)',
-            //     'rgba(255, 159, 64, 1)'
-            // ],
+            borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)')
         }]
     };
     new Chart(ctx, {
@@ -134,6 +118,15 @@ class StringCounter {
     }
 }
 
+// Should use NodeFilter.FILTER_ACCEPT
+// but for JSDOM they're not defined yet see
+// -- https://github.com/nhunzaker/jsdom/commit/ca3b6c234875200ce54a1494d61589112289b654
+// -- https://github.com/tmpvar/jsdom/issues/317
+const FILTER_ACCEPT = 1;
+const FILTER_REJECT = 2;
+const FILTER_SKIP = 3;
+const SHOW_TEXT = 4;
+
 export function findNodesWithNWords(minWords: number, theDocument: Document): Array<string> {
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
@@ -143,20 +136,20 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
         acceptNode: n => {
             if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
-                return NodeFilter.FILTER_REJECT;
+                return FILTER_REJECT;
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                return NodeFilter.FILTER_ACCEPT;
+                return FILTER_ACCEPT;
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
-                return NodeFilter.FILTER_SKIP;
+                return FILTER_SKIP;
             }
         }
 
     };
     const walker = theDocument.createTreeWalker(
         theDocument.body,
-        NodeFilter.SHOW_TEXT,
+        SHOW_TEXT,
         // NodeFilter.SHOW_ALL,
         filter_by_word,
         false
