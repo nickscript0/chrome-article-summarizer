@@ -12,55 +12,105 @@
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords } from "../summarize";
+import { findNodesWithNWords, getSentencesFromDocument } from "../summarize";
 
 const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
 
-describe('findNodesWithNWords', () => {
-    const fourSentence = 'one two three four.';
-    const fiveSentence = 'one two three four Five!';
-    const tenSentence = 'one two three four Five, six, (seven) eight nine 10.';
+describe('summarize', () => {
+    describe('findNodesWithNWords', () => {
+        const fourSentence = 'one two three four.';
+        const fiveSentence = 'one two three four Five!';
+        const tenSentence = 'one two three four Five, six, (seven) eight nine 10.';
 
-    it('should ignore nodes with less than N words', () => {
-        createDocWithText(document, [fourSentence]);
-        const nodes = findNodesWithNWords(10, document);
-        expect(nodes.length).to.equal(0);
+        beforeEach(() => {
+            while (document.body.hasChildNodes()) {
+                const lastChild = document.body.lastChild;
+                if (lastChild) document.body.removeChild(lastChild);
+            }
+        });
+
+        it('should return 0 nodes if all have less than N words', () => {
+            addPNodesToBody([fourSentence]);
+            const nodes = findNodesWithNWords(10, document);
+            expect(nodes.length).to.equal(0);
+        });
+
+        it('should ignore nodes with less than N words and keep nodes with that or more', () => {
+            addPNodesToBody([fiveSentence, fourSentence, tenSentence]);
+            const nodes = findNodesWithNWords(5, document);
+
+            expect(nodes.length).to.equal(2);
+            expect(nodes[0]).to.equal(fiveSentence);
+            expect(nodes[1]).to.equal(tenSentence);
+        });
+
+        it('should ignore blacklisted nodes', () => {
+            addPNodesToBody([fiveSentence]);
+            const b = document.createElement('button');
+            b.textContent = fiveSentence;
+            document.body.appendChild(b);
+
+            const nodes = findNodesWithNWords(2, document);
+
+            expect(nodes.length).to.equal(1);
+            expect(nodes[0]).to.equal(fiveSentence);
+        });
+
+        it('should include a element text', () => {
+            addPNodesToBody([fiveSentence]);
+            const linkText = 'some link text';
+            const a = document.createElement('a');
+            a.textContent = linkText;
+            document.body.appendChild(a);
+            addPNodesToBody([fourSentence]);
+
+            const nodes = findNodesWithNWords(2, document);
+            expect(nodes.length).to.equal(3);
+            console.log(`RESULT IS: ${JSON.stringify(nodes)}`);
+            expect(nodes[0]).to.equal(fiveSentence);
+            expect(nodes[1]).to.equal(linkText);
+            expect(nodes[2]).to.equal(fourSentence);
+
+        });
     });
 
-    it('should ignore nodes with less than N words and keep nodes with that or more', () => {
-        createDocWithText(document, [fiveSentence, fourSentence, tenSentence]);
-        const nodes = findNodesWithNWords(5, document);
+    describe('getSentencesFromDocument', () => {
+        const part11Sentence = '*part11Sentence: one two three four five, six, seven eight nine ten eleven*';
+        const part5Sentence = '*part5Sentence: one two three four Five*';
+        const full10Sentence = 'one two three four Five, six, (seven) eight nine 10.';
 
-        expect(nodes.length).to.equal(2);
-        expect(nodes[0]).to.equal(fiveSentence);
-        expect(nodes[1]).to.equal(tenSentence);
-    });
+        beforeEach(() => {
+            while (document.body.hasChildNodes()) {
+                const lastChild = document.body.lastChild;
+                if (lastChild) document.body.removeChild(lastChild);
+            }
+        });
 
-    it('should ignore blacklisted nodes', () => {
-        createDocWithText(document, [fiveSentence]);
-        const b = document.createElement('button');
-        b.textContent = fiveSentence;
-        document.body.appendChild(b);
+        it('should include "a" element text in the sentence', () => {
+            addPNodesToBody([part11Sentence]);
+            const linkText = 'some link text';
+            const a = document.createElement('a');
+            a.textContent = linkText;
+            document.body.appendChild(a);
+            addPNodesToBody([full10Sentence]);
 
-        const nodes = findNodesWithNWords(2, document);
-
-        expect(nodes.length).to.equal(1);
-        expect(nodes[0]).to.equal(fiveSentence);
+            const sentences = getSentencesFromDocument(document);
+            console.log(`RESULT IS: ${JSON.stringify(sentences)}`);
+            
+            expect(sentences.length).to.equal(1);
+            const expected = `${part11Sentence}${linkText}${full10Sentence}`;
+            expect(sentences[0]).to.equal(expected);
+            // expect(nodes[1]).to.equal(linkText);
+            // expect(nodes[2]).to.equal(fourSentence);
+        });
     });
 });
 
-
-function createDocWithText(doc: Document, nodeTexts: Array<string>) {
-    // const doc = document.implementation.createHTMLDocument('summarize-test');
-    while (doc.body.hasChildNodes()) {
-        const lastChild = doc.body.lastChild;
-        if (lastChild) doc.body.removeChild(lastChild);
-    }
-
+function addPNodesToBody(nodeTexts: Array<string>) {
     nodeTexts.forEach(text => {
-        const p = doc.createElement('p');
+        const p = document.createElement('p');
         p.textContent = text;
-        doc.body.appendChild(p);
+        document.body.appendChild(p);
     });
-    return doc;
+    return document;
 }

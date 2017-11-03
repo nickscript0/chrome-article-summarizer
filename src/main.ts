@@ -4,7 +4,7 @@
 
 /**
  * TODOs:
- * - Bug: elements that don't have end punctuation are joined with others (See TODO line 11 summarize.ts)
+ * - Bug: elements that don't have end punctuation are joined with others (See TODO line 30 summarize.ts)
  * - Bug: <a href> els should grab the link text and insert it into the block (instead they're blank)
  * 1. Make num sentences easily adjustable in the UI
  * 4. Show feedback when processing (e.g. a large page just hangs for a while)

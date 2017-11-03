@@ -7,12 +7,7 @@ const NUM_SUMMARY_SENTENCES = 5;
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
-    const textBlocks = findNodesWithNWords(10, document);
-    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
-    // blocks that don't end in punctuation it will join them together in a sentence
-    const sentences = getSentences(textBlocks.join(' '));
-
-    const result = summarizeSentences(sentences);
+    const result = summarizeSentences(getSentencesFromDocument(document));
     let i = 1;
     for (const text of result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES)) {
         let p = _createParagraph(text);
@@ -28,6 +23,13 @@ export function getPageText() {
     const chart = _createChart(result.allPageRanks(), NUM_SUMMARY_SENTENCES);
     if (chart) rootDiv.appendChild(chart);
     return rootDiv;
+}
+
+export function getSentencesFromDocument(theDocument: Document): Array<string> {
+    const textBlocks = findNodesWithNWords(10, theDocument);
+    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
+    // blocks that don't end in punctuation it will join them together in a sentence
+    return getSentences(textBlocks.join(' '));
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
