@@ -142,6 +142,17 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                 return FILTER_ACCEPT;
+            } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'a') {
+                // CASE: Include <a href> if its text word count plus its wrapper node text word count
+                const parentText = (n.parentNode && n.parentNode.parentNode && n.parentNode.parentNode.textContent)
+                    || '';
+                const aText = n.textContent || '';
+                if (_wordCount(parentText + aText) >= minWords) {
+                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
+                    return FILTER_ACCEPT;
+                } else {
+                    return FILTER_SKIP;
+                }
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
                 return FILTER_SKIP;
