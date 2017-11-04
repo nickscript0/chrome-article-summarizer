@@ -115,22 +115,56 @@ describe('summarize', () => {
             const sentences = getSentencesFromDocument(testdoc);
             expect(sentences[0]).to.equal(expected1);
             expect(sentences[1]).to.equal(expected2);
-            // expect(1).to.equal(2);
         });
     });
 });
 
-const NYTIMES_ACCURACY = 66;
+enum Site {
+    NYTIMES = 'NYTIMES',
+    MEDIUM = 'MEDIUM',
+    VERGE = 'VERGE',
+    CBC = 'CBC'
+}
+
+class Accuracies {
+    expected: any;
+    results: any;
+    constructor() {
+        this.results = {};
+        this.expected = {};
+        this.expected[Site.NYTIMES] = 86;
+        this.expected[Site.MEDIUM] = 42;
+        this.expected[Site.VERGE] = 77;
+        this.expected[Site.CBC] = 45;
+    }
+
+    report(site: Site, reported: number) {
+        this.results[site] = reported;
+        expect(reported).gte(this.expected[site]);
+    }
+
+    getResults() {
+        return (<any>Object).entries(this.results)
+            .map(([k, v]) => `${k}: ${v}%`)
+            .join('\n');
+    }
+}
+
 import * as nlp from 'compromise';
 
 describe('getSentencesFromDocument real article test accuracy', () => {
+    const accuracies = new Accuracies();
+    after(function () {
+        console.log(`\n*******************\nSentence extraction accuracies:\n${accuracies.getResults()}\n*******************`);
+    });
+
     it('should handle nytimes format', async () => {
         const testdoc = new JSDOM(await readFile('src/test/res/nytimes1.html')).window.document;
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
+        accuracies.report(Site.NYTIMES, accuracy);
     });
 
     it('should handle medium format', async () => {
@@ -139,7 +173,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences', true);
         // console.log(`ACCURACY: ${accuracy}`);
-        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
+        accuracies.report(Site.MEDIUM, accuracy);
     });
 
     it('should handle verge format', async () => {
@@ -147,8 +181,17 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
-        console.log(`ACCURACY: ${accuracy}`);
-        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
+        // console.log(`ACCURACY: ${accuracy}`);
+        accuracies.report(Site.VERGE, accuracy);
+    });
+
+    it('should handle cbc format', async () => {
+        const testdoc = new JSDOM(await readFile('src/test/res/cbc1.html')).window.document;
+        const sentences = getSentencesFromDocument(testdoc);
+        // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/cbc1.sentences');
+        // console.log(`ACCURACY: ${accuracy}`);
+        accuracies.report(Site.CBC, accuracy);
     });
 
     // it('compromise testing', async () => {

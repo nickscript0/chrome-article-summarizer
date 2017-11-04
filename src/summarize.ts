@@ -136,6 +136,14 @@ const FILTER_REJECT = 2;
 const FILTER_SKIP = 3;
 const SHOW_TEXT = 4;
 
+/**
+ * How to improve accuracy:
+ * cbc
+ *  -- If we are going to use a pText node's text (which includes all sub children text), then we should remove any BLACKLISTed nodes from the subtree first
+ *  -- Don't do ''.join at all, keep the output of findNodesWithWords as separate sentences
+ * @param minWords
+ * @param theDocument
+ */
 export function findNodesWithNWords(minWords: number, theDocument: Document): Array<string> {
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
@@ -150,6 +158,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'p') {
                 const pText = n.parentNode.textContent;
                 if (pText && _wordCount(pText) >= minWords) {
+                    if (pText.includes(`Change addresses`)) console.log(`THIS pNode IS DOING IT: ${n.parentNode.nodeName}:\n${pText}`); // DEBUG
                     acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                     matched_nodes.add(pText);
                 }
@@ -158,6 +167,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                 if (n.textContent) matched_nodes.add(n.textContent);
+                if (n.textContent && n.textContent.includes(`Change addresses`)) console.log(`THIS non-pNode IS DOING IT: ${n.parentNode && n.parentNode.nodeName}:\n${n.textContent}`);     // DEBUG       
                 return FILTER_ACCEPT;
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
