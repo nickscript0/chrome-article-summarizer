@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords, getSentencesFromDocument, origGetSentencesFromDocument } from "../summarize";
+import { findNodesWithNWords, getSentencesFromDocument } from "../summarize";
 
 const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
 
@@ -120,17 +120,28 @@ describe('summarize', () => {
     });
 });
 
+const NYTIMES_ACCURACY = 66;
 
-describe('getSentencesFromDocument real article tests', () => {
+describe('getSentencesFromDocument real article test accuracy', () => {
     it('should handle nytimes format', async () => {
         const testdoc = new JSDOM(await readFile('src/test/res/nytimes1.html')).window.document;
         const sentences = getSentencesFromDocument(testdoc);
-        console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const sentencesOrig = origGetSentencesFromDocument(testdoc);
-        console.log(`\n\nNYTIMES ORIG:\n${sentencesOrig.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
+        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
     });
 });
 
+async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string): Promise<number> {
+    const expectedSentencesRaw = (await readFile(expectedSentencesFilepath)).split('\n');
+    // Ignore end punctuation for now, as that's the format we're going with
+    const expectedSentencesSet = new Set(expectedSentencesRaw.map(s => {
+        return (s.endsWith('.') || s.endsWith('?') || s.endsWith('!')) ? s.slice(0, s.length - 1) : s;
+    }));
+    const actualSentencesSet = new Set(sentences);
+    const intersection = new Set(Array.from(expectedSentencesSet).filter(x => actualSentencesSet.has(x)));
+    return parseFloat((intersection.size * 100 / expectedSentencesSet.size).toFixed(2));
+}
 
 function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Document = document) {
     nodeTexts.forEach(text => {

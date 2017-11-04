@@ -32,13 +32,6 @@ export function getSentencesFromDocument(theDocument: Document): Array<string> {
     return getSentences(textBlocks.join(''));
 }
 
-export function origGetSentencesFromDocument(theDocument: Document): Array<string> {
-    const textBlocks = findNodesWithNWordsOrig(10, theDocument);
-    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
-    // blocks that don't end in punctuation it will join them together in a sentence
-    return getSentences(textBlocks.join(''));
-}
-
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     // <canvas id="myChart" width="400" height="400"></canvas>
     // <script>
@@ -184,57 +177,6 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
     console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
     return Array.from(matched_nodes);
-}
-
-export function findNodesWithNWordsOrig(minWords: number, theDocument: Document): Array<string> {
-    const rejectCounter = new StringCounter();
-    const acceptCounter = new StringCounter();
-    const skipCounter = new StringCounter();
-
-    const filter_by_word: NodeFilter = {
-        acceptNode: n => {
-            if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
-                rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
-                return FILTER_REJECT;
-            } else if (_wordCount(n.textContent) >= minWords) {
-                acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                return FILTER_ACCEPT;
-            } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'a') {
-                // CASE: Include <a href> if its text word count plus its wrapper node text word count
-                const parentText = (n.parentNode && n.parentNode.parentNode && n.parentNode.parentNode.textContent)
-                    || '';
-                const aText = n.textContent || '';
-                if (_wordCount(parentText + aText) >= minWords) {
-                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                    return FILTER_ACCEPT;
-                } else {
-                    return FILTER_SKIP;
-                }
-            } else {
-                skipCounter.incr(n.parentNode && n.parentNode.nodeName);
-                return FILTER_SKIP;
-            }
-        }
-
-    };
-    const walker = theDocument.createTreeWalker(
-        theDocument.body,
-        SHOW_TEXT,
-        // NodeFilter.SHOW_ALL,
-        filter_by_word,
-        false
-    );
-
-    let n;
-    const matched_nodes: Array<string> = [];
-    while (n = walker.nextNode()) {
-        matched_nodes.push(n.textContent);
-    }
-
-    console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
-    // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
-    console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
-    return matched_nodes;
 }
 
 function _wordCount(s: string | null): number {
