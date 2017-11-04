@@ -86,12 +86,10 @@ describe('summarize', () => {
             }
         });
 
-        it('should include "a" element text in the sentence', () => {
-            addPNodesToBody([part11Sentence]);
-            const linkText = 'some link text';
-            const a = document.createElement('a');
-            a.textContent = linkText;
-            document.body.appendChild(a);
+        it('should include non <p> elements text when above word count minimum', () => {
+            addPNodesToBody([part11Sentence], 'span');
+            const linkText = 'some link text above the min text count, 1, 2, 3';
+            addPNodesToBody([linkText], 'a');
             addPNodesToBody([full10Sentence]);
 
             const sentences = getSentencesFromDocument(document);
@@ -101,8 +99,6 @@ describe('summarize', () => {
             // TODO: should we ignore periods?
             expected = expected.slice(0, expected.length - 1);
             expect(sentences[0]).to.equal(expected);
-            // expect(nodes[1]).to.equal(linkText);
-            // expect(nodes[2]).to.equal(fourSentence);
         });
 
         it('should combine multiple <a> elements embedded in a <p> element', () => {
@@ -124,7 +120,7 @@ describe('summarize', () => {
     });
 });
 
-function addPNodesToBody(nodeTexts: Array<string>, d: Document = document) {
+function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Document = document) {
     nodeTexts.forEach(text => {
         const p = d.createElement('p');
         p.textContent = text;
