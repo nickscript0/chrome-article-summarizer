@@ -8,11 +8,11 @@
  * - JSDom doesn't support treeWalker!!! https://github.com/tmpvar/jsdom/issues/539
  */
 
-
+import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords, getSentencesFromDocument } from "../summarize";
+import { findNodesWithNWords, getSentencesFromDocument, origGetSentencesFromDocument } from "../summarize";
 
 const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
 
@@ -120,6 +120,18 @@ describe('summarize', () => {
     });
 });
 
+
+describe('getSentencesFromDocument real article tests', () => {
+    it('should handle nytimes format', async () => {
+        const testdoc = new JSDOM(await readFile('src/test/res/nytimes1.html')).window.document;
+        const sentences = getSentencesFromDocument(testdoc);
+        console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const sentencesOrig = origGetSentencesFromDocument(testdoc);
+        console.log(`\n\nNYTIMES ORIG:\n${sentencesOrig.map((s, i) => `${i}: ${s}`).join('\n')}`);
+    });
+});
+
+
 function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Document = document) {
     nodeTexts.forEach(text => {
         const p = d.createElement('p');
@@ -127,4 +139,11 @@ function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Do
         d.body.appendChild(p);
     });
     return d;
+}
+
+// promisified fs.readFile
+function readFile(filename): Promise<string> {
+    return new Promise<string>((resolve, reject) =>
+        fs.readFile(filename, (err, data) => (err) ? reject(err) : resolve(data.toString('utf-8')))
+    );
 }
