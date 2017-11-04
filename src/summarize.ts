@@ -133,45 +133,44 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
     const skipCounter = new StringCounter();
+    const matched_nodes: Array<string> = [];
 
     const filter_by_word: NodeFilter = {
         acceptNode: n => {
-            if (n.parentNode && n.parentNode.parentNode) {
-                const expectedText = `Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity`;
-                if (n.parentNode.parentNode.textContent) {
-                    const ppText = n.parentNode.parentNode.textContent.trim();
-                    const ppTextInclExpected = ppText.includes(expectedText);
-                    const ppTextLen = ppText.length;
+            // if (n.parentNode && n.parentNode.parentNode) {
+            //     const expectedText = `Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity`;
+            //     if (n.parentNode.parentNode.textContent) {
+            //         const ppText = n.parentNode.parentNode.textContent.trim();
+            //         const ppTextInclExpected = ppText.includes(expectedText);
+            //         const ppTextLen = ppText.length;
 
-                    const pText = (n.parentNode.textContent) ? n.parentNode.textContent.trim() : '';
-                    const pTextInclExpected = pText.includes(expectedText);
-                    const pTextLen = pText.length;
+            //         const pText = (n.parentNode.textContent) ? n.parentNode.textContent.trim() : '';
+            //         const pTextInclExpected = pText.includes(expectedText);
+            //         const pTextLen = pText.length;
 
-                    console.log(`nodeName: ${n.parentNode.nodeName}, parent.nodeName: ${n.parentNode.parentNode.nodeName}, previousSibling: ${n.previousSibling && n.previousSibling.nodeName}
-                    textContent: ${n.textContent && n.textContent.length}
-                    parent.textContent: ${pTextInclExpected} (${pTextLen})
-                    parent.parent.textContent: ${ppTextInclExpected} (${ppTextLen})`);
-                }
+            //         console.log(`nodeName: ${n.parentNode.nodeName}, parent.nodeName: ${n.parentNode.parentNode.nodeName}, previousSibling: ${n.previousSibling && n.previousSibling.nodeName}
+            //         textContent: ${n.textContent && n.textContent.length}
+            //         parent.textContent: ${pTextInclExpected} (${pTextLen})
+            //         parent.parent.textContent: ${ppTextInclExpected} (${ppTextLen})`);
+            //     }
 
 
-            }
+            // }
             if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return FILTER_REJECT;
+            } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'p') {
+                const pText = n.parentNode.textContent;
+                if (pText && _wordCount(pText) >= minWords) {
+                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
+                    matched_nodes.push(pText);
+                }
+                // We are done with this node subtree as n.parentNode.textContent will contain all text in the subtree
+                return FILTER_REJECT;
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
+                if (n.textContent) matched_nodes.push(n.textContent);
                 return FILTER_ACCEPT;
-            } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'a') {
-                // CASE: Include <a href> if its text word count plus its wrapper node text word count
-                const parentText = (n.parentNode.parentNode && n.parentNode.parentNode.textContent)
-                    || '';
-                const aText = n.textContent || '';
-                if (_wordCount(parentText + aText) >= minWords) {
-                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                    return FILTER_ACCEPT;
-                } else {
-                    return FILTER_SKIP;
-                }
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
                 return FILTER_SKIP;
@@ -188,9 +187,9 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     );
 
     let n;
-    const matched_nodes: Array<string> = [];
+    // const matched_nodes: Array<string> = [];
     while (n = walker.nextNode()) {
-        matched_nodes.push(n.textContent);
+        // matched_nodes.push(n.textContent);
     }
 
     console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
