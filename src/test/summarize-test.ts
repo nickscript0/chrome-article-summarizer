@@ -95,10 +95,9 @@ describe('summarize', () => {
             addPNodesToBody([full10Sentence]);
 
             const sentences = getSentencesFromDocument(document);
-            console.log(`RESULT IS: ${JSON.stringify(sentences)}`);
 
             expect(sentences.length).to.equal(1);
-            let expected = `${part11Sentence} ${linkText} ${full10Sentence}`;
+            let expected = `${part11Sentence}${linkText}${full10Sentence}`;
             // TODO: should we ignore periods?
             expected = expected.slice(0, expected.length - 1);
             expect(sentences[0]).to.equal(expected);
@@ -106,19 +105,30 @@ describe('summarize', () => {
             // expect(nodes[2]).to.equal(fourSentence);
         });
 
-        it('complicated test with a element and single text period', () => {
+        it('should combine multiple <a> elements embedded in a <p> element', () => {
             // TODO: parse the following line correctly
-            //<p>Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are <a href="http://www.forbes.com/sites/wadeshepard/2017/09/27/amazon-com-the-place-where-american-dreams-are-stolen-by-chinese-counterfeiters/" target="_self">having their products knocked-off</a> on major e-commerce platforms by foreign counterfeiters <a href="http://www.forbes.com/sites/wadeshepard/2017/01/12/why-amazon-is-losing-its-battle-against-chinese-counterfeiters/" target="_self">who seemingly operate with impunity</a>.</p>
-            expect(1).to.equal(2);
+            const html = `<!DOCTYPE html>
+            <head><title>summarize test</title></head>
+            <body>
+                <p>Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are <a href="http://www.forbes.com/sites/wadeshepard/2017/09/27/amazon-com-the-place-where-american-dreams-are-stolen-by-chinese-counterfeiters/" target="_self">having their products knocked-off</a> on major e-commerce platforms by foreign counterfeiters <a href="http://www.forbes.com/sites/wadeshepard/2017/01/12/why-amazon-is-losing-its-battle-against-chinese-counterfeiters/" target="_self">who seemingly operate with impunity</a>.</p>
+            </body>`;
+            const testdoc: Document = new JSDOM(html).window.document;
+            const expected1 = `Pond’s question was not rhetorical`;
+            const expected2 = `She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity`;
+
+            const sentences = getSentencesFromDocument(testdoc);
+            expect(sentences[0]).to.equal(expected1);
+            expect(sentences[1]).to.equal(expected2);
+            // expect(1).to.equal(2);
         });
     });
 });
 
-function addPNodesToBody(nodeTexts: Array<string>) {
+function addPNodesToBody(nodeTexts: Array<string>, d: Document = document) {
     nodeTexts.forEach(text => {
-        const p = document.createElement('p');
+        const p = d.createElement('p');
         p.textContent = text;
-        document.body.appendChild(p);
+        d.body.appendChild(p);
     });
-    return document;
+    return d;
 }

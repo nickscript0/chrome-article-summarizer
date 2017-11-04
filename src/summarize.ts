@@ -29,7 +29,7 @@ export function getSentencesFromDocument(theDocument: Document): Array<string> {
     const textBlocks = findNodesWithNWords(10, theDocument);
     // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
     // blocks that don't end in punctuation it will join them together in a sentence
-    return getSentences(textBlocks.join(' '));
+    return getSentences(textBlocks.join(''));
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
@@ -136,6 +136,25 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
 
     const filter_by_word: NodeFilter = {
         acceptNode: n => {
+            if (n.parentNode && n.parentNode.parentNode) {
+                const expectedText = `Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity`;
+                if (n.parentNode.parentNode.textContent) {
+                    const ppText = n.parentNode.parentNode.textContent.trim();
+                    const ppTextInclExpected = ppText.includes(expectedText);
+                    const ppTextLen = ppText.length;
+
+                    const pText = (n.parentNode.textContent) ? n.parentNode.textContent.trim() : '';
+                    const pTextInclExpected = pText.includes(expectedText);
+                    const pTextLen = pText.length;
+
+                    console.log(`nodeName: ${n.parentNode.nodeName}, parent.nodeName: ${n.parentNode.parentNode.nodeName}, previousSibling: ${n.previousSibling && n.previousSibling.nodeName}
+                    textContent: ${n.textContent && n.textContent.length}
+                    parent.textContent: ${pTextInclExpected} (${pTextLen})
+                    parent.parent.textContent: ${ppTextInclExpected} (${ppTextLen})`);
+                }
+
+
+            }
             if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return FILTER_REJECT;
@@ -144,7 +163,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
                 return FILTER_ACCEPT;
             } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'a') {
                 // CASE: Include <a href> if its text word count plus its wrapper node text word count
-                const parentText = (n.parentNode && n.parentNode.parentNode && n.parentNode.parentNode.textContent)
+                const parentText = (n.parentNode.parentNode && n.parentNode.parentNode.textContent)
                     || '';
                 const aText = n.textContent || '';
                 if (_wordCount(parentText + aText) >= minWords) {
