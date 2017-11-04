@@ -1,6 +1,7 @@
+import * as nlp from 'compromise';
+import { Chart } from "chart.js";
 
 import { calculatePageRank, makeGraph, getSentences } from "./text-rank";
-import { Chart } from "chart.js";
 
 const NUM_SUMMARY_SENTENCES = 5;
 
@@ -25,11 +26,17 @@ export function getPageText() {
     return rootDiv;
 }
 
-export function getSentencesFromDocument(theDocument: Document): Array<string> {
+
+export function getSentencesFromDocument(theDocument: Document, useNlp = true): Array<string> {
     const textBlocks = findNodesWithNWords(10, theDocument);
     // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
     // blocks that don't end in punctuation it will join them together in a sentence
-    return getSentences(textBlocks.join(''));
+
+    if (useNlp) {
+        return nlp(textBlocks.join(' ')).sentences().data().map(s => s.text);
+    } else {
+        return getSentences(textBlocks.join(''));
+    }
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {

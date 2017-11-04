@@ -121,6 +121,7 @@ describe('summarize', () => {
 });
 
 const NYTIMES_ACCURACY = 66;
+import * as nlp from 'compromise';
 
 describe('getSentencesFromDocument real article test accuracy', () => {
     it('should handle nytimes format', async () => {
@@ -128,17 +129,44 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
+        // console.log(`ACCURACY: ${accuracy}`);
         expect(accuracy).greaterThan(NYTIMES_ACCURACY);
     });
+
+    it('should handle medium format', async () => {
+        const testdoc = new JSDOM(await readFile('src/test/res/medium1.html')).window.document;
+        const sentences = getSentencesFromDocument(testdoc, false);
+        // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences', true);
+        // console.log(`ACCURACY: ${accuracy}`);
+        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
+    });
+
+    it('should handle verge format', async () => {
+        const testdoc = new JSDOM(await readFile('src/test/res/verge1.html')).window.document;
+        const sentences = getSentencesFromDocument(testdoc);
+        // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
+        console.log(`ACCURACY: ${accuracy}`);
+        expect(accuracy).greaterThan(NYTIMES_ACCURACY);
+    });
+
+    // it('compromise testing', async () => {
+    //     const text = `Biologists and conservationists are rooting for a natural reunion between the two largest populations of grizzlies in the country, Dr. van Manen said.`
+    //     const res = nlp(text).sentences().data().map(s => s.text);
+    //     console.log(`NLP results:\n${res.map((s, i) => `${i}: ${s}`).join('\n')}`);
+    // });
 });
 
-async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string): Promise<number> {
+
+async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string, ignoreEndPunctuation: boolean = false): Promise<number> {
     const expectedSentencesRaw = (await readFile(expectedSentencesFilepath)).split('\n');
-    // Ignore end punctuation for now, as that's the format we're going with
-    const expectedSentencesSet = new Set(expectedSentencesRaw.map(s => {
-        return (s.endsWith('.') || s.endsWith('?') || s.endsWith('!')) ? s.slice(0, s.length - 1) : s;
-    }));
-    const actualSentencesSet = new Set(sentences);
+    const expectedSentencesSet = (!ignoreEndPunctuation) ? new Set(expectedSentencesRaw) :
+        new Set(expectedSentencesRaw.map(s => {
+            return (s.endsWith('.') || s.endsWith('?') || s.endsWith('!')) ? s.slice(0, s.length - 1) : s;
+        }));
+
+    const actualSentencesSet = new Set(sentences.map(s => s.trim()));
     const intersection = new Set(Array.from(expectedSentencesSet).filter(x => actualSentencesSet.has(x)));
     return parseFloat((intersection.size * 100 / expectedSentencesSet.size).toFixed(2));
 }
