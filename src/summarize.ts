@@ -30,11 +30,7 @@ export function getPageText() {
 
 export function getSentencesFromDocument(theDocument: Document, useNlp = true): Array<string> {
     const textBlocks = findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument);
-    // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
-    // blocks that don't end in punctuation it will join them together in a sentence
-
     if (useNlp) {
-        // return nlp(textBlocks.join(' ')).sentences().data().map(s => s.text);
         const sentences2d = textBlocks.map(b => nlp(b).sentences().data().map(s => s.text.trim()));
         return Array.prototype.concat(...sentences2d);
     } else {
@@ -54,7 +50,6 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     const ctx = canvasEl.getContext('2d');
     if (!ctx) return;
     const barChartData = {
-        // labels: ["January", "February", "March", "April", "May", "June", "July"],
         labels: Array.from(Array(prArr.length).keys()).map(x => x.toString()),
         datasets: [{
             label: 'Page Rank Values',
@@ -141,9 +136,8 @@ const SHOW_TEXT = 4;
 
 /**
  * How to improve accuracy:
- * cbc
- *  -- If we are going to use a pText node's text (which includes all sub children text), then we should remove any BLACKLISTed nodes from the subtree first
- *  -- Don't do ''.join at all, keep the output of findNodesWithWords as separate sentences
+ * cbc: If we are going to use a pText node's text (which includes all sub children text), then we should remove any BLACKLISTed nodes from the subtree first
+ * medium1: include 'li' nodes in the pText check (this causes more false positives in the other articles though and isn't worth it)
  * @param minWords
  * @param theDocument
  */
@@ -161,7 +155,6 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             } else if (n.parentNode && ['p'].includes(n.parentNode.nodeName.toLowerCase())) {
                 const pText = n.parentNode.textContent;
                 if (pText && _wordCount(pText) >= minWords) {
-                    if (pText.includes(`Change addresses`)) console.log(`THIS pNode IS DOING IT: ${n.parentNode.nodeName}:\n${pText}`); // DEBUG
                     acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                     matched_nodes.add(pText);
                 }
@@ -170,7 +163,6 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
                 if (n.textContent) matched_nodes.add(n.textContent);
-                if (n.textContent && n.textContent.includes(`Change addresses`)) console.log(`THIS non-pNode IS DOING IT: ${n.parentNode && n.parentNode.nodeName}:\n${n.textContent}`);     // DEBUG       
                 return FILTER_ACCEPT;
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
@@ -188,14 +180,12 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     );
 
     let n;
-    // const matched_nodes: Array<string> = [];
     while (n = walker.nextNode()) {
-        // matched_nodes.push(n.textContent);
     }
 
-    console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
+    // console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
     // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
-    console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
+    // console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
     return Array.from(matched_nodes);
 }
 

@@ -27,3 +27,15 @@ MEDIUM	54.6%	22.61%
 VERGE	100%	45.45%
 CBC	80%	73.77%
 ********************
+
+2017-11-05 06:50:22 [revision: 4b46d9b7d4475acb1acf8ea2db6692995933e7a1]
+********************
+Sentence extraction accuracies:
+Site	Match	Extra
+----------------------
+NYTIMES	97.73%	21.82%
+MEDIUM	54.6%	22.61%
+MEDIUM2	89.82%	13.8%
+VERGE	100%	45.45%
+CBC	80%	73.77%
+********************

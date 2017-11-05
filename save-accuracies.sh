@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 OUTFILE='accuracies.txt'
 REVISION=$(git rev-parse HEAD)
 DATE=$(date +"%Y-%m-%d %H:%M:%S")

@@ -66,7 +66,6 @@ describe('summarize', () => {
 
             const nodes = findNodesWithNWords(2, document);
             expect(nodes.length).to.equal(3);
-            console.log(`RESULT IS: ${JSON.stringify(nodes)}`);
             expect(nodes[0]).to.equal(fiveSentence);
             expect(nodes[1]).to.equal(linkText);
             expect(nodes[2]).to.equal(fourSentence);
@@ -76,7 +75,6 @@ describe('summarize', () => {
 
     describe('getSentencesFromDocument', () => {
         const part11Sentence = '*part11Sentence: one two three four five, six, seven eight nine ten eleven*';
-        const part5Sentence = '*part5Sentence: one two three four Five*';
         const full10Sentence = 'one two three four Five, six, (seven) eight nine 10.';
 
         beforeEach(() => {
@@ -151,8 +149,6 @@ class Accuracies {
                 .join('\n');
     }
 }
-
-import * as nlp from 'compromise';
 
 describe('getSentencesFromDocument real article test accuracy', () => {
     const accuracies = new Accuracies();
