@@ -1,0 +1,41 @@
+
+2017-11-04 18:10:15 [revision: 6b4f3eacc216cd218a2256884f1cff5644a7288d]
+********************
+Sentence extraction accuracies:
+NYTIMES: 86.36%
+MEDIUM: 42.33%
+VERGE: 77.78%
+CBC: 45%
+********************
+
+2017-11-04 18:11:23 [revision: 6b4f3eacc216cd218a2256884f1cff5644a7288d]
+********************
+Sentence extraction accuracies:
+NYTIMES: 97.73%
+MEDIUM: 42.33%
+VERGE: 100%
+CBC: 80%
+********************
+
+2017-11-05 06:16:24 [revision: 1ebdf330930bb756ffbf9aff36e5aada086c201c]
+********************
+Sentence extraction accuracies:
+Site	Match	Extra
+----------------------
+NYTIMES	97.73%	21.82%
+MEDIUM	54.6%	22.61%
+VERGE	100%	45.45%
+CBC	80%	73.77%
+********************
+
+2017-11-05 06:50:22 [revision: 4b46d9b7d4475acb1acf8ea2db6692995933e7a1]
+********************
+Sentence extraction accuracies:
+Site	Match	Extra
+----------------------
+NYTIMES	97.73%	21.82%
+MEDIUM	54.6%	22.61%
+MEDIUM2	89.82%	13.8%
+VERGE	100%	45.45%
+CBC	80%	73.77%
+********************

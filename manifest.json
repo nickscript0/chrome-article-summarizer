@@ -8,9 +8,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "ext/require.min.js",
-                "build/main.js",
-                "ext/bootstrap.js"
+                "build/bundle.js"
             ]
         }
     ],

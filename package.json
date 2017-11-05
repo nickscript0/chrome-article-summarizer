@@ -4,6 +4,25 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@types/chrome": "0.0.51"
+    "@types/chart.js": "^2.6.10",
+    "@types/chrome": "0.0.51",
+    "chart.js": "^2.7.1",
+    "compromise": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/jsdom": "^11.0.3",
+    "@types/mocha": "^2.2.44",
+    "chai": "^4.1.2",
+    "jsdom": "^11.3.0",
+    "mocha": "^4.0.1",
+    "ts-loader": "^3.1.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.3",
+    "webpack": "^3.8.1"
+  },
+  "scripts": {
+    "watch": "webpack --watch",
+    "test": "mocha -r ts-node/register src/test/**.ts"
   }
 }
