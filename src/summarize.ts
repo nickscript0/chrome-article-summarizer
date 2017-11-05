@@ -9,7 +9,9 @@ const MIN_WORDS_SENTENCE = 10;
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
-    const result = summarizeSentences(getSentencesFromDocument(document));
+
+    const { sentences, nlpBlocks } = getSubsetsFromDocument(document);
+    const result = summarizeSentences(sentences);
     let i = 1;
     for (const text of result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES)) {
         let p = _createParagraph(text);
@@ -19,7 +21,7 @@ export function getPageText() {
 
     // Add stats text
     const pre = document.createElement('pre');
-    pre.textContent = result.getStatsText(NUM_SUMMARY_SENTENCES);
+    pre.textContent = result.getStatsText(NUM_SUMMARY_SENTENCES) + '\n' + getWordStats(nlpBlocks);
     // pre.style.fontWeight = 'bold';
     rootDiv.appendChild(pre);
     const chart = _createChart(result.allPageRanks(), NUM_SUMMARY_SENTENCES);
@@ -27,14 +29,47 @@ export function getPageText() {
     return rootDiv;
 }
 
+function getWordStats(nlpBlocks: Array<any>): string {
+    const N = 5;
+    function nbSubsetToArr(nlpBlocks, subsetFunc) {
+        const count2d = nlpBlocks.map(nb => subsetFunc(nb).data()
+            .filter(d => d)
+            .map(d => d.text.trim())
+            .filter(t => t !== '')
+        );
+        return Array.prototype.concat(...count2d);
+    }
 
-export function getSentencesFromDocument(theDocument: Document, useNlp = true): Array<string> {
+    const peopleArr = nbSubsetToArr(nlpBlocks, a => a.people());
+    const placesArr = nbSubsetToArr(nlpBlocks, a => a.places());
+    const nounsArr = nbSubsetToArr(nlpBlocks, a => a.nouns());
+    const thingsArr = [...nounsArr]
+        .filter(x => !(new Set(peopleArr).has(x)))
+        .filter(x => !(new Set(placesArr).has(x)));
+
+    const topPeople = new StringCounter(peopleArr).topN(N).join(', ');
+    const topPlaces = new StringCounter(placesArr).topN(N).join(', ');
+    const topThings = new StringCounter(thingsArr).topN(N).join(', ');
+
+
+    return `Top People: ${topPeople}
+Top Places: ${topPlaces}
+Top Nouns: ${topThings}
+`;
+}
+
+interface NlpSubsets {
+    sentences: Array<string>;
+    nlpBlocks: Array<object>;
+}
+
+export function getSubsetsFromDocument(theDocument: Document, useNlp = true): NlpSubsets {
     const textBlocks = findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument);
-    if (useNlp) {
-        const sentences2d = textBlocks.map(b => nlp(b).sentences().data().map(s => s.text.trim()));
-        return Array.prototype.concat(...sentences2d);
-    } else {
-        return getSentences(textBlocks.join(''));
+    const nlpBlocks = textBlocks.map(tb => nlp(tb));
+    const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
+    return {
+        sentences: Array.prototype.concat(...sentences2d),
+        nlpBlocks: nlpBlocks
     }
 }
 
@@ -107,8 +142,12 @@ const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav', 'img', 'no
 
 class StringCounter {
     private stringCounts: Map<string, number>;
-    constructor() {
+    constructor(initArray: Array<string> | null = null) {
         this.stringCounts = new Map();
+
+        if (initArray) {
+            initArray.forEach(s => this.incr(s));
+        }
     }
 
     incr(s: string | null) {
@@ -116,6 +155,14 @@ class StringCounter {
         const last = this.stringCounts.get(s);
         const next = (last) ? last + 1 : 1;
         this.stringCounts.set(s, next);
+    }
+
+    topN(n) {
+        return Array.from(this.stringCounts.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, n)
+            .map(el => `${el[0]} (${el[1]})`);
+
     }
 
     toString() {

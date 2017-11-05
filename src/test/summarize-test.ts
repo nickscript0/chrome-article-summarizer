@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords, getSentencesFromDocument } from "../summarize";
+import { findNodesWithNWords, getSubsetsFromDocument } from "../summarize";
 
 const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
 
@@ -90,7 +90,7 @@ describe('summarize', () => {
             addPNodesToBody([linkText], 'a');
             addPNodesToBody([full10Sentence]);
 
-            const sentences = getSentencesFromDocument(document);
+            const sentences = getSubsetsFromDocument(document).sentences;
 
             expect(sentences[0]).to.equal(part11Sentence);
             expect(sentences[1]).to.equal(linkText);
@@ -108,7 +108,7 @@ describe('summarize', () => {
             const expected1 = `Pond’s question was not rhetorical.`;
             const expected2 = `She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity.`;
 
-            const sentences = getSentencesFromDocument(testdoc);
+            const sentences = getSubsetsFromDocument(testdoc).sentences;
             expect(sentences[0]).to.equal(expected1);
             expect(sentences[1]).to.equal(expected2);
         });
@@ -197,7 +197,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.NYTIMES;
         const testdoc = new JSDOM(await readFile('src/test/res/nytimes1.html')).window.document;
         timers.start(site);
-        const sentences = getSentencesFromDocument(testdoc);
+        const sentences = getSubsetsFromDocument(testdoc).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -209,7 +209,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.MEDIUM;
         const testdoc = new JSDOM(await readFile('src/test/res/medium1.html')).window.document;
         timers.start(site);
-        const sentences = getSentencesFromDocument(testdoc);
+        const sentences = getSubsetsFromDocument(testdoc).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -221,7 +221,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.MEDIUM2;
         const testdoc = new JSDOM(await readFile('src/test/res/medium2.html')).window.document;
         timers.start(site);
-        const sentences = getSentencesFromDocument(testdoc);
+        const sentences = getSubsetsFromDocument(testdoc).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium2.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -233,7 +233,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.VERGE;
         const testdoc = new JSDOM(await readFile('src/test/res/verge1.html')).window.document;
         timers.start(site);
-        const sentences = getSentencesFromDocument(testdoc);
+        const sentences = getSubsetsFromDocument(testdoc).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -245,7 +245,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.CBC;
         const testdoc = new JSDOM(await readFile('src/test/res/cbc1.html')).window.document;
         timers.start(site);
-        const sentences = getSentencesFromDocument(testdoc);
+        const sentences = getSubsetsFromDocument(testdoc).sentences;
         // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/cbc1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
