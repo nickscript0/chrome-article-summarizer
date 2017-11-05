@@ -16,7 +16,6 @@ function setupMenus() {
     });
 
     chrome.browserAction.onClicked.addListener(function () {
-        console.log('browserAction CLICKED!');
         sendToggleSummaryMessage();
     });
 }

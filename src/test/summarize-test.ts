@@ -142,63 +142,115 @@ class Accuracies {
     }
 
     getResults() {
-        return `Site\tMatch\tExtra\n`
-            + `----------------------\n`
-            + (<any>Object).entries(this.results)
-                .map(([k, v]) => `${k}\t${v.matchExpected}%\t${v.notExpected}%`)
-                .join('\n');
+        return this.results;
     }
+}
+
+class Timers {
+    timers: Map<string, number>;
+    results: Map<string, number>;
+
+    constructor() {
+        this.timers = new Map();
+        this.results = new Map();
+    }
+
+    start(name) {
+        this.timers.set(name, this._clock());
+    }
+
+    stop(name) {
+        const start = this.timers.get(name);
+        if (!start) throw new Error(`No start called for timer ${name}`);
+        const result = this._clock() - start;
+        this.results.set(name, result);
+    }
+
+    get(name) {
+        const res = this.results.get(name);
+        return (res) ? res : '';
+    }
+
+    _clock() {
+        const t = process.hrtime();
+        return Math.round((t[0] * 1000) + (t[1] / 1000000));
+    }
+}
+
+function printResults(accuracies: Accuracies, timers: Timers) {
+    return `Site\tMatch\tExtra\tTime\n`
+        + `-----------------------------\n`
+        + (<any>Object).entries(accuracies.getResults())
+            .map(([k, v]) => `${k}\t${v.matchExpected}%\t${v.notExpected}%\t${timers.get(k)}ms`)
+            .join('\n');
 }
 
 describe('getSentencesFromDocument real article test accuracy', () => {
     const accuracies = new Accuracies();
+    const timers = new Timers();
+
     after(function () {
-        console.log(`\n********************\nSentence extraction accuracies:\n${accuracies.getResults()}\n********************`);
+        console.log(`\n********************\nSentence extraction accuracies:\n${printResults(accuracies, timers)}\n********************`);
     });
 
     it('should handle nytimes format', async () => {
+        const site = Site.NYTIMES;
         const testdoc = new JSDOM(await readFile('src/test/res/nytimes1.html')).window.document;
+        timers.start(site);
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        accuracies.report(Site.NYTIMES, accuracy);
+        timers.stop(site);
+        accuracies.report(site, accuracy);
     });
 
     it('should handle medium format', async () => {
+        const site = Site.MEDIUM;
         const testdoc = new JSDOM(await readFile('src/test/res/medium1.html')).window.document;
+        timers.start(site);
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        accuracies.report(Site.MEDIUM, accuracy);
+        timers.stop(site);
+        accuracies.report(site, accuracy);
     });
 
     it('should handle medium format #2', async () => {
+        const site = Site.MEDIUM2;
         const testdoc = new JSDOM(await readFile('src/test/res/medium2.html')).window.document;
+        timers.start(site);
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium2.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        accuracies.report(Site.MEDIUM2, accuracy);
+        timers.stop(site);
+        accuracies.report(site, accuracy);
     });
 
     it('should handle verge format', async () => {
+        const site = Site.VERGE;
         const testdoc = new JSDOM(await readFile('src/test/res/verge1.html')).window.document;
+        timers.start(site);
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        accuracies.report(Site.VERGE, accuracy);
+        timers.stop(site);
+        accuracies.report(site, accuracy);
     });
 
     it('should handle cbc format', async () => {
+        const site = Site.CBC;
         const testdoc = new JSDOM(await readFile('src/test/res/cbc1.html')).window.document;
+        timers.start(site);
         const sentences = getSentencesFromDocument(testdoc);
         // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/cbc1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
-        accuracies.report(Site.CBC, accuracy);
+        timers.stop(site);
+        accuracies.report(site, accuracy);
     });
 
     // it('compromise testing', async () => {

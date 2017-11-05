@@ -39,3 +39,15 @@ MEDIUM2	89.82%	13.8%
 VERGE	100%	45.45%
 CBC	80%	73.77%
 ********************
+
+2017-11-05 11:11:53 [revision: 1587d80b73fb5c7bf6b1d2a12598ead71b152244]
+********************
+Sentence extraction accuracies:
+Site	Match	Extra	Time
+-----------------------------
+NYTIMES	97.73%	21.82%	306ms
+MEDIUM	54.6%	22.61%	360ms
+MEDIUM2	89.82%	13.8%	1031ms
+VERGE	100%	45.45%	119ms
+CBC	80%	73.77%	213ms
+********************
