@@ -34,7 +34,7 @@ export function getSentencesFromDocument(theDocument: Document, useNlp = true): 
 
     if (useNlp) {
         // return nlp(textBlocks.join(' ')).sentences().data().map(s => s.text);
-        const sentences2d = textBlocks.map(b => nlp(b).sentences().data().map(s => s.text));
+        const sentences2d = textBlocks.map(b => nlp(b).sentences().data().map(s => s.text.trim()));
         return Array.prototype.concat(...sentences2d);
     } else {
         return getSentences(textBlocks.join(''));
