@@ -4,6 +4,7 @@ import { Chart } from "chart.js";
 import { calculatePageRank, makeGraph, getSentences } from "./text-rank";
 
 const NUM_SUMMARY_SENTENCES = 5;
+const MIN_WORDS_SENTENCE = 10;
 
 export function getPageText() {
     const rootDiv = document.createElement('div');
@@ -28,7 +29,7 @@ export function getPageText() {
 
 
 export function getSentencesFromDocument(theDocument: Document, useNlp = true): Array<string> {
-    const textBlocks = findNodesWithNWords(10, theDocument);
+    const textBlocks = findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument);
     // TODO: it is incorrect to do "textBlocks.join(' ')" on the next line, in case of
     // blocks that don't end in punctuation it will join them together in a sentence
 
@@ -157,7 +158,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return FILTER_REJECT;
-            } else if (n.parentNode && n.parentNode.nodeName.toLowerCase() === 'p') {
+            } else if (n.parentNode && ['p'].includes(n.parentNode.nodeName.toLowerCase())) {
                 const pText = n.parentNode.textContent;
                 if (pText && _wordCount(pText) >= minWords) {
                     if (pText.includes(`Change addresses`)) console.log(`THIS pNode IS DOING IT: ${n.parentNode.nodeName}:\n${pText}`); // DEBUG

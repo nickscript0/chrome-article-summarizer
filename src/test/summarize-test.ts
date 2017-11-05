@@ -120,6 +120,7 @@ describe('summarize', () => {
 enum Site {
     NYTIMES = 'NYTIMES',
     MEDIUM = 'MEDIUM',
+    MEDIUM2 = 'MEDIUM2',
     VERGE = 'VERGE',
     CBC = 'CBC'
 }
@@ -130,10 +131,11 @@ class Accuracies {
     constructor() {
         this.results = {};
         this.expected = {};
-        this.expected[Site.NYTIMES] = 86;
-        this.expected[Site.MEDIUM] = 42;
-        this.expected[Site.VERGE] = 77;
-        this.expected[Site.CBC] = 45;
+        this.expected[Site.NYTIMES] = 97;
+        this.expected[Site.MEDIUM] = 54;
+        this.expected[Site.MEDIUM2] = 89;
+        this.expected[Site.VERGE] = 100;
+        this.expected[Site.CBC] = 80;
     }
 
     report(site: Site, reported: AccuracyResult) {
@@ -174,6 +176,15 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         accuracies.report(Site.MEDIUM, accuracy);
+    });
+
+    it('should handle medium format #2', async () => {
+        const testdoc = new JSDOM(await readFile('src/test/res/medium2.html')).window.document;
+        const sentences = getSentencesFromDocument(testdoc);
+        // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium2.sentences');
+        // console.log(`ACCURACY: ${accuracy}`);
+        accuracies.report(Site.MEDIUM2, accuracy);
     });
 
     it('should handle verge format', async () => {
