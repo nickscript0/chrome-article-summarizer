@@ -136,15 +136,17 @@ class Accuracies {
         this.expected[Site.CBC] = 45;
     }
 
-    report(site: Site, reported: number) {
+    report(site: Site, reported: AccuracyResult) {
         this.results[site] = reported;
-        expect(reported).gte(this.expected[site]);
+        expect(reported.matchExpected).gte(this.expected[site]);
     }
 
     getResults() {
-        return (<any>Object).entries(this.results)
-            .map(([k, v]) => `${k}: ${v}%`)
-            .join('\n');
+        return `Site\tMatch\tExtra\n`
+            + `----------------------\n`
+            + (<any>Object).entries(this.results)
+                .map(([k, v]) => `${k}\t${v.matchExpected}%\t${v.notExpected}%`)
+                .join('\n');
     }
 }
 
@@ -167,9 +169,9 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle medium format', async () => {
         const testdoc = new JSDOM(await readFile('src/test/res/medium1.html')).window.document;
-        const sentences = getSentencesFromDocument(testdoc, false);
-        // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences', true);
+        const sentences = getSentencesFromDocument(testdoc);
+        // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         accuracies.report(Site.MEDIUM, accuracy);
     });
@@ -199,8 +201,12 @@ describe('getSentencesFromDocument real article test accuracy', () => {
     // });
 });
 
+interface AccuracyResult {
+    matchExpected: number; // Percentage that are in expected set
+    notExpected: number; // Percentage that are not in expected set
+}
 
-async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string, ignoreEndPunctuation: boolean = false): Promise<number> {
+async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string, ignoreEndPunctuation: boolean = false): Promise<AccuracyResult> {
     const expectedSentencesRaw = (await readFile(expectedSentencesFilepath)).split('\n');
     const expectedSentencesSet = (!ignoreEndPunctuation) ? new Set(expectedSentencesRaw) :
         new Set(expectedSentencesRaw.map(s => {
@@ -209,7 +215,13 @@ async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFil
 
     const actualSentencesSet = new Set(sentences.map(s => s.trim()));
     const intersection = new Set(Array.from(expectedSentencesSet).filter(x => actualSentencesSet.has(x)));
-    return parseFloat((intersection.size * 100 / expectedSentencesSet.size).toFixed(2));
+    // console.log(`MISSING FROM EXPECTED SENTENCES:\n${[...expectedSentencesSet].filter(x => !actualSentencesSet.has(x)).join('\n')}`); // DEBUG
+    const notExpectedArr = [...actualSentencesSet].filter(x => !expectedSentencesSet.has(x));
+    const notExpectedPercent = (notExpectedArr.length * 100 / actualSentencesSet.size).toFixed(2);
+    return {
+        matchExpected: parseFloat((intersection.size * 100 / expectedSentencesSet.size).toFixed(2)),
+        notExpected: parseFloat(notExpectedPercent)
+    };
 }
 
 function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Document = document) {
