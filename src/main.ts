@@ -4,11 +4,10 @@
 
 /**
  * TODOs:
- * - Bug: elements that don't have end punctuation are joined with others (See TODO line 30 summarize.ts)
- * - Bug: sentences that end with a quote like << some quote." >> the quote is put into the next sentence
  * 1. Make num sentences easily adjustable in the UI
  * 4. Show feedback when processing (e.g. a large page just hangs for a while)
- * 5. Add unit tests for things like split sentences edge cases, and TextRank
+ * 5. a. Extract TextRank and <html sentence extraction> to their own repo
+ *    b. Add unit tests for TextRank
  * 6. Use an overlay div instead of replacing the body (this will then not repaint and loose image loading when toggling)
  * 7. Add title to summarize page (probably just the <title> value?)
 

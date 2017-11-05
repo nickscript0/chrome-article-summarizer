@@ -2,6 +2,9 @@
     "name": "Article Summarizer",
     "version": "0.1",
     "description": "Summarizes web pages using the Text Rank algorithm.",
+    "browser_action": {
+        "name": "Toggle Summary"
+    },
     "content_scripts": [
         {
             "matches": [

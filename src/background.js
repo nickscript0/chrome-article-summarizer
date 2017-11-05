@@ -14,6 +14,11 @@ function setupMenus() {
     chrome.commands.onCommand.addListener(function (command) {
         sendToggleSummaryMessage();
     });
+
+    chrome.browserAction.onClicked.addListener(function () {
+        console.log('browserAction CLICKED!');
+        sendToggleSummaryMessage();
+    });
 }
 
 function sendToggleSummaryMessage() {
