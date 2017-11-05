@@ -155,7 +155,7 @@ import * as nlp from 'compromise';
 describe('getSentencesFromDocument real article test accuracy', () => {
     const accuracies = new Accuracies();
     after(function () {
-        console.log(`\n*******************\nSentence extraction accuracies:\n${accuracies.getResults()}\n*******************`);
+        console.log(`\n********************\nSentence extraction accuracies:\n${accuracies.getResults()}\n********************`);
     });
 
     it('should handle nytimes format', async () => {

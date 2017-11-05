@@ -1,0 +1,18 @@
+
+2017-11-04 18:10:15 [revision: 6b4f3eacc216cd218a2256884f1cff5644a7288d]
+********************
+Sentence extraction accuracies:
+NYTIMES: 86.36%
+MEDIUM: 42.33%
+VERGE: 77.78%
+CBC: 45%
+********************
+
+2017-11-04 18:11:23 [revision: 6b4f3eacc216cd218a2256884f1cff5644a7288d]
+********************
+Sentence extraction accuracies:
+NYTIMES: 97.73%
+MEDIUM: 42.33%
+VERGE: 100%
+CBC: 80%
+********************

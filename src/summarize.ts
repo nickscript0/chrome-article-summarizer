@@ -33,7 +33,9 @@ export function getSentencesFromDocument(theDocument: Document, useNlp = true): 
     // blocks that don't end in punctuation it will join them together in a sentence
 
     if (useNlp) {
-        return nlp(textBlocks.join(' ')).sentences().data().map(s => s.text);
+        // return nlp(textBlocks.join(' ')).sentences().data().map(s => s.text);
+        const sentences2d = textBlocks.map(b => nlp(b).sentences().data().map(s => s.text));
+        return Array.prototype.concat(...sentences2d);
     } else {
         return getSentences(textBlocks.join(''));
     }
