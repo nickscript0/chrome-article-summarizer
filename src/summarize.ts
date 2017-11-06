@@ -1,7 +1,7 @@
 import * as nlp from 'compromise';
 import { Chart } from "chart.js";
 
-import { calculatePageRank, makeGraph, getSentences } from "./text-rank";
+import { calculatePageRank, makeGraph } from "./text-rank";
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
@@ -34,7 +34,7 @@ function getWordStats(nlpBlocks: Array<any>): string {
     function nbSubsetToArr(nlpBlocks, subsetFunc) {
         const count2d = nlpBlocks.map(nb => subsetFunc(nb).data()
             .filter(d => d)
-            .map(d => d.text.trim())
+            .map(d => d.normal.trim())
             .filter(t => t !== '')
         );
         return Array.prototype.concat(...count2d);
@@ -70,7 +70,7 @@ export function getSubsetsFromDocument(theDocument: Document, useNlp = true): Nl
     return {
         sentences: Array.prototype.concat(...sentences2d),
         nlpBlocks: nlpBlocks
-    }
+    };
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
@@ -138,7 +138,7 @@ function summarizeSentences(sentences: Array<string>) {
 }
 
 // Skip these element types and all their children
-const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav', 'img', 'noscript'];
+const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav', 'img', 'noscript', 'iframe'];
 
 class StringCounter {
     private stringCounts: Map<string, number>;
