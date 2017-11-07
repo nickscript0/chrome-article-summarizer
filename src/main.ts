@@ -9,7 +9,6 @@
  * 5. a. Extract TextRank and <html sentence extraction> to their own repo
  *    b. Add unit tests for TextRank
  * 6. Use an overlay div instead of replacing the body (this will then not repaint and lose image loading when toggling)
- * 7. Add title to summarize page (probably just the <title> value?)
  */
 
 import { getPageText } from "./summarize";

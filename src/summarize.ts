@@ -9,6 +9,9 @@ const MIN_WORDS_SENTENCE = 10;
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
+    const title = document.createElement('h3');
+    title.textContent = document.title;
+    rootDiv.appendChild(_setFontStyle(title));
 
     const { sentences, nlpBlocks } = getSubsetsFromDocument(document);
     const result = summarizeSentences(sentences);
@@ -23,6 +26,7 @@ export function getPageText() {
     const pre = document.createElement('pre');
     pre.textContent = result.getStatsText(NUM_SUMMARY_SENTENCES) + '\n' + getWordStats(nlpBlocks);
     // pre.style.fontWeight = 'bold';
+    rootDiv.appendChild(document.createElement('br'));
     rootDiv.appendChild(pre);
     const chart = _createChart(result.allPageRanks(), NUM_SUMMARY_SENTENCES);
     if (chart) rootDiv.appendChild(chart);
@@ -117,11 +121,15 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
 function _createParagraph(text) {
     const p = document.createElement('p');
     p.textContent = text;
+    p.style.fontSize = '15px';
+    return _setFontStyle(p);
+}
+
+function _setFontStyle(e: HTMLElement) {
     // Font styling modeled off of nytimes
-    p.style.fontFamily = `georgia, "times new roman", times, serif`;
-    p.style.fontSize = '16px';
-    p.style.color = 'black';
-    return p;
+    e.style.fontFamily = `georgia, "times new roman", times, serif`;
+    e.style.color = 'black';
+    return e;
 }
 
 function summarizeSentences(sentences: Array<string>) {
