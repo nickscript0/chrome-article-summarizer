@@ -188,6 +188,7 @@ const FILTER_ACCEPT = 1;
 const FILTER_REJECT = 2;
 const FILTER_SKIP = 3;
 const SHOW_TEXT = 4;
+// const SHOW_ALL = 0xFFFFFFFF;
 
 /**
  * How to improve accuracy:
@@ -204,7 +205,10 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
 
     const filter_by_word: NodeFilter = {
         acceptNode: n => {
-            if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
+            if (_classBlacklisted(n)) {
+                n.parentNode && _removeTree(n.parentNode);
+                return FILTER_REJECT;
+            } else if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return FILTER_REJECT;
             } else if (n.parentNode && ['p'].includes(n.parentNode.nodeName.toLowerCase())) {
@@ -229,7 +233,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     const walker = theDocument.createTreeWalker(
         theDocument.body,
         SHOW_TEXT,
-        // NodeFilter.SHOW_ALL,
+        // SHOW_ALL,
         filter_by_word,
         false
     );
@@ -242,6 +246,24 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
     // console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
     return Array.from(matched_nodes);
+}
+
+function _removeTree(node: Node) {
+    while (node.lastChild) {
+        node.removeChild(node.lastChild);
+    }
+}
+
+function _classBlacklisted(n: Node | null): boolean {
+    if (!n) return false;
+    const el = (<HTMLElement>n.parentNode);
+    // if (el.className) console.log(`CLASSNAME is ${el.className}`);
+    if (el.className !== undefined && el.className.includes && el.className.includes('comments-panel')) {
+        // console.log(`BLACKLISTED CLASSNAME is ${el.className}`);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function _wordCount(s: string | null): number {

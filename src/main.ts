@@ -9,6 +9,8 @@
  * 5. a. Extract TextRank and <html sentence extraction> to their own repo
  *    b. Add unit tests for TextRank
  * 6. Use an overlay div instead of replacing the body (this will then not repaint and lose image loading when toggling)
+ * 7. Filter out nytimes comments: instead of including a <p>.textContent, do a treeWalk on this p node and ignore CLASS and TYPE blacklists and concat the text
+ * 8. Summarize text selection when it exists
  */
 
 import { getPageText } from "./summarize";
