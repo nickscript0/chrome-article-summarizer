@@ -10,7 +10,8 @@
  *    b. Add unit tests for TextRank
  * 6. Use an overlay div instead of replacing the body (this will then not repaint and lose image loading when toggling)
  * 7. Filter out nytimes comments: instead of including a <p>.textContent, do a treeWalk on this p node and ignore CLASS and TYPE blacklists and concat the text
- * 8. Summarize text selection when it exists
+ * 8. Summarize text selection in an inline overlay window (as we don't want to reload the page in this case)
+  TRY TO USE IFRAME for step 8, this will allow me to work from a blank CSS (not share the parent page's)
  */
 
 import { getPageText } from "./summarize";
@@ -54,4 +55,3 @@ function toggleStylesheets(enabled: boolean) {
 
 }
 
-console.log(`Content Script loaded!`);

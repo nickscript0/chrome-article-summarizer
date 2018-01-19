@@ -9,6 +9,9 @@ const MIN_WORDS_SENTENCE = 10;
 export function getPageText() {
     const rootDiv = document.createElement('div');
     rootDiv.style.padding = '50px';
+    rootDiv.style.marginLeft = '100px';
+    rootDiv.style.marginRight = '100px';
+
     const title = document.createElement('h3');
     title.textContent = document.title;
     rootDiv.appendChild(_setFontStyle(title));
@@ -68,7 +71,9 @@ interface NlpSubsets {
 }
 
 export function getSubsetsFromDocument(theDocument: Document, useNlp = true): NlpSubsets {
-    const textBlocks = findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument);
+    const selection = window.getSelection().toString().trim();
+
+    const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument): [selection];
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
     return {

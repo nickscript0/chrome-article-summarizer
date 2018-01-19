@@ -28,5 +28,3 @@ function sendToggleSummaryMessage() {
 }
 
 setupMenus();
-
-console.log(`Background Script loaded!`);
