@@ -17,45 +17,9 @@
 
 import { getPageText } from "./summarize";
 
-const ORIGINAL_BODY = document.body.innerHTML;
-let SUMMARIZE_ON = false;
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === "summarize") {
-        toggleSummarizeView();
+        console.log(`Content script received summarize command!`);
+        sendResponse({data: getPageText()});
     }
 });
-
-function toggleSummarizeView() {
-    const rootDiv = getPageText();
-    chrome.runtime.sendMessage({ command: "display_summary", summary: rootDiv }, () => {
-        console.log(`Content script sent display_summary command to background, and summarized rootDiv!`);
-    });
-
-    // if (SUMMARIZE_ON) {
-    //     toggleStylesheets(true);
-    //     document.body.innerHTML = ORIGINAL_BODY;
-
-    //     console.log(`Wrote original document body!`);
-    //     SUMMARIZE_ON = false;
-    // } else {
-    //     toggleStylesheets(false);
-
-    //     const rootDiv = getPageText();
-    //     document.body.innerHTML = "";
-    //     document.body.appendChild(rootDiv);
-    //     console.log(`Wrote summarized document body!`);
-    //     SUMMARIZE_ON = true;
-    // }
-}
-
-function toggleStylesheets(enabled: boolean) {
-    for (let i = 0; i < document.styleSheets.length; i++) {
-        // TODO: find a more consistent way to handle this
-        // ChartJS's stylesheet is added on module import so exists in the head before even calling getPage
-        const ss = <CSSStyleSheet>document.styleSheets[i];
-        const isChartJs = ss.cssRules && ss.cssRules[0] && ss.cssRules[0].cssText && ss.cssRules[0].cssText.includes('chartjs');
-        if (!isChartJs) document.styleSheets[i].disabled = !enabled;
-    }
-}
-

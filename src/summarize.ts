@@ -1,39 +1,23 @@
 import * as nlp from 'compromise';
-import { Chart } from "chart.js";
 
 import { calculatePageRank, makeGraph } from "./text-rank";
+import { SummaryData } from './messages';
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
-export function getPageText() {
-    const rootDiv = document.createElement('div');
-    rootDiv.style.padding = '50px';
-    rootDiv.style.marginLeft = '100px';
-    rootDiv.style.marginRight = '100px';
-
-    const title = document.createElement('h3');
-    title.textContent = document.title;
-    rootDiv.appendChild(_setFontStyle(title));
-
+export function getPageText(): SummaryData {
     const { sentences, nlpBlocks } = getSubsetsFromDocument(document);
     const result = summarizeSentences(sentences);
-    let i = 1;
-    for (const text of result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES)) {
-        let p = _createParagraph(text);
-        rootDiv.appendChild(p);
-        i += 1;
-    }
 
-    // Add stats text
-    const pre = document.createElement('pre');
-    pre.textContent = result.getStatsText(NUM_SUMMARY_SENTENCES) + '\n' + getWordStats(nlpBlocks);
-    // pre.style.fontWeight = 'bold';
-    rootDiv.appendChild(document.createElement('br'));
-    rootDiv.appendChild(pre);
-    const chart = _createChart(result.allPageRanks(), NUM_SUMMARY_SENTENCES);
-    if (chart) rootDiv.appendChild(chart);
-    return rootDiv;
+    return {
+        title: document.title,
+        sentences: result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES),
+        textStats: result.getStatsText(NUM_SUMMARY_SENTENCES),
+        wordStats: getWordStats(nlpBlocks),
+        pageRanks: result.allPageRanks(),
+        numSummarySentences: NUM_SUMMARY_SENTENCES
+    };
 }
 
 function getWordStats(nlpBlocks: Array<any>): string {
@@ -73,68 +57,13 @@ interface NlpSubsets {
 export function getSubsetsFromDocument(theDocument: Document, useNlp = true): NlpSubsets {
     const selection = window.getSelection().toString().trim();
 
-    const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument): [selection];
+    const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
     return {
         sentences: Array.prototype.concat(...sentences2d),
         nlpBlocks: nlpBlocks
     };
-}
-
-function _createChart(prArr: Array<number>, num_summary_sentences: number) {
-    // <canvas id="myChart" width="400" height="400"></canvas>
-    // <script>
-    // var ctx = document.getElementById("myChart").getContext('2d');
-    const canvasEl = document.createElement('canvas');
-    // canvasEl.width = 200;
-    // canvasEl.height = 200;
-    // canvasEl.style.width = '400px';
-    // canvasEl.style.height = '400px';
-    const ctx = canvasEl.getContext('2d');
-    if (!ctx) return;
-    const barChartData = {
-        labels: Array.from(Array(prArr.length).keys()).map(x => x.toString()),
-        datasets: [{
-            label: 'Page Rank Values',
-            // backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-            // borderColor: window.chartColors.red,
-            borderWidth: 1,
-            data: prArr,
-            backgroundColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 0.2)'),
-            borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)')
-        }]
-    };
-    new Chart(ctx, {
-        type: 'bar',
-        data: barChartData,
-        options: {
-            // maintainAspectRatio: false,
-            // responsive: false
-        }
-    });
-
-    const div = document.createElement('div');
-    div.style.width = '800px';
-    div.style.height = '400px';
-    div.style.textAlign = 'center';
-    div.appendChild(canvasEl);
-    return div;
-}
-
-
-function _createParagraph(text) {
-    const p = document.createElement('p');
-    p.textContent = text;
-    p.style.fontSize = '15px';
-    return _setFontStyle(p);
-}
-
-function _setFontStyle(e: HTMLElement) {
-    // Font styling modeled off of nytimes
-    e.style.fontFamily = `georgia, "times new roman", times, serif`;
-    e.style.color = 'black';
-    return e;
 }
 
 function summarizeSentences(sentences: Array<string>) {

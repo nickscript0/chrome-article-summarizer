@@ -3,7 +3,8 @@ const path = require('path');
 module.exports = {
     entry: {
         main: './src/main.ts',
-        background: './src/background.ts'
+        display: './src/display.ts',
+        background: './src/background.ts',
     },
     output: {
         path: path.resolve(__dirname, 'build'),
