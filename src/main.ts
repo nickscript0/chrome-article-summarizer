@@ -27,21 +27,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function toggleSummarizeView() {
-    if (SUMMARIZE_ON) {
-        toggleStylesheets(true);
-        document.body.innerHTML = ORIGINAL_BODY;
+    const rootDiv = getPageText();
+    chrome.runtime.sendMessage({ command: "display_summary", summary: rootDiv }, () => {
+        console.log(`Content script sent display_summary command to background, and summarized rootDiv!`);
+    });
 
-        console.log(`Wrote original document body!`);
-        SUMMARIZE_ON = false;
-    } else {
-        toggleStylesheets(false);
+    // if (SUMMARIZE_ON) {
+    //     toggleStylesheets(true);
+    //     document.body.innerHTML = ORIGINAL_BODY;
 
-        const rootDiv = getPageText();
-        document.body.innerHTML = "";
-        document.body.appendChild(rootDiv);
-        console.log(`Wrote summarized document body!`);
-        SUMMARIZE_ON = true;
-    }
+    //     console.log(`Wrote original document body!`);
+    //     SUMMARIZE_ON = false;
+    // } else {
+    //     toggleStylesheets(false);
+
+    //     const rootDiv = getPageText();
+    //     document.body.innerHTML = "";
+    //     document.body.appendChild(rootDiv);
+    //     console.log(`Wrote summarized document body!`);
+    //     SUMMARIZE_ON = true;
+    // }
 }
 
 function toggleStylesheets(enabled: boolean) {
@@ -52,7 +57,5 @@ function toggleStylesheets(enabled: boolean) {
         const isChartJs = ss.cssRules && ss.cssRules[0] && ss.cssRules[0].cssText && ss.cssRules[0].cssText.includes('chartjs');
         if (!isChartJs) document.styleSheets[i].disabled = !enabled;
     }
-
-
 }
 
