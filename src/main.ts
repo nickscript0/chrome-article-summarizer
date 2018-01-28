@@ -15,6 +15,7 @@
 * 11. Use Web Workers (great for CPU bound tasks and parallelization). Note to use all 4 cores of a CPU you'd have to create 4 workers https://stackoverflow.com/a/11871543/9204336, probably not something I'd do as the document needs to be treated as a whole, but definitely should use at least 1 web worker for performance and not lagging the UI thread. USE transferrable (pass by reference) objects for best performance https://developers.google.com/web/updates/2011/12/Transferable-Objects-Lightning-Fast
 *  - Good post on when to use Structured Clone (worker.postMessage()) and when to use Transferrable objects: https://stackoverflow.com/a/34061491/9204336
 *    in short: if JSON use postMessage, if large binary video, audio, or integer array use Transferrable obj
+* 12. TODO: Inject Timer into getPageText, that way we can stub it out better
 */
 
 import { getPageText } from "./summarize";

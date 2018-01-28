@@ -8,13 +8,13 @@
  * - JSDom doesn't support treeWalker!!! https://github.com/tmpvar/jsdom/issues/539
  */
 
- // TODO: Add tests by mocking getSelection with an article instead of just an empty string
- 
+// TODO: Add tests by mocking getSelection with an article instead of just an empty string
+
 import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords, getSubsetsFromDocument } from "../summarize";
+import { findNodesWithNWords, getTextBlocksFromDom, getNlpSentencesBlocks } from "../summarize";
 
 // const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
 const window = newWindowFromString(`<!DOCTYPE html>`) as any;
@@ -96,7 +96,7 @@ describe('summarize', () => {
             addPNodesToBody([linkText], 'a');
             addPNodesToBody([full10Sentence]);
 
-            const sentences = getSubsetsFromDocument(window).sentences;
+            const sentences = getNlpSentencesBlocks(window, getTextBlocksFromDom(window)).sentences;
 
             expect(sentences[0]).to.equal(part11Sentence);
             expect(sentences[1]).to.equal(linkText);
@@ -114,7 +114,7 @@ describe('summarize', () => {
             const expected1 = `Pond’s question was not rhetorical.`;
             const expected2 = `She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity.`;
 
-            const sentences = getSubsetsFromDocument(testwin).sentences;
+            const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
             expect(sentences[0]).to.equal(expected1);
             expect(sentences[1]).to.equal(expected2);
         });
@@ -203,7 +203,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.NYTIMES;
         const testwin = await newWindowFromFile('src/test/res/nytimes1.html');
         timers.start(site);
-        const sentences = getSubsetsFromDocument(testwin).sentences;
+        const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -215,7 +215,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.MEDIUM;
         const testwin = await newWindowFromFile('src/test/res/medium1.html');
         timers.start(site);
-        const sentences = getSubsetsFromDocument(testwin).sentences;
+        const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -227,7 +227,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.MEDIUM2;
         const testwin = await newWindowFromFile('src/test/res/medium2.html');
         timers.start(site);
-        const sentences = getSubsetsFromDocument(testwin).sentences;
+        const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium2.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -239,7 +239,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.VERGE;
         const testwin = await newWindowFromFile('src/test/res/verge1.html');
         timers.start(site);
-        const sentences = getSubsetsFromDocument(testwin).sentences;
+        const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -251,7 +251,7 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.CBC;
         const testwin = await newWindowFromFile('src/test/res/cbc1.html');
         timers.start(site);
-        const sentences = getSubsetsFromDocument(testwin).sentences;
+        const sentences = getNlpSentencesBlocks(testwin, getTextBlocksFromDom(testwin)).sentences;
         // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
         const accuracy = await rateSentencesMatch(sentences, 'src/test/res/cbc1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
@@ -306,6 +306,7 @@ function newWindowFromString(htmlString: string) {
     const w = new JSDOM(htmlString).window as any;
     // Mock getSelection due to https://github.com/jsdom/jsdom/issues/321
     w.getSelection = () => '';
+    w.performance = { now: () => null };
     return w;
 }
 

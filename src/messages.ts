@@ -16,9 +16,11 @@ export enum Commands {
 
 export class Timer {
     start: number;
+    currentWindow;
 
-    constructor() {
-        this.start = performance.now();
+    constructor(currentWindow = window) {
+        this.currentWindow = currentWindow;
+        this.start = this.currentWindow.performance.now();
     }
 
     logTimeAndReset(m: string) {
@@ -26,7 +28,7 @@ export class Timer {
     }
 
     reset(): number {
-        const now = performance.now();
+        const now = this.currentWindow.performance.now();
         const measurement = now - this.start;
         this.start = now;
         return measurement;

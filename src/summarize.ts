@@ -7,7 +7,8 @@ const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
 export function getPageText(): SummaryData {
-    const { sentences, nlpBlocks } = getSubsetsFromDocument(window);
+    const textBlocks = getTextBlocksFromDom(window);
+    const { sentences, nlpBlocks } = getNlpSentencesBlocks(window, textBlocks);
     const t = new Timer();
     const result = summarizeSentences(sentences);
     t.logTimeAndReset('summarizeSentences');
@@ -68,13 +69,18 @@ interface NlpSubsets {
     nlpBlocks: Array<object>;
 }
 
-export function getSubsetsFromDocument(theWindow: Window, useNlp = true): NlpSubsets {
+export function getTextBlocksFromDom(theWindow: Window): string[] {
     const selection = theWindow.getSelection().toString().trim();
     const theDocument = theWindow.document;
 
-    const t = new Timer();
+    const t = new Timer(theWindow);
     const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
     t.logTimeAndReset('treeWalk');
+    return textBlocks;
+}
+
+export function getNlpSentencesBlocks(currentWindow: Window, textBlocks: string[]): NlpSubsets {
+    const t = new Timer(currentWindow);
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
     t.logTimeAndReset('nlp processing');
