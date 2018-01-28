@@ -7,7 +7,7 @@ const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
 export function getPageText(): SummaryData {
-    const { sentences, nlpBlocks } = getSubsetsFromDocument(document);
+    const { sentences, nlpBlocks } = getSubsetsFromDocument(window);
     const result = summarizeSentences(sentences);
 
     return {
@@ -54,8 +54,9 @@ interface NlpSubsets {
     nlpBlocks: Array<object>;
 }
 
-export function getSubsetsFromDocument(theDocument: Document, useNlp = true): NlpSubsets {
-    const selection = window.getSelection().toString().trim();
+export function getSubsetsFromDocument(theWindow: Window, useNlp = true): NlpSubsets {
+    const selection = theWindow.getSelection().toString().trim();
+    const theDocument = theWindow.document;
 
     const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
