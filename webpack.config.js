@@ -1,10 +1,13 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/main.ts',
+    entry: {
+        main: './src/main.ts',
+        background: './src/background.ts'
+    },
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',
         publicPath: '/build/'
     },
     resolve: {

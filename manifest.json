@@ -11,13 +11,13 @@
                 "<all_urls>"
             ],
             "js": [
-                "build/bundle.js"
+                "build/main.bundle.js"
             ]
         }
     ],
     "background": {
         "scripts": [
-            "src/background.js"
+            "build/background.bundle.js"
         ]
     },
     "permissions": [
