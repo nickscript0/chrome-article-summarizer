@@ -16,10 +16,11 @@
 */
 
 import { getPageText } from "./summarize";
+import { Commands } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.command === "summarize") {
+    if (request.command === Commands.Summarize) {
         console.log(`Content script received summarize command!`);
-        sendResponse({data: getPageText()});
+        sendResponse({ data: getPageText() });
     }
 });

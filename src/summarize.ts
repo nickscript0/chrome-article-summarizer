@@ -21,7 +21,7 @@ export function getPageText(): SummaryData {
 }
 
 function getWordStats(nlpBlocks: Array<any>): string {
-    const N = 5;
+    const NUM_WORD_STATS = 5;
     function nbSubsetToArr(nlpBlocks, subsetFunc) {
         const count2d = nlpBlocks.map(nb => subsetFunc(nb).data()
             .filter(d => d)
@@ -38,9 +38,9 @@ function getWordStats(nlpBlocks: Array<any>): string {
         .filter(x => !(new Set(peopleArr).has(x)))
         .filter(x => !(new Set(placesArr).has(x)));
 
-    const topPeople = new StringCounter(peopleArr).topN(N).join(', ');
-    const topPlaces = new StringCounter(placesArr).topN(N).join(', ');
-    const topThings = new StringCounter(thingsArr).topN(N).join(', ');
+    const topPeople = new StringCounter(peopleArr).topN(NUM_WORD_STATS).join(', ');
+    const topPlaces = new StringCounter(placesArr).topN(NUM_WORD_STATS).join(', ');
+    const topThings = new StringCounter(thingsArr).topN(NUM_WORD_STATS).join(', ');
 
 
     return `Top People: ${topPeople}

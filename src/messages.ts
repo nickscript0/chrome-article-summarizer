@@ -8,3 +8,8 @@ export interface SummaryData {
     pageRanks: number[];
     numSummarySentences: number;
 }
+
+export enum Commands {
+    Display = 'Display',
+    Summarize = 'Summarize'
+}

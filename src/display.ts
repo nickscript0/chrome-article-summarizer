@@ -1,12 +1,11 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData } from './messages';
+import { SummaryData, Commands } from './messages';
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.command === "display_summary") {
-        console.log(`DATA IS ${JSON.stringify(request.data)}`);
+    if (request.command === Commands.Display) {
         display(request.data);
     }
 });
