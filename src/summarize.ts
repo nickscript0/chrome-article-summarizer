@@ -1,22 +1,36 @@
 import * as nlp from 'compromise';
 
 import { calculatePageRank, makeGraph } from "./text-rank";
-import { SummaryData } from './messages';
+import { SummaryData, Timer } from './messages';
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
 export function getPageText(): SummaryData {
     const { sentences, nlpBlocks } = getSubsetsFromDocument(window);
+    const t = new Timer();
     const result = summarizeSentences(sentences);
+    t.logTimeAndReset('summarizeSentences');
 
+    const title = document.title;
+    const tsub = new Timer();
+    const sentencesR = result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES);
+    tsub.logTimeAndReset('-->getSentencesOrderedByOccurence');
+    const textStats = result.getStatsText(NUM_SUMMARY_SENTENCES);
+    tsub.logTimeAndReset('-->getStatsText');
+    const wordStats = getWordStats(nlpBlocks);
+    tsub.logTimeAndReset('-->getWordStats');
+    const pageRanks = result.allPageRanks();
+    tsub.logTimeAndReset('-->allPageRanks');
+    const numSummarySentences = NUM_SUMMARY_SENTENCES;
+    t.logTimeAndReset('finalDataStructureMapping');
     return {
-        title: document.title,
-        sentences: result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES),
-        textStats: result.getStatsText(NUM_SUMMARY_SENTENCES),
-        wordStats: getWordStats(nlpBlocks),
-        pageRanks: result.allPageRanks(),
-        numSummarySentences: NUM_SUMMARY_SENTENCES
+        title,
+        sentences: sentencesR,
+        textStats,
+        wordStats,
+        pageRanks,
+        numSummarySentences
     };
 }
 
@@ -58,9 +72,12 @@ export function getSubsetsFromDocument(theWindow: Window, useNlp = true): NlpSub
     const selection = theWindow.getSelection().toString().trim();
     const theDocument = theWindow.document;
 
+    const t = new Timer();
     const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
+    t.logTimeAndReset('treeWalk');
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
+    t.logTimeAndReset('nlp processing');
     return {
         sentences: Array.prototype.concat(...sentences2d),
         nlpBlocks: nlpBlocks
