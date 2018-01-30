@@ -11,7 +11,8 @@ export interface SummaryData {
 
 export enum Commands {
     Display = 'Display',
-    Summarize = 'Summarize'
+    Summarize = 'Summarize',
+    DisplayTabReady = 'DisplayTabReady'
 }
 
 export class Timer {

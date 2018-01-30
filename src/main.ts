@@ -1,5 +1,6 @@
 /**
  * Article Summarizer Chrome Extension
+ * - See here why web workers can't be used in content scripts (without a proxy) https://github.com/Rob--W/chrome-api/tree/master/worker_proxy
  */
 
 /**
