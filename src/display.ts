@@ -7,7 +7,9 @@ function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
     worker.port.addEventListener('message', function (e) {
         if (e.data.type === Commands.Display) {
+            console.log(`Total processing time before Display : ${getTimeDiffMs(e.data.startTime)}ms`);
             display(e.data.payload);
+            console.log(`Total processing time after Display : ${getTimeDiffMs(e.data.startTime)}ms`);
         }
     });
 
@@ -16,6 +18,13 @@ function attachWorker() {
     worker.port.postMessage({
         type: Commands.DisplayTabReady
     });
+}
+
+function getTimeDiffMs(startTime: number): string {
+    const now = Date.now();
+    const diff = (now - startTime).toFixed(0);
+    // console.log(`Calculated TimeDiffMs: start=${startTime}, now=${now}, diff=${diff}`);
+    return diff;
 }
 
 function display(data: SummaryData) {

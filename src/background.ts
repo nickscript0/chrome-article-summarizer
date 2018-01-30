@@ -26,8 +26,8 @@ function setupMenus() {
 function sendToggleSummaryMessage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const mainTabId = tabs[0].id;
-        if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.Summarize }, response => {
-            attachWorker(response.data);
+        if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.Summarize }, r => {
+            attachWorker(r.data);
             createDisplayTab();
         });
     });

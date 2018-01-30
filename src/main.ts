@@ -26,7 +26,15 @@ import { Commands } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.Summarize) {
-        sendResponse({ data: {textBlocks: getTextBlocksFromDom(window), title: document.title }});
+        const startTime = Date.now();
+        const textBlocks = getTextBlocksFromDom(window);
+        sendResponse({
+            data: {
+                textBlocks: textBlocks,
+                title: document.title,
+                startTime: startTime
+            }
+        });
     }
 });
 
