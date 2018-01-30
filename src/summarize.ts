@@ -6,14 +6,13 @@ import { SummaryData, Timer } from './messages';
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
-export function getPageText(): SummaryData {
-    const textBlocks = getTextBlocksFromDom(window);
-    const { sentences, nlpBlocks } = getNlpSentencesBlocks(window, textBlocks);
+export function summarizeTextBlocks(textBlocks: string[], docTitle: string): SummaryData {
+    const { sentences, nlpBlocks } = getNlpSentencesBlocks(textBlocks);
     const t = new Timer();
     const result = summarizeSentences(sentences);
     t.logTimeAndReset('summarizeSentences');
 
-    const title = document.title;
+    const title = docTitle;
     const tsub = new Timer();
     const sentencesR = result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES);
     tsub.logTimeAndReset('-->getSentencesOrderedByOccurence');
@@ -73,14 +72,14 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
     const selection = theWindow.getSelection().toString().trim();
     const theDocument = theWindow.document;
 
-    const t = new Timer(theWindow);
+    const t = new Timer();
     const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
     t.logTimeAndReset('treeWalk');
     return textBlocks;
 }
 
-export function getNlpSentencesBlocks(currentWindow: Window, textBlocks: string[]): NlpSubsets {
-    const t = new Timer(currentWindow);
+export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {
+    const t = new Timer();
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
     t.logTimeAndReset('nlp processing');

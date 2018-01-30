@@ -3,16 +3,10 @@
 import { Chart } from "chart.js";
 import { SummaryData, Commands } from './messages';
 
-
-// START WORKER 
 function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
-    console.log(`Created Worker!`);
     worker.port.addEventListener('message', function (e) {
-        console.log(`Received ANY command from Worker!`);
         if (e.data.type === Commands.Display) {
-            //display(e.data.result);
-            console.log(`Received DISPLAY command from Worker!`);
             display(e.data.payload);
         }
     });
@@ -23,14 +17,6 @@ function attachWorker() {
         type: Commands.DisplayTabReady
     });
 }
-// END WORKER
-
-// TODO: remove this
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.command === Commands.Display) {
-        // display(request.data);
-    }
-});
 
 function display(data: SummaryData) {
     const rootDiv = document.createElement('div');
@@ -57,8 +43,6 @@ function display(data: SummaryData) {
     rootDiv.appendChild(pre);
     const chart = _createChart(data.pageRanks, data.numSummarySentences);
     if (chart) rootDiv.appendChild(chart);
-
-    console.log(`Appending a rootDiv ${JSON.stringify(rootDiv)}`);
     document.body.appendChild(rootDiv);
 }
 

@@ -19,13 +19,12 @@
 * 12. TODO: Inject Timer into getPageText, that way we can stub it out better
 */
 
-import { getPageText } from "./summarize";
+import { getTextBlocksFromDom } from "./summarize";
 import { Commands } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.Summarize) {
-        console.log(`Content script received summarize command!`);
-        sendResponse({ data: getPageText() });
+        sendResponse({ data: {textBlocks: getTextBlocksFromDom(window), title: document.title }});
     }
 });
 

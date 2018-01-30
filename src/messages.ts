@@ -17,21 +17,29 @@ export enum Commands {
 
 export class Timer {
     start: number;
-    currentWindow;
+    performance;
 
-    constructor(currentWindow = window) {
-        this.currentWindow = currentWindow;
-        this.start = this.currentWindow.performance.now();
+    constructor() {
+        this.start = this.now();
     }
 
     logTimeAndReset(m: string) {
-        console.log(`${m} ${this.reset().toFixed(0)}ms`);
+        if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
     }
 
     reset(): number {
-        const now = this.currentWindow.performance.now();
+        const now = this.now();
         const measurement = now - this.start;
         this.start = now;
         return measurement;
+    }
+
+    now(): number {
+        // Trick to run for jsdom uni tests that don't have performance defined
+        return this.performanceDefined() ? performance.now() : 0;
+    }
+
+    performanceDefined(): boolean {
+        return typeof performance !== 'undefined';
     }
 }
