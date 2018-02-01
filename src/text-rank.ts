@@ -137,9 +137,13 @@ class SummarizerResult {
         return arr.sort((a, b) => b.pagerank - a.pagerank);
     }
 
-    getSentencesOrderedByOccurence(maxSentences: number): Array<string> {
+    getSentencesOrderedByOccurence(maxSentences: number): Array<{ content: string, rank: string }> {
         return this._getTopPrResultOrderedByOccurence(maxSentences)
-            .map(s => `${s.sentence} [Rank: ${this.orderIndexToPRMap.get(s.index)}]`);
+            .map(s => {
+                const rank = this.orderIndexToPRMap.get(s.index);
+                const rankString = rank ? rank.toString() : '';
+                return { content: s.sentence, rank: rankString };
+            });
     }
 
     _getTopPrResultOrderedByOccurence(maxSentences: number): Array<PageRankResult> {

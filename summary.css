@@ -1,0 +1,21 @@
+.page {
+    padding: 50px;
+    margin-left: 225px;
+    margin-right: 225px;
+    /* font-family: georgia, "times new roman", times, serif; */
+}
+
+.stats-text {
+    font-size: 14px;
+}
+
+.paragraph {
+    font-size: 16px;
+    margin-bottom: 22px;
+    color: black;
+}
+
+.paragraph::after {
+    content: ' ';
+    display: block;
+}

@@ -1,7 +1,7 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData, Commands } from './messages';
+import { SummaryData, Commands, Sentence } from './messages';
 
 function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
@@ -23,15 +23,12 @@ function attachWorker() {
 function getTimeDiffMs(startTime: number): string {
     const now = Date.now();
     const diff = (now - startTime).toFixed(0);
-    // console.log(`Calculated TimeDiffMs: start=${startTime}, now=${now}, diff=${diff}`);
     return diff;
 }
 
 function display(data: SummaryData) {
     const rootDiv = document.createElement('div');
-    rootDiv.style.padding = '50px';
-    rootDiv.style.marginLeft = '100px';
-    rootDiv.style.marginRight = '100px';
+    rootDiv.className = 'page';
 
     const title = document.createElement('h2');
     title.textContent = data.title;
@@ -47,7 +44,7 @@ function display(data: SummaryData) {
     // Add stats text
     const pre = document.createElement('pre');
     pre.textContent = data.textStats + '\n' + data.wordStats;
-    pre.style.fontSize = '14px';
+    pre.className = 'stats-text';
     rootDiv.appendChild(document.createElement('br'));
     rootDiv.appendChild(pre);
     const chart = _createChart(data.pageRanks, data.numSummarySentences);
@@ -55,11 +52,11 @@ function display(data: SummaryData) {
     document.body.appendChild(rootDiv);
 }
 
-function _createParagraph(text: string) {
-    const p = document.createElement('p');
-    p.textContent = text;
-    p.style.fontSize = '15px';
-    return _setFontStyle(p);
+function _createParagraph(text: Sentence) {
+    const p = document.createElement('div');
+    p.textContent = text.content;
+    p.className = 'paragraph';
+    return p;
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
@@ -100,13 +97,6 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     div.style.textAlign = 'center';
     div.appendChild(canvasEl);
     return div;
-}
-
-function _setFontStyle(e: HTMLElement) {
-    // Font styling modeled off of nytimes
-    e.style.fontFamily = `georgia, "times new roman", times, serif`;
-    e.style.color = 'black';
-    return e;
 }
 
 attachWorker();

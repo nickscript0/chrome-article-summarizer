@@ -2,11 +2,16 @@
 
 export interface SummaryData {
     title: string;
-    sentences: string[];
+    sentences: Sentence[];
     textStats: string;
     wordStats: string;
     pageRanks: number[];
     numSummarySentences: number;
+}
+
+export interface Sentence {
+    content: string;
+    rank: string;
 }
 
 export enum Commands {
