@@ -54,8 +54,15 @@ function display(data: SummaryData) {
 
 function _createParagraph(text: Sentence) {
     const p = document.createElement('div');
-    p.textContent = text.content;
     p.className = 'paragraph';
+    const pContent = document.createElement('div');
+    pContent.className = 'p-content';
+    pContent.textContent = text.content;
+    const pRank = document.createElement('div');
+    pRank.className = 'p-rank';
+    pRank.textContent = `[Rank: ${text.rank}]`;
+    p.appendChild(pContent);
+    p.appendChild(pRank);
     return p;
 }
 
