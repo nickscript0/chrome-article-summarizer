@@ -27,6 +27,7 @@ function getTimeDiffMs(startTime: number): string {
 }
 
 function display(data: SummaryData) {
+    document.title = data.title + ' - Summary';
     const rootDiv = document.createElement('div');
     rootDiv.className = 'page';
 
