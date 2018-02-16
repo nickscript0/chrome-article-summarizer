@@ -49,14 +49,30 @@ function display(data: SummaryData) {
         i += 1;
     }
 
-    // Add stats text
+    // Add toggle button for showing the chart
+    const toggleChartButton = document.createElement('a');
+    toggleChartButton.text = 'Toggle Details';
+    toggleChartButton.href = '#';
+    // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
+    toggleChartButton.onclick = () => {
+        const detailsEl = document.getElementById('details');
+        if (detailsEl) detailsEl.style.display = detailsEl.style.display === 'none' ? '' : 'none';
+    };
+    rootDiv.appendChild(document.createElement('br'));
+    rootDiv.appendChild(toggleChartButton);
+
+    // Add details div with stats text and chart
+    const details = document.createElement('div');
+    details.id = 'details';
+    details.style.display = 'none';
     const pre = document.createElement('pre');
     pre.textContent = data.textStats + '\n' + data.wordStats;
     pre.className = 'stats-text';
-    rootDiv.appendChild(document.createElement('br'));
-    rootDiv.appendChild(pre);
+    details.appendChild(pre);
     const chart = _createChart(data.pageRanks, data.numSummarySentences);
-    if (chart) rootDiv.appendChild(chart);
+    if (chart) details.appendChild(chart);
+    rootDiv.appendChild(details);
+
     document.body.appendChild(rootDiv);
 }
 
