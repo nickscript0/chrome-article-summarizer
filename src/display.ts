@@ -123,8 +123,10 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     });
 
     const div = document.createElement('div');
-    div.style.width = '800px';
-    div.style.height = '400px';
+    // div.style.width = '800px';
+    // div.style.height = '400px';
+    div.style.width = '100%';
+    div.style.height = '100%';
     div.style.textAlign = 'center';
     div.appendChild(canvasEl);
     return div;
