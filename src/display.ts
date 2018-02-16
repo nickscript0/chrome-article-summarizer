@@ -73,6 +73,8 @@ function display(data: SummaryData) {
     if (chart) details.appendChild(chart);
     rootDiv.appendChild(details);
 
+    const loadingClock = document.getElementById('loading-clock');
+    if (loadingClock) loadingClock.style.display = 'none';
     document.body.appendChild(rootDiv);
 }
 
