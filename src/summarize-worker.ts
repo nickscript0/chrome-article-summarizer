@@ -18,14 +18,15 @@ onconnect = e => {
         if (event.data.type === Commands.DisplayTabReady) {
             summarizePort && summarizePort.postMessage({ type: Commands.DisplayTabReady });
         }
-        else if (event.data.type === Commands.Summarize) {
+        else if (event.data.type === Commands.ToggleSummarize) {
             const textBlocks = event.data.payload.textBlocks;
             const pageTitle = event.data.payload.title;
             const summaryData = summarizeTextBlocks(textBlocks, pageTitle);
             displayPort && displayPort.postMessage({
                 type: Commands.Display,
                 payload: summaryData,
-                startTime: event.data.payload.startTime
+                startTime: event.data.payload.startTime,
+                url: event.data.payload.url
             });
             // This is necessary otherwise connections goes to 2, 3 the next article that is summarized
             // TODO: investigate if closing the working, and opening it each summarize

@@ -26,7 +26,7 @@ function setupMenus() {
 function sendToggleSummaryMessage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const mainTabId = tabs[0].id;
-        if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.Summarize }, r => {
+        if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
             attachWorker(r.data);
             createDisplayTab();
         });
@@ -35,9 +35,10 @@ function sendToggleSummaryMessage() {
 
 function createDisplayTab() {
     const url = chrome.extension.getURL("summary.html");
-    chrome.tabs.create({ url: url, selected: true }, (tab) => {
+    chrome.tabs.update(undefined, {url: url});
+    // chrome.tabs.create({ url: url, selected: true }, (tab) => {
 
-    });
+    // });
 }
 
 function attachWorker(payload) {
@@ -47,7 +48,7 @@ function attachWorker(payload) {
     worker.port.addEventListener('message', function (e) {
         if (e.data.type === Commands.DisplayTabReady) {
             worker.port.postMessage({
-                type: Commands.Summarize,
+                type: Commands.ToggleSummarize,
                 payload: payload
             });
         }

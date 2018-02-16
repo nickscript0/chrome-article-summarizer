@@ -16,7 +16,7 @@ export interface Sentence {
 
 export enum Commands {
     Display = 'Display',
-    Summarize = 'Summarize',
+    ToggleSummarize = 'ToggleSummarize',
     DisplayTabReady = 'DisplayTabReady'
 }
 

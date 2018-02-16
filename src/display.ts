@@ -7,6 +7,13 @@ function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
     worker.port.addEventListener('message', function (e) {
         if (e.data.type === Commands.Display) {
+            // Add a listener that loads the original page
+            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+                if (request.command === Commands.ToggleSummarize) {
+                    document.location.href = e.data.url;
+                }
+            });
+
             console.log(`Total processing time before Display : ${getTimeDiffMs(e.data.startTime)}ms`);
             display(e.data.payload);
             console.log(`Total processing time after Display : ${getTimeDiffMs(e.data.startTime)}ms`);

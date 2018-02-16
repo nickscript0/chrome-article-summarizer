@@ -25,14 +25,15 @@ import { getTextBlocksFromDom } from "./summarize";
 import { Commands } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.command === Commands.Summarize) {
+    if (request.command === Commands.ToggleSummarize) {
         const startTime = Date.now();
         const textBlocks = getTextBlocksFromDom(window);
         sendResponse({
             data: {
                 textBlocks: textBlocks,
                 title: document.title,
-                startTime: startTime
+                startTime: startTime,
+                url: document.location.href
             }
         });
     }
