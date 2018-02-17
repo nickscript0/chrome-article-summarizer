@@ -1,5 +1,8 @@
 import { Commands, InputPayload, WorkerPayload, WorkerPayloadCommand, InputPayloadCommand } from './messages';
 
+// key: tab.id, value: url string or null if not in summary mode
+let activeTabs: { [tabid: number]: string | undefined} = {};
+
 function setupMenus() {
     chrome.contextMenus.create({
         title: "Toggle Summarize",
@@ -25,11 +28,23 @@ function setupMenus() {
 function sendToggleSummaryMessage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const mainTabId = tabs[0].id;
-        if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
-            const payload: InputPayload = r.data;
-            createDisplayTab(payload);
-            // attachWorker(payload);
-        });
+        if (mainTabId) {
+            if (activeTabs[mainTabId]) {
+                chrome.tabs.update(mainTabId, { url: activeTabs[mainTabId] });
+                delete activeTabs[mainTabId];
+            } else {
+                chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
+                    console.log(`GOT RESPONSE: `);
+                    // If a user is togglingSummary button when the summary is displayed, r.data will be sent from display.ts and empty
+                    if (r) {
+                        const payload: InputPayload = r.data;
+                        activeTabs[mainTabId] = payload.url;
+                        createDisplayTab(payload);
+                        // attachWorker(payload);
+                    }
+                });
+            }
+        }
     });
 }
 

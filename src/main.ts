@@ -38,3 +38,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
+// async function main() {
+//     const { message, sender, sendResponse } = await onMessageListener();
+//     console.log(`MESSAGE IS ${message}`);
+//     if (message.command === Commands.ToggleSummarize) {
+//         const startTime = Date.now();
+//         const textBlocks = getTextBlocksFromDom(window);
+//         const payload: InputPayload = {
+//             textBlocks: textBlocks,
+//             title: document.title,
+//             startTime: startTime,
+//             url: document.location.href
+//         };
+//         console.log(`sending repsonse !!! ${payload.url}, ${payload.startTime}`);
+//         sendResponse(payload);
+//     }
+
+// }
+
+
+function onMessageListener(): Promise<{ message: any, sender: chrome.runtime.MessageSender, sendResponse: Function }> {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            return resolve({ message, sender, sendResponse });
+        });
+    });
+}
+
+// main();

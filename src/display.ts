@@ -45,7 +45,7 @@ function display(data: SummaryData, startTime: number) {
     // Add toggle button for showing the chart
     const toggleChartButton = document.createElement('a');
     toggleChartButton.text = 'Toggle Details';
-    toggleChartButton.href = '#';
+    toggleChartButton.href = 'javascript:void(0);';
     // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
     toggleChartButton.onclick = () => {
         const detailsEl = document.getElementById('details');
