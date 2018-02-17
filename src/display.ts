@@ -4,7 +4,7 @@ import { Chart } from "chart.js";
 import { SummaryData, Commands, Sentence, WorkerPayload, SimpleCommand, WorkerPayloadCommand } from './messages';
 
 function setupListeners() {
-    const port = chrome.runtime.connect({ name: Commands.Display });
+    const port = chrome.runtime.connect({ name: 'DisplayConnect' });
     port.onMessage.addListener(function (msg: WorkerPayloadCommand) {
         if (msg.command === Commands.Display) {
             const workerPayload: WorkerPayload = msg.payload;
@@ -12,6 +12,7 @@ function setupListeners() {
             display(workerPayload.payload, workerPayload.startTime);
             console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
         }
+        port.disconnect();
     });
     const readyCommand: SimpleCommand = {
         command: Commands.DisplayTabReady
