@@ -1,5 +1,19 @@
 // Interfaces for message passing between tabs and background script
 
+export interface InputPayload {
+    textBlocks: string[];
+    title: string;
+    startTime: number;
+    url: string;
+}
+
+export interface WorkerPayload {
+    type: Commands;
+    payload: SummaryData;
+    startTime: number;
+    url: string;
+}
+
 export interface SummaryData {
     title: string;
     sentences: Sentence[];

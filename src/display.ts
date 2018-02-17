@@ -1,12 +1,13 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData, Commands, Sentence } from './messages';
+import { SummaryData, Commands, Sentence, WorkerPayload } from './messages';
 
 function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
     worker.port.addEventListener('message', function (e) {
-        if (e.data.type === Commands.Display) {
+        const workerPayload: WorkerPayload = e.data;
+        if (workerPayload.type === Commands.Display) {
             // Add listener that loads the original page if extension is activated again (e.g. user clicks Summarize button a 2nd time)
             chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (request.command === Commands.ToggleSummarize) {
@@ -26,7 +27,7 @@ function attachWorker() {
             // window.history.pushState("object or string", document.title, e.data.url);
 
             console.log(`Total processing time before Display : ${getTimeDiffMs(e.data.startTime)}ms`);
-            display(e.data.payload, e.data.startTime);
+            display(workerPayload.payload, workerPayload.startTime);
             console.log(`Total processing time after Display : ${getTimeDiffMs(e.data.startTime)}ms`);
         }
     });

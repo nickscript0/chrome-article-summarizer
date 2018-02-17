@@ -19,19 +19,21 @@
 */
 
 import { getTextBlocksFromDom } from "./summarize";
-import { Commands } from './messages';
+import { Commands, InputPayload } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.ToggleSummarize) {
         const startTime = Date.now();
         const textBlocks = getTextBlocksFromDom(window);
+        const payload: InputPayload = {
+            textBlocks: textBlocks,
+            title: document.title,
+            startTime: startTime,
+            url: document.location.href
+        };
+
         sendResponse({
-            data: {
-                textBlocks: textBlocks,
-                title: document.title,
-                startTime: startTime,
-                url: document.location.href
-            }
+            data: payload
         });
     }
 });

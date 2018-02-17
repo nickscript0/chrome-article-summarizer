@@ -1,4 +1,4 @@
-import { Commands } from './messages';
+import { Commands, InputPayload, WorkerPayload } from './messages';
 import { summarizeTextBlocks } from './summarize';
 declare let onconnect;
 
@@ -19,15 +19,17 @@ onconnect = e => {
             summarizePort && summarizePort.postMessage({ type: Commands.DisplayTabReady });
         }
         else if (event.data.type === Commands.ToggleSummarize) {
-            const textBlocks = event.data.payload.textBlocks;
-            const pageTitle = event.data.payload.title;
+            const payload: InputPayload = event.data.payload;
+            const textBlocks = payload.textBlocks;
+            const pageTitle = payload.title;
             const summaryData = summarizeTextBlocks(textBlocks, pageTitle);
-            displayPort && displayPort.postMessage({
+            const workerPayload: WorkerPayload = {
                 type: Commands.Display,
                 payload: summaryData,
-                startTime: event.data.payload.startTime,
-                url: event.data.payload.url
-            });
+                startTime: payload.startTime,
+                url: payload.url
+            };
+            displayPort && displayPort.postMessage(workerPayload);
             // This is necessary otherwise connections goes to 2, 3 the next article that is summarized
             // TODO: investigate if closing the working, and opening it each summarize
             close();

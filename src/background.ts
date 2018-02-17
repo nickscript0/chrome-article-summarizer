@@ -1,4 +1,4 @@
-import { Commands } from './messages';
+import { Commands, InputPayload } from './messages';
 
 function setupMenus() {
     chrome.contextMenus.create({
@@ -27,7 +27,8 @@ function sendToggleSummaryMessage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const mainTabId = tabs[0].id;
         if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
-            attachWorker(r.data);
+            const payload: InputPayload = r.data;
+            attachWorker(payload);
             createDisplayTab();
         });
     });
@@ -41,7 +42,7 @@ function createDisplayTab() {
     // });
 }
 
-function attachWorker(payload) {
+function attachWorker(payload: InputPayload) {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
     worker.port.start(); // TODO: is this necessary?
 
