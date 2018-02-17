@@ -1,5 +1,32 @@
 // Interfaces for message passing between tabs and background script
 
+export interface SimpleCommand {
+    command: Commands;
+}
+
+export interface WorkerPayloadCommand {
+    command: Commands.Display;
+    payload: WorkerPayload;
+}
+
+export interface InputPayloadCommand {
+    command: Commands.ToggleSummarize;
+    payload: InputPayload;
+}
+
+
+// export interface WorkerCommand {
+//     type: Commands;
+//     url: string;
+//     client: WorkerClients;
+//     payload?: InputPayload;
+// }
+
+// export enum WorkerClients {
+//     BackgroundPage,
+//     DisplayPage
+// }
+
 export interface InputPayload {
     textBlocks: string[];
     title: string;

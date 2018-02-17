@@ -1,42 +1,22 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData, Commands, Sentence, WorkerPayload } from './messages';
+import { SummaryData, Commands, Sentence, WorkerPayload, SimpleCommand, WorkerPayloadCommand } from './messages';
 
-function attachWorker() {
-    const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
-    worker.port.addEventListener('message', function (e) {
-        const workerPayload: WorkerPayload = e.data;
-        if (workerPayload.type === Commands.Display) {
-            // Add listener that loads the original page if extension is activated again (e.g. user clicks Summarize button a 2nd time)
-            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-                if (request.command === Commands.ToggleSummarize) {
-                    document.location.href = e.data.url;
-                }
-            });
-
-            // TODO: THIS DOESNT WORK, because even though it changes the url, the refresh event continues and loads the current page
-            // will need to use another technique such as 
-            // Add a listener that loads the original page on refresh or back event
-            // window.onbeforeunload = function (innerE) {
-            //     console.log(`onbeforeunload event achieved!!`);
-            //     document.location.href = e.data.url;
-            // };
-
-            // This doesn't work as it's a new domain
-            // window.history.pushState("object or string", document.title, e.data.url);
-
-            console.log(`Total processing time before Display : ${getTimeDiffMs(e.data.startTime)}ms`);
+function setupListeners() {
+    const port = chrome.runtime.connect({ name: Commands.Display });
+    port.onMessage.addListener(function (msg: WorkerPayloadCommand) {
+        if (msg.command === Commands.Display) {
+            const workerPayload: WorkerPayload = msg.payload;
+            console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
             display(workerPayload.payload, workerPayload.startTime);
-            console.log(`Total processing time after Display : ${getTimeDiffMs(e.data.startTime)}ms`);
+            console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
         }
     });
-
-    worker.port.start();
-
-    worker.port.postMessage({
-        type: Commands.DisplayTabReady
-    });
+    const readyCommand: SimpleCommand = {
+        command: Commands.DisplayTabReady
+    };
+    port.postMessage(readyCommand);
 }
 
 function getTimeDiffMs(startTime: number): string {
@@ -147,4 +127,4 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     return div;
 }
 
-attachWorker();
+setupListeners();

@@ -1,4 +1,4 @@
-import { Commands, InputPayload } from './messages';
+import { Commands, InputPayload, WorkerPayload, SimpleCommand, WorkerPayloadCommand, InputPayloadCommand } from './messages';
 
 function setupMenus() {
     chrome.contextMenus.create({
@@ -20,7 +20,6 @@ function setupMenus() {
     chrome.browserAction.onClicked.addListener(function () {
         sendToggleSummaryMessage();
     });
-
 }
 
 function sendToggleSummaryMessage() {
@@ -28,31 +27,39 @@ function sendToggleSummaryMessage() {
         const mainTabId = tabs[0].id;
         if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
             const payload: InputPayload = r.data;
-            attachWorker(payload);
             createDisplayTab();
+            attachWorker(payload);
         });
     });
 }
 
 function createDisplayTab() {
     const url = chrome.extension.getURL("summary.html");
-    chrome.tabs.update({url: url});
-    // chrome.tabs.create({ url: url, selected: true }, (tab) => {
-
-    // });
+    chrome.tabs.update({ url: url });
 }
 
 function attachWorker(payload: InputPayload) {
-    const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
-    worker.port.start(); // TODO: is this necessary?
+    // runtime.connect: Background <-> DisplayTab
+    chrome.runtime.onConnect.addListener(displayTabPort => {
+        displayTabPort.onMessage.addListener((msg: SimpleCommand) => {
+            if (msg.command === Commands.DisplayTabReady) {
+                const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
+                worker.onmessage = e => {
+                    const workerPayload: WorkerPayload = e.data;
+                    const wpCommand: WorkerPayloadCommand = {
+                        command: Commands.Display,
+                        payload: workerPayload
+                    };
+                    displayTabPort.postMessage(wpCommand);
+                };
 
-    worker.port.addEventListener('message', function (e) {
-        if (e.data.type === Commands.DisplayTabReady) {
-            worker.port.postMessage({
-                type: Commands.ToggleSummarize,
-                payload: payload
-            });
-        }
+                const ipCommand: InputPayloadCommand = {
+                    command: Commands.ToggleSummarize,
+                    payload: payload
+                };
+                worker.postMessage(ipCommand);
+            }
+        });
     });
 }
 
