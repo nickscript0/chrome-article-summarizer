@@ -5,19 +5,22 @@ import { SummaryData, Commands, Sentence, WorkerPayload, SimpleCommand, WorkerPa
 
 function setupListeners() {
     const port = chrome.runtime.connect({ name: 'DisplayConnect' });
-    port.onMessage.addListener(function (msg: WorkerPayloadCommand) {
+    port.onMessage.addListener(onMessageListener);
+    function onMessageListener(msg: WorkerPayloadCommand) {
         if (msg.command === Commands.Display) {
             const workerPayload: WorkerPayload = msg.payload;
             console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
             display(workerPayload.payload, workerPayload.startTime);
             console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
+            port.onMessage.removeListener(onMessageListener);
+            port.disconnect();
         }
-        port.disconnect();
-    });
-    const readyCommand: SimpleCommand = {
-        command: Commands.DisplayTabReady
-    };
-    port.postMessage(readyCommand);
+
+    }
+    // const readyCommand: SimpleCommand = {
+    //     command: Commands.DisplayTabReady
+    // };
+    // port.postMessage(readyCommand);
 }
 
 function getTimeDiffMs(startTime: number): string {

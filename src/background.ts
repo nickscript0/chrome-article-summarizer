@@ -40,27 +40,30 @@ function createDisplayTab() {
 
 function attachWorker(payload: InputPayload) {
     // runtime.connect: Background <-> DisplayTab
-    chrome.runtime.onConnect.addListener(displayTabPort => {
-        displayTabPort.onMessage.addListener((msg: SimpleCommand) => {
-            if (msg.command === Commands.DisplayTabReady) {
-                const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
-                worker.onmessage = e => {
-                    const workerPayload: WorkerPayload = e.data;
-                    const wpCommand: WorkerPayloadCommand = {
-                        command: Commands.Display,
-                        payload: workerPayload
-                    };
-                    displayTabPort.postMessage(wpCommand);
-                };
+    chrome.runtime.onConnect.addListener(onConnectListener);
+    function onConnectListener(displayTabPort) {
+        console.log(`runtime.onConnect: ${payload.url}`);
 
-                const ipCommand: InputPayloadCommand = {
-                    command: Commands.ToggleSummarize,
-                    payload: payload
-                };
-                worker.postMessage(ipCommand);
-            }
-        });
-    });
+        const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
+        worker.onmessage = e => {
+            const workerPayload: WorkerPayload = e.data;
+            const wpCommand: WorkerPayloadCommand = {
+                command: Commands.Display,
+                payload: workerPayload
+            };
+            // worker.terminate();
+            console.log(`Sending message to displayTabPort: ${wpCommand.payload.url}`);
+            displayTabPort.postMessage(wpCommand);
+            chrome.runtime.onConnect.removeListener(onConnectListener);
+            displayTabPort.disconnect();
+        };
+
+        const ipCommand: InputPayloadCommand = {
+            command: Commands.ToggleSummarize,
+            payload: payload
+        };
+        worker.postMessage(ipCommand);
+    }
 }
 
 setupMenus();

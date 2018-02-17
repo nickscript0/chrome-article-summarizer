@@ -70,7 +70,7 @@ export class Timer {
     }
 
     logTimeAndReset(m: string) {
-        if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
+        //if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
     }
 
     reset(): number {
