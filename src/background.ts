@@ -1,4 +1,4 @@
-import { Commands, InputPayload, WorkerPayload, SimpleCommand, WorkerPayloadCommand, InputPayloadCommand } from './messages';
+import { Commands, InputPayload, WorkerPayload, WorkerPayloadCommand, InputPayloadCommand } from './messages';
 
 function setupMenus() {
     chrome.contextMenus.create({
@@ -27,43 +27,43 @@ function sendToggleSummaryMessage() {
         const mainTabId = tabs[0].id;
         if (mainTabId !== undefined) chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
             const payload: InputPayload = r.data;
-            createDisplayTab();
-            attachWorker(payload);
+            createDisplayTab(payload);
+            // attachWorker(payload);
         });
     });
 }
 
-function createDisplayTab() {
+function createDisplayTab(payload: InputPayload) {
     const url = chrome.extension.getURL("summary.html");
-    chrome.tabs.update({ url: url });
-}
+    chrome.tabs.update({ url: url }, (currentTab: chrome.tabs.Tab) => {
+        chrome.tabs.onUpdated.addListener(onUpdatedListener);
+        function onUpdatedListener(tabId: number, info) {
+            console.log(`onUpdated hit: tabId=${tabId} info=${info.status}`);
+            if (currentTab.id === tabId && info.status === 'complete') {
+                // chrome.tabs.query()
+                const currentTabId = currentTab.id;
+                const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
+                worker.onmessage = e => {
+                    const workerPayload: WorkerPayload = e.data;
+                    const wpCommand: WorkerPayloadCommand = {
+                        command: Commands.Display,
+                        payload: workerPayload
+                    };
+                    // worker.terminate();
+                    console.log(`chrome.tabs.sendMessage summaryPayload to tabId=${currentTabId}`);
+                    chrome.tabs.sendMessage(currentTabId, wpCommand);
+                    chrome.tabs.onUpdated.removeListener(onUpdatedListener);
+                };
 
-function attachWorker(payload: InputPayload) {
-    // runtime.connect: Background <-> DisplayTab
-    chrome.runtime.onConnect.addListener(onConnectListener);
-    function onConnectListener(displayTabPort) {
-        console.log(`runtime.onConnect: ${payload.url}`);
+                const ipCommand: InputPayloadCommand = {
+                    command: Commands.ToggleSummarize,
+                    payload: payload
+                };
+                worker.postMessage(ipCommand);
 
-        const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
-        worker.onmessage = e => {
-            const workerPayload: WorkerPayload = e.data;
-            const wpCommand: WorkerPayloadCommand = {
-                command: Commands.Display,
-                payload: workerPayload
-            };
-            // worker.terminate();
-            console.log(`Sending message to displayTabPort: ${wpCommand.payload.url}`);
-            displayTabPort.postMessage(wpCommand);
-            chrome.runtime.onConnect.removeListener(onConnectListener);
-            displayTabPort.disconnect();
+            }
         };
-
-        const ipCommand: InputPayloadCommand = {
-            command: Commands.ToggleSummarize,
-            payload: payload
-        };
-        worker.postMessage(ipCommand);
-    }
+    });
 }
 
 setupMenus();

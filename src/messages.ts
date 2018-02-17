@@ -4,6 +4,11 @@ export interface SimpleCommand {
     command: Commands;
 }
 
+export interface AssignIdCommand {
+    command: Commands.AssignId;
+    id: string;
+}
+
 export interface WorkerPayloadCommand {
     command: Commands.Display;
     payload: WorkerPayload;
@@ -58,7 +63,8 @@ export interface Sentence {
 export enum Commands {
     Display = 'Display',
     ToggleSummarize = 'ToggleSummarize',
-    DisplayTabReady = 'DisplayTabReady'
+    DisplayTabReady = 'DisplayTabReady',
+    AssignId = 'AssignId'
 }
 
 export class Timer {
@@ -70,7 +76,7 @@ export class Timer {
     }
 
     logTimeAndReset(m: string) {
-        //if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
+        if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
     }
 
     reset(): number {

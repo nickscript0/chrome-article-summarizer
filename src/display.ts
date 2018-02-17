@@ -1,26 +1,17 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData, Commands, Sentence, WorkerPayload, SimpleCommand, WorkerPayloadCommand } from './messages';
+import { SummaryData, Sentence, WorkerPayload } from './messages';
 
 function setupListeners() {
-    const port = chrome.runtime.connect({ name: 'DisplayConnect' });
-    port.onMessage.addListener(onMessageListener);
-    function onMessageListener(msg: WorkerPayloadCommand) {
-        if (msg.command === Commands.Display) {
-            const workerPayload: WorkerPayload = msg.payload;
-            console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
-            display(workerPayload.payload, workerPayload.startTime);
-            console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
-            port.onMessage.removeListener(onMessageListener);
-            port.disconnect();
-        }
-
-    }
-    // const readyCommand: SimpleCommand = {
-    //     command: Commands.DisplayTabReady
-    // };
-    // port.postMessage(readyCommand);
+    chrome.runtime.onMessage.addListener(onMessageListener);
+    function onMessageListener(request, sender, sendResponse) {
+        const workerPayload: WorkerPayload = request.payload;
+        console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
+        display(workerPayload.payload, workerPayload.startTime);
+        console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
+        chrome.runtime.onMessage.removeListener(onMessageListener);
+    };
 }
 
 function getTimeDiffMs(startTime: number): string {
@@ -31,8 +22,14 @@ function getTimeDiffMs(startTime: number): string {
 
 function display(data: SummaryData, startTime: number) {
     document.title = data.title + ' - Summary';
+
+    // Remove any previous state (i.e. cases where the extension page is refreshed)
+    const oldRoot = document.getElementById('root-div');
+    oldRoot && oldRoot.remove();
+
     const rootDiv = document.createElement('div');
     rootDiv.className = 'page';
+    rootDiv.id = 'root-div';
 
     const title = document.createElement('h2');
     title.textContent = data.title;
