@@ -7,15 +7,26 @@ function attachWorker() {
     const worker = new SharedWorker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
     worker.port.addEventListener('message', function (e) {
         if (e.data.type === Commands.Display) {
-            // Add a listener that loads the original page
+            // Add listener that loads the original page if extension is activated again (e.g. user clicks Summarize button a 2nd time)
             chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (request.command === Commands.ToggleSummarize) {
                     document.location.href = e.data.url;
                 }
             });
 
+            // TODO: THIS DOESNT WORK, because even though it changes the url, the refresh event continues and loads the current page
+            // will need to use another technique such as 
+            // Add a listener that loads the original page on refresh or back event
+            // window.onbeforeunload = function (innerE) {
+            //     console.log(`onbeforeunload event achieved!!`);
+            //     document.location.href = e.data.url;
+            // };
+
+            // This doesn't work as it's a new domain
+            // window.history.pushState("object or string", document.title, e.data.url);
+
             console.log(`Total processing time before Display : ${getTimeDiffMs(e.data.startTime)}ms`);
-            display(e.data.payload);
+            display(e.data.payload, e.data.startTime);
             console.log(`Total processing time after Display : ${getTimeDiffMs(e.data.startTime)}ms`);
         }
     });
@@ -33,7 +44,7 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
-function display(data: SummaryData) {
+function display(data: SummaryData, startTime: number) {
     document.title = data.title + ' - Summary';
     const rootDiv = document.createElement('div');
     rootDiv.className = 'page';
@@ -66,7 +77,8 @@ function display(data: SummaryData) {
     details.id = 'details';
     details.style.display = 'none';
     const pre = document.createElement('pre');
-    pre.textContent = data.textStats + '\n' + data.wordStats;
+    const generatedTimeText = `Summarized in ${getTimeDiffMs(startTime)} ms`;
+    pre.textContent = [generatedTimeText, data.textStats, data.wordStats].join('\n');
     pre.className = 'stats-text';
     details.appendChild(pre);
     const chart = _createChart(data.pageRanks, data.numSummarySentences);

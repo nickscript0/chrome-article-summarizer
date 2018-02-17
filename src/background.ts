@@ -35,7 +35,7 @@ function sendToggleSummaryMessage() {
 
 function createDisplayTab() {
     const url = chrome.extension.getURL("summary.html");
-    chrome.tabs.update(undefined, {url: url});
+    chrome.tabs.update({url: url});
     // chrome.tabs.create({ url: url, selected: true }, (tab) => {
 
     // });
