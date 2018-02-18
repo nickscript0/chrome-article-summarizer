@@ -1,7 +1,7 @@
 import { Commands, InputPayload, WorkerPayload, WorkerPayloadCommand, InputPayloadCommand } from './messages';
 
 // key: tab.id, value: url string or null if not in summary mode
-let activeTabs: { [tabid: number]: string | undefined} = {};
+let activeTabs: { [tabid: number]: string | undefined } = {};
 
 function setupMenus() {
     chrome.contextMenus.create({
@@ -34,7 +34,6 @@ function sendToggleSummaryMessage() {
                 delete activeTabs[mainTabId];
             } else {
                 chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
-                    console.log(`GOT RESPONSE: `);
                     // If a user is togglingSummary button when the summary is displayed, r.data will be sent from display.ts and empty
                     if (r) {
                         const payload: InputPayload = r.data;
@@ -48,13 +47,20 @@ function sendToggleSummaryMessage() {
     });
 }
 
+let onUpdatedListenerCount = 0; // debug
+
 function createDisplayTab(payload: InputPayload) {
     const url = chrome.extension.getURL("summary.html");
     chrome.tabs.update({ url: url }, (currentTab: chrome.tabs.Tab) => {
+        console.log(`onUpdate.addListener count ${++onUpdatedListenerCount}`);
         chrome.tabs.onUpdated.addListener(onUpdatedListener);
         function onUpdatedListener(tabId: number, info) {
-            console.log(`onUpdated hit: tabId=${tabId} info=${info.status}`);
-            if (currentTab.id === tabId && info.status === 'complete') {
+            // Call worker iff:
+            //  1. This is the currently active tab
+            //  2. The display tab is done initializing
+            //  3. Display tab is in display mode and not reverting to original url i.e. activeTabs[currentTab.id] is set
+            if (currentTab.id === tabId && info.status === 'complete' && activeTabs[currentTab.id]) {
+                console.log(`onUpdated for current active tab hit: tabId=${tabId} info=${info.status}: calling Worker..`);
                 // chrome.tabs.query()
                 const currentTabId = currentTab.id;
                 const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
@@ -67,7 +73,7 @@ function createDisplayTab(payload: InputPayload) {
                     // worker.terminate();
                     console.log(`chrome.tabs.sendMessage summaryPayload to tabId=${currentTabId}`);
                     chrome.tabs.sendMessage(currentTabId, wpCommand);
-                    chrome.tabs.onUpdated.removeListener(onUpdatedListener);
+                    // chrome.tabs.onUpdated.removeListener(onUpdatedListener);
                 };
 
                 const ipCommand: InputPayloadCommand = {
@@ -76,6 +82,10 @@ function createDisplayTab(payload: InputPayload) {
                 };
                 worker.postMessage(ipCommand);
 
+            } // Remove the listener when transitioned from Summary Display View --> Original Page View
+            else if (currentTab.id === tabId && info.status === 'complete' && !activeTabs[currentTab.id]) {
+                chrome.tabs.onUpdated.removeListener(onUpdatedListener);
+                onUpdatedListenerCount--;
             }
         };
     });
