@@ -5,6 +5,8 @@ import { SummaryData, Sentence, WorkerPayload } from './messages';
 
 function setupListeners() {
     chrome.runtime.onMessage.addListener(onMessageListener);
+    LoadingAnimation.start();
+
     function onMessageListener(request, sender, sendResponse) {
         const workerPayload: WorkerPayload = request.payload;
         console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
@@ -12,6 +14,31 @@ function setupListeners() {
         console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
         chrome.runtime.onMessage.removeListener(onMessageListener);
     };
+}
+
+class LoadingAnimation {
+    static start() {
+        LoadingAnimation.updateLoadingCounter();
+    }
+
+    static stop() {
+        const loadingClock = document.getElementById('loading-clock');
+        if (loadingClock) loadingClock.style.display = 'none';
+        // TODO: come up with more elegant way to disable the loadingCount
+        const loadingCounter = document.getElementById('loading-counter');
+        if (loadingCounter) loadingCounter.textContent = '';
+    }
+
+    private static updateLoadingCounter() {
+        console.log(`updateLoadingCounter!`);
+        const counterEl = document.getElementById('loading-counter');
+        const loadingClock = document.getElementById('loading-clock');
+        // Stop updating if loadingClock's display is set to none
+        if (!counterEl || !loadingClock || loadingClock.style.display === 'none') return;
+        const value = counterEl.textContent ? parseInt(counterEl.textContent) + 1 : 0;
+        counterEl.textContent = value.toString() + 's';
+        setTimeout(LoadingAnimation.updateLoadingCounter, 1000);
+    }
 }
 
 function getTimeDiffMs(startTime: number): string {
@@ -67,8 +94,8 @@ function display(data: SummaryData, startTime: number) {
     if (chart) details.appendChild(chart);
     rootDiv.appendChild(details);
 
-    const loadingClock = document.getElementById('loading-clock');
-    if (loadingClock) loadingClock.style.display = 'none';
+    LoadingAnimation.stop();
+
     document.body.appendChild(rootDiv);
 }
 

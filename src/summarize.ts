@@ -7,8 +7,9 @@ const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
 export function summarizeTextBlocks(textBlocks: string[], docTitle: string): SummaryData {
-    const { sentences, nlpBlocks } = getNlpSentencesBlocks(textBlocks);
     const t = new Timer();
+    const { sentences, nlpBlocks } = getNlpSentencesBlocks(textBlocks);
+    t.logTimeAndReset('getNlpSentencesBlocks');
     const result = summarizeSentences(sentences);
     t.logTimeAndReset('summarizeSentences');
 
@@ -79,10 +80,8 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
 }
 
 export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {
-    const t = new Timer();
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
     const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
-    t.logTimeAndReset('nlp processing');
     return {
         sentences: Array.prototype.concat(...sentences2d),
         nlpBlocks: nlpBlocks
