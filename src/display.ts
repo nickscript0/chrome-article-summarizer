@@ -86,7 +86,8 @@ function display(data: SummaryData, startTime: number) {
     details.id = 'details';
     details.style.display = 'none';
     const pre = document.createElement('pre');
-    const generatedTimeText = `Summarized in ${getTimeDiffMs(startTime)} ms`;
+    const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
+    const generatedTimeText = `Summarized in ${getTimeDiffMs(startTime)} ms (${detailedTimeText})`;
     pre.textContent = [generatedTimeText, data.textStats, data.wordStats].join('\n');
     pre.className = 'stats-text';
     details.appendChild(pre);

@@ -8,6 +8,7 @@ onmessage = function (event) {
         const textBlocks = payload.textBlocks;
         const pageTitle = payload.title;
         const summaryData = summarizeTextBlocks(textBlocks, pageTitle);
+        summaryData.timing = summaryData.timing.concat(payload.timings);
         const workerPayload: WorkerPayload = {
             type: Commands.Display,
             payload: summaryData,

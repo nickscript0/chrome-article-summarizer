@@ -37,6 +37,7 @@ export interface InputPayload {
     title: string;
     startTime: number;
     url: string;
+    timings: Timings;
 }
 
 export interface WorkerPayload {
@@ -53,6 +54,7 @@ export interface SummaryData {
     wordStats: string;
     pageRanks: number[];
     numSummarySentences: number;
+    timing: Timings;
 }
 
 export interface Sentence {
@@ -67,31 +69,48 @@ export enum Commands {
     AssignId = 'AssignId'
 }
 
+type Timings = Array<Timing>;
+
+interface Timing {
+    name: string;
+    value: number;
+}
+
 export class Timer {
     start: number;
     performance;
+    data: Timings;
 
     constructor() {
         this.start = this.now();
+        this.data = [];
     }
 
     logTimeAndReset(m: string) {
-        if (this.performanceDefined()) console.log(`${m} ${this.reset().toFixed(0)}ms`);
+        if (this.performanceDefined()) {
+            const timeDiff = this.reset();
+            this.data.push({ name: m, value: Math.round(timeDiff) });
+            console.log(`${m} ${timeDiff.toFixed(0)}ms`);
+        }
     }
 
-    reset(): number {
+    serialize(): Timings {
+        return this.data;
+    }
+
+    private reset(): number {
         const now = this.now();
         const measurement = now - this.start;
         this.start = now;
         return measurement;
     }
 
-    now(): number {
+    private now(): number {
         // Trick to run for jsdom uni tests that don't have performance defined
         return this.performanceDefined() ? performance.now() : 0;
     }
 
-    performanceDefined(): boolean {
+    private performanceDefined(): boolean {
         return typeof performance !== 'undefined';
     }
 }

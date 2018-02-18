@@ -9,9 +9,9 @@ const MIN_WORDS_SENTENCE = 10;
 export function summarizeTextBlocks(textBlocks: string[], docTitle: string): SummaryData {
     const t = new Timer();
     const { sentences, nlpBlocks } = getNlpSentencesBlocks(textBlocks);
-    t.logTimeAndReset('getNlpSentencesBlocks');
+    t.logTimeAndReset('nlp get sentences');
     const result = summarizeSentences(sentences);
-    t.logTimeAndReset('summarizeSentences');
+    t.logTimeAndReset('page rank summarize');
 
     const title = docTitle;
     const tsub = new Timer();
@@ -24,14 +24,15 @@ export function summarizeTextBlocks(textBlocks: string[], docTitle: string): Sum
     const pageRanks = result.allPageRanks();
     tsub.logTimeAndReset('-->allPageRanks');
     const numSummarySentences = NUM_SUMMARY_SENTENCES;
-    t.logTimeAndReset('finalDataStructureMapping');
+    t.logTimeAndReset('get stats');
     return {
         title,
         sentences: sentencesR,
         textStats,
         wordStats,
         pageRanks,
-        numSummarySentences
+        numSummarySentences,
+        timing: t.serialize()
     };
 }
 

@@ -15,17 +15,20 @@
 */
 
 import { getTextBlocksFromDom } from "./summarize";
-import { Commands, InputPayload } from './messages';
+import { Commands, InputPayload, Timer } from './messages';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.ToggleSummarize) {
         const startTime = Date.now();
+        const t = new Timer();
         const textBlocks = getTextBlocksFromDom(window);
+        t.logTimeAndReset('text from dom');
         const payload: InputPayload = {
             textBlocks: textBlocks,
             title: document.title,
             startTime: startTime,
-            url: document.location.href
+            url: document.location.href,
+            timings: t.serialize()
         };
 
         sendResponse({
