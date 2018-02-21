@@ -1,7 +1,7 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
-import { SummaryData, Sentence, WorkerPayload } from './messages';
+import { SummaryData, Sentence, WorkerPayload, Timings } from './messages';
 
 function setupListeners() {
     chrome.runtime.onMessage.addListener(onMessageListener);
@@ -91,6 +91,9 @@ function display(data: SummaryData, startTime: number) {
     pre.textContent = [generatedTimeText, data.textStats, data.wordStats].join('\n');
     pre.className = 'stats-text';
     details.appendChild(pre);
+
+    const profilingChart = _createProfilingChart(data.timing);
+    if (profilingChart) details.appendChild(profilingChart);
     const chart = _createChart(data.pageRanks, data.numSummarySentences);
     if (chart) details.appendChild(chart);
     rootDiv.appendChild(details);
@@ -149,6 +152,42 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     const div = document.createElement('div');
     // div.style.width = '800px';
     // div.style.height = '400px';
+    div.style.width = '100%';
+    div.style.height = '100%';
+    div.style.textAlign = 'center';
+    div.appendChild(canvasEl);
+    return div;
+}
+
+function _createProfilingChart(timings: Timings) {
+    const canvasEl = document.createElement('canvas');
+    const ctx = canvasEl.getContext('2d');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: timings.map(t => t.name), //["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: 'Processing time (ms)',
+                data: timings.map(t => t.value), // [12, 19, 3, 5, 2, 3],
+                backgroundColor: Array(timings.length).fill('rgba(75, 192, 192, 0.2)'),
+                borderColor: Array(timings.length).fill('rgba(75, 192, 192, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Time (ms)'
+                    }
+                }]
+            }
+        }
+    });
+
+    const div = document.createElement('div');
     div.style.width = '100%';
     div.style.height = '100%';
     div.style.textAlign = 'center';

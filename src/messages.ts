@@ -69,7 +69,7 @@ export enum Commands {
     AssignId = 'AssignId'
 }
 
-type Timings = Array<Timing>;
+export type Timings = Array<Timing>;
 
 interface Timing {
     name: string;
