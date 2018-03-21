@@ -6,6 +6,7 @@
   "dependencies": {
     "@types/chart.js": "^2.6.10",
     "@types/chrome": "0.0.51",
+    "@types/sharedworker": "0.0.27",
     "chart.js": "^2.7.1",
     "compromise": "^11.1.0"
   },

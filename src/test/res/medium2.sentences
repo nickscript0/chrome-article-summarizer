@@ -1,0 +1,288 @@
+Funding Open Source: How Webpack Reached $400k+/year
+Webpack’s Sean Larkin on growing the project’s budget with crowdfunding, sponsorships, grants, partnerships… and pure love.
+Watch the recording of the live webinar, or read the text version below.
+We don’t want the success we’ve had to be a unique story.
+I’m a program manager for the Microsoft Web Platform, working on Edge Dev Tools.
+I’m also a maintainer of Webpack — I fit into the developer advocate role for the org.
+I’ve done some work with the Angular core team, and I’m an evangelist for open source sustainability.
+We don’t want the success we’ve had at Webpack to be a unique story.
+So I’m doing what I can to get other maintainers excited about making their project more well-known and well-funded.
+We use Open Collective as the driver for our ability to fund our organisation.
+2012: Tobias Koppers started creating Webpack for a thesis project based on an abandoned PR for a library called Modules Webmake.
+Webpack was forked from that to add code splitting.
+2014: React-hot-loader shows up.
+Other developers, like Dan Abramov, from the React core team, who helps create Redux and React App, started learning about what Webpack and its features were.
+He’s in there answering Webpack questions and you can see interest increasing in the community.
+Webpack 1 was noticed by Pete Hunt of Instagram.
+He introduced Webpack to the universe at OsCon West, showing the architecture of how Instagram was built using Webpack and why it was so beneficial to them.
+This was the point of explosion in Webpack’s popularity, when the React community started to adopt it.
+2015: I experienced Webpack for the first time as a UX developer at a company I was contracting with, and I got obsessed with it.
+I had the opportunity speak at a conference about it, and realised no one in the Angular community understood what Webpack was.
+I reached out to the Webpack maintainers and said, “Look, I want to get you guys paid.” We created a Gitter chat with all of them and I asked what I could do to help.
+I reached out to the Webpack maintainers and said, ‘Look, I want to get you guys paid.’
+2016: Out of dumb luck, we had the opportunity to be on a podcast, and I got on there to be a panelist.
+That day, Kent Dodds had posted a graphic showing the Webpack Core Team, and my face was just there.
+We had never talked about this, but in July 2016 the core team was established and I became a maintainer.
+We wanted to not only release Webpack 2, but have a revitalisation of our image, branding, and everything.
+That’s when we joined Open Collective and pushed our transparent funding model.
+Finally we were able to finish our documentation and release Webpack 2.
+Things started increasing at a really rapid pace.
+We were trying to reach $100,000 in the first year, and we hit $80,000 in 3 months.
+Then Juho released SurviveJS - Webpack, a 500 page guide to using Webpack that was complementary to our documentation and also helped drive his Webpack consulting.
+2017: We released Webpack 3.
+You can see a huge difference between the time it took to ship Webpack 1, 2, and 3.
+By August we’d crossed a quarter million dollars in the budget, with not only Open Collective funds, but also a $125,000 grant from Mozilla and a large support agreement with Trivago for $12,000 a month.
+Our annual budget is now over $400,000.
+I’m sure you’re thinking, ‘How? Sean, I don’t care just tell me how you did it.’
+Webpack used to be just a project, maintained by one person.
+Tobias was working on it 5 hours a day while being a full time C# developer who made software for industrial CT machines.
+So this was a change in not only development activity and support, but how we reached out to people, how we published meeting notes, how we communicated on Twitter, and how we recruited people to get involved with the project.
+Our Medium publication is the most active it’s ever been.
+We not only publish content ourselves about four times a month, I’m constantly looking for great articles from other people, especially people who are under-represented in our community, so we can host those articles on our publication.
+What’s so important about Medium is it allows us to aggregate and really take over mind-share of quality content for Webpack.
+Sometimes when an open source project first comes out or starts to get hot, you’ll tend to notice random people trying to push out a bunch of cheap 5 cent articles.
+We try to stop this immediately.
+If you search for Webpack you don’t see “Webpack Bits” or “WebpackNews.com” — you get the Webpack Medium publication.
+We’ve monopolized the content creation.
+I recommend people trying to build their project’s image and identity create a Medium page, make it readily accessible, and prevent content being spread across multiple random authors and channels.
+Outreach is very important to me.
+Maybe it’s because I’m a talky person and I like interacting with people.
+When I first became a maintainer, I was too terrified to make code changes.
+I didn’t know how it worked.
+So I asked myself what I could do that I could kick ass at.
+I essentially just got on Twitter and started spending hours a day searching “Webpack”.
+Back then there were a lot of callous messages about us, and a collective mindset about how things were in the state of the project.
+I literally just started responding and saying, “Hey! Can I help? Can I take your feedback?” If someone was especially difficult, I’d point out it was a great opportunity for them to contribute or maybe just to raise a GitHub issue.
+When I first became a maintainer, I was too terrified to make code changes, so I asked myself what I could kick ass at.
+Most of the time, people just want to be heard and listened to.
+I like to think we set the standard for open source projects doing this, outside of projects that are officially funded or backed by a company.
+We are a grassroots project trying to show the community that we care about their voice and that they are what makes Webpack great.
+We have a voting page where you can log in with a GitHub account and every user gets one point per day that we call “influence”.
+There’s a list of features and users can chose what they want to support.
+We give the users the power to decide what we’re going to focus on.
+We created this to put users in control of how the project will be shaped for the future.
+And then we have Golden Influence, which we give for each dollar a backer or sponsor contributes.
+It’s 100 times stronger than normal influence.
+This gives a stronger influence to those who have backed us, but not so strong that it outweighs the voice of the greater collective of people who use and contribute to the project.
+Ever since we were able to grow the budget large enough for Tobias to work on Webpack full time, we promised we’d keep people up to date about what we’re working on.
+People have the ability to look behind the scenes and see the architectural challenges.
+We put it out on our Medium page, on weekly Logbooks.
+And of course we use Open Collective to be transparent.
+It’s one of our favourite choices we’ve made: every transaction, whether a sponsorship or an individual backer, is tracked publicly.
+Anybody can see the finances and the work done on the project.
+I cannot express how important love is to me, and how much of an important influence it’s been on the project.
+It might sounds cheesy, but the greatest power you have for haters or trolls is love.
+A lot of times people just want to vent, but if you show them you care they’ll be happy to help.
+Sometimes they’re just having a bad day, or need to be pointed in the right direction.
+The greatest power you have for haters or trolls is love.
+Love is so important to us that we take it to an extreme.
+If there’s ever an article that drops on Reddit or Hacker News, I try to be the first one to comment and say “Hey, thank you so much, we really appreciate the support we’ve gotten from the community.” These days, most articles about Webpack have no negative comments on them, which is a pretty powerful statement for places like Reddit and Hacker News.
+If you show you really care about what the user is trying to accomplish, and empathize with their day-to-day challenges, these small steps change the culture and perception of Webpack as a whole.
+Even with trolls, we try to just say, “We’d love your help, and we’re sorry this is happening.” Most people do understand that you are human.
+Maybe we have an edge as grassroots projects without big companies behind them, because we can make mistakes and publish bugs and breaking changes, and as long as we’re open and helpful about it people will just say, “Yeah, it’s Webpack, it’s OK we love ‘em.”
+You’re not only reaching out to people, you’re reaching out to project managers, CEOs and CTOs, showing that you want to change the culture and the mindset.
+When it comes to funding, I’ve never talked about money first.
+It’s the last thing I worry about.
+The first thing is “What is this person’s need? What are they trying to accomplish? And how can we help with their unmet needs and challenges?”
+Sometimes you have to make a play, and think about long-term strategy for your project.
+Sustainability is really important.
+We need to find out why new tools are popping into existence, not to prevent them but to understand the challenges.
+A great example is that we found out a year ago that Web Assembly was going to be supported by all browsers, so I started speaking to some people at Chrome Dev Summit about a possible Webpack story there.
+I asked who the key stakeholders were, and they pointed me at someone at Mozilla.
+I got connected and said there could be a great story there.
+So we created this relationship over time, prior to even thinking about a grant.
+And then when we found out that Mozilla had a grant for open source projects, it was really important to me that we chose the right thing to work on, because Web Assembly was a killer feature for Firefox and there are huge incentives behind it.
+That meant the likelihood of success of the grant was a lot higher if we submitted it to Mozilla.
+Those are the strategies that are really important to think about long-term.
+For what it’s worth, every feature we work on has to be beneficial to the web ecosystem and to users — it’s not like you can just find a company that needs something landed and say, “Hey let’s do it.” You have to be forward thinking and have an idea of what your long-term roadmap is.
+What’s your advice for projects just getting started with funding, and those who have made a start but want to take it to the next level?
+If you’ve never funded your project before, the first thing to do is understand what you’re planning to do with the funding.
+If you had $20,000 what would you do with it?
+We believe that anyone who wants to work on open source should be supported.
+Whether it’s 20 hours or 40 hours, we don’t think they should have to find a job that supports open source.
+We should help them to work on the project and then expense the work they’ve done.
+I wanted to fund Tobias because he not only loved working on the project, but he needed to sustain himself day to day.
+I was in a situation where I had a stable job, but I wanted to be able to put in the time and justify it.
+And I want that for anybody.
+If you’ve never funded your project before, the first thing to do is understand what you’re planning to do with the funding.
+So, if not a roadmap, at least have an outline of what you want.
+Why are you raising money? What specifically are you going to fund? Is it time, infrastructure, hosting on Travis with extra parallelism, events, speakers, meetups? There are so many different things, so focus on two or three.
+Identify your needs so you can forecast your budget.
+For projects that have some money and want to increase it, Babel is always the project that jumps to my mind.
+Henry has done an incredible job with the community side and wrangling contributors, but this is where “partnerships first” comes in.
+Once you’ve got some initial funding you need to get out there and meet people.
+Find companies or developers who are using your tool and ask, “Hey, what are you biggest challenges?” Then over time, when you’ve strengthened the bond with this person by helping them, start talking about collaborating on potential features that could benefit everyone.
+Just build up the connection with the person and their organisation.
+“It’s not charity, it’s value in return.”
+Eventually, you’ll be able to point out an awesome sponsorship opportunity or invite them to become an official sponsor to get better publicity.
+Share with people that they love your tool and they support open source.
+It could be great marketing.
+It’s not charity, it’s value in return, even if it’s not something you can immediately expense.
+Starting with partnerships is the most important thing.
+With Trivago, we’d been communicating with them for two years.
+Initially they had Tobias go out there and showed him their workflow and their environment.
+They were looking to hire someone full time to maintain these things.
+They are strong believers in Webpack, and our connection over two years really helped solidify their sponsorship.
+With webpack becoming the tool of choice for many companies across the world, its success and that of the companies…
+Always stay positive in the community.
+Something I always try to nip in the bud immediately is people saying, “You should be funding this project more” or “Why aren’t you charging a license for this?” Because anytime you start focusing on the money first, you’re always going to lose out.
+It’s more important to have positive, inspiring sentiments, and they are much more valuable than monetary figures.
+If people tweet complaints, I say “Please stop.
+We are super happy with what we have.”
+It’s never about the money first, and we honestly believe that.
+We genuinely want to show people that we first give a shit about you and your needs, and then find out how they can get something in return for becoming a sponsor.
+But I’m a developer.
+I just want to code.
+You’re talking about marketing, sales, branding, outreach, relationship building….
+I’m obsessed with Webpack because the first taste that hit my tongue when I started using it was just the most awesome, goosebumps-giving experience ever when it came to web dev.
+It was pure joy.
+For me to be the one reaching out to people on Twitter, I need front to back knowledge of the tool — but I didn’t have to have it right away.
+I wanted to start speaking at conferences, so I had to start pushing the boundaries of how much I knew, and contributing and landing commits.
+I helped add 10,000 lines on GitHub or whatever it says to land Webpack 2, and that really strengthened my knowledge.
+Communication is equally important to the code itself, especially for an established project.
+Yes, you could recruit someone external with special skills in comms, but it’s a unique touch to have a maintainer with not only technical savvy, but the ability to work with people.
+Communication is equally important to the code itself.
+I’ve seen Tobias’s own growth be astronomical.
+He didn’t even have a Twitter account until 2016.
+It only takes one person to start creating the growth and share those capabilities and skills with others on the team, to interact with people and find others that are equally as passionate.
+It really boils down to the passion.
+I’d take someone who was obsessed with Webpack and had zero comms skills, because I can show them the ropes and help them with that, over someone with excellent comms skills who doesn’t know anything about Webpack or have a passion for it.
+Because the passion will drive the hard work in the end.
+What are the different revenue streams that go into your budget?
+Webpack Academy: I’ve put up two courses so far.
+I’ve since joined Microsoft, so some of my free time went away.
+We have a ‘giving back’ edition, and I put 30% of the revenue into the Webpack Open Collective.
+
+An open source project is not just code, but a platform for content, support, and everything else.
+It’s another example of aggregating and monopolizing all the paid content for our project that’s out there.
+It’s hard if your project’s been out there for a while.
+Like there are a bajillion Angular videos that are paid.
+If you’re a growing project, instantly create a video channel and have the paid ones support your project.
+That way, you’re not only ensuring quality content but you can onboard content creators to contribute to your platform.
+An open source project is not just code, but a platform for content, support, and everything else.
+Webpack Threadless: We’ve connected our apparel store to our Open Collective.
+We can design t-shirts and people can order them.
+It’s a little more expensive because it’s a print on demand deal, but what’s nice is that you can have all the proceeds go directly to your Open Collective without having to manage anything.
+Grants: Grant funding is super important.
+It’s allowed is to get $125,000 and instantly extend our life and work on a feature for a whole year.
+Tobias also went through Segment, which is kind of like a scholarship to an individual to work on open source.
+There are these things you can sign up for or be nominated for to have your work funded for X months on a project.
+We try to keep it as broad as possible and accept all opportunities, because this kind of model is really new so we don’t want all our eggs in one basket.
+And of course, our backers and sponsors!
+What’s your view on sustainability for the open source ecosystem?
+I think open source sustainability is broken in this day and age, for every single project that’s out there.
+It’s failed since the Linux Foundation 25 years ago.
+Now we’re in a completely different age of how people connect, consume, distribute, and monitize open source.
+There are two really broken models.
+Forcing people to pay for your product, especially commercial licenses, and not funding projects, but hiring people to work on stuff.
+Working on an open source project at a company, you’ll always be trying to fit some business need in.
+We’re the opposite: we have sponsors and backers, but we don’t represent any need or goal besides that of the users as a whole.
+Our project’s not perfect and every project has different needs, but this whole mindset that a project should only be funded to handle legal issues, or infrastructure? I completely disagree with that.
+We have sponsors and backers, but we don’t represent any need or goal besides those of the users as a whole.
+You strip all the passion out of why people love open source when you tell them they need to work for a company to work on a project.
+Because then you’re not working on something that makes you happy anymore.
+I love Webpack and I love the 120 hours I put in a month, because I love the people and what the product has become and will become.
+The models that have existed in the past remove that piece that makes open source special.
+You strip all the passion out of why people love open source when you tell them they need to work for a company to work on a project.
+I think we should be trying to fund people on the project level, so anyone can have the same blessings that have been afforded to me or Tobias, or to anyone in an organisation whose seen their career grow just from working on our project.
+Especially those who don’t even have the ability to sustain themselves day to day.
+If we can give $1000 for 40 hours work to somebody in Nigeria, which is a middle-wage income for them, why aren’t we doing that? There are so many dynamics that become possible when you have a collective funding model that anyone can benefit from.
+There are so many dynamics that become possible when you have a collective funding model that anyone can benefit from.
+How can I get up to speed with Webpack and get involved?
+Of course there’s the normal advice to go through our documentation.
+If you just want to contribute but you don’t know how it works, I’d say message a maintainer.
+You can tweet me.
+Something I’ve been working on but haven’t finished is the Webpack Contributors Guide on Medium.
+I wrote two articles and want to write two more showing everything you’d want to know if you want to contribute but don’t know how.
+It has an overview of the ecosystem, explains what packages in the repos do, what you might like if you like parsers or writing technical docs or error messages or testing.
+It’s one of the first things I have new contributors take a look at, so they can tell me what they want to try.
+I ask people, “What do you enjoy? What kind of programming do you like? Tell me about yourself.
+Do you like parsers or compilers or functional programming or infrastructure?” That gives me an idea of what to point them toward that will get them to stick with it long-term and inspire their self-direction.
+What’s challenging for me is having to manage 100 repos on two GitHub orgs and still do hand-holding, which is one of the most costly things.
+It’s not that I mind it, but it’s not scalable for just me to do it.
+So I try to find ideas for people that they’ll really love, so they’ll be more confident and want to push the boundaries of their abilities.
+It allows things to be more self-directed.
+I ask people, ‘What do you enjoy? What kind of programming do you like? Tell me about yourself.’
+So reach out to a maintainer and tell them what you love to do or how you want to help.
+Ask them to point you at some materials.
+I’d show you all those things instead of having to prod you with questions.
+At Microsoft they have an image that’s inspired me.
+It’s a Venn Diagram of what you like doing, what you do best, and what creates value — and in the middle is your purpose.
+That’s how I feel about people contributing to Webpack.
+I want them to do what they do best, whether it’s interacting with people or tweeting or triaging issues.
+It’s the maintainer’s job to find out how people can create value for projects.
+That’s the best way to distill how you can get people to work on your project long-term.
+I took over maintenance of a project — Reactive UI — which is 9 years old at this stage.
+You’ll find ReactiveUI inside of products made by Amazon, Atlassian, Slack, GitHub, Elastic Inc and 343 Industries.
+I completely agree with centralising your message.
+That’s what we’ve been doing for the last two years.
+Our message was spread on blogs all over the place, and when people were trying to consume the product they weren’t getting a consistent message and it was causing frustration.
+So we centralised everything and started building out the brand.
+A couple of years ago, the creator of ReactiveUI took a new job that was a great opportunity for him.
+Previously he had been paid to maintain the software by his employer, and as soon as he left the project and community around it died.
+We’ve spent the last two and half years reviving it, and now we’ve got about $2000 revenue through our Open Collective.
+We used the new Open Collective layout and redid our page two days ago, to better define the “why”.
+I came to the realisation that if someone didn’t know me they might think I was in it for the money.
+As soon as you lead with the money, you lose.
+If people don’t know you and your motivations, and you just talk about the money, they are going to be missing context of what our community and maintainers have been through and my desire to ensure it never happens again.
+At ReactiveUI we now have a CRM.
+It feels really weird, but when people sign up for the newsletter they get a unique ID in the CRM and we have implemented lead scoring.
+If someone visits the contributing page multiple times, they’ll get tagged as a possible maintainer and I’ll send them an email saying, “Hey, are you interested in contributing?” If someone’s hanging out on Android, I’ll ask what Android app they’re making.
+It’s completely not scalable, but we’re having early success in building those long-term relationships.
+I’m heading down to the Write the Docs conference in Melbourne next month to enlist the help of a tech-writer.
+We’ve got some funds for it — not enough, but maybe if I find someone interested they’ll come onboard and help.
+It feels like I give so much to the project already, and the current level of output isn’t sustainable.
+Documentation is key, but when I write it I feel like I’m giving away too much, because I’m already giving so much.
+Maybe if we had something like Webpack Academy that could aide with sustainability.
+A lot of the things I’ve seen from you on Twitter have been pretty exciting, like the CRM you talked about and planting the seed for video publishing.
+It’s all been really well done.
+I don’t know if there’s an exact formula.
+I may spend 4 or 5 hours a day on Twitter just searching “Webpack” and I don’t see as many tweets as I think I should.
+Sometimes I’ll miss an entire day.
+If the need or growth of the project isn’t there and just a few people use it and aren’t tweeting about it much, maybe the need for that kind of outreach doesn’t exist yet.
+But maybe there’s a need for the best documentation on the planet.
+I basically created the Webpack Academy courses based on our written documentation.
+Video learning is more of a premium feature for an open source project.
+Written documentation is important because it’s easy for anyone to touch and get involved in changing.
+It also gives you an opportunity to involve people from other countries in doing translations.
+About seven months ago I started a project called Webpack China with a group of nine maintainers who work for well-known companies in China.
+They were passionate about being involved in a project and taking responsibility, so these nine people became the maintainers of Webpack China.
+I gave them two goals.
+First, enjoy what you’re doing.
+If this is what you love, do it.
+If not, I can help you find something else.
+Next, be leaders and represent Webpack as Chinese developers.
+The ecosystem is completely different there, when it comes to platforms and social media.
+They created an entire documentation page and a WeChat channel (where I stop in to say hi and get feedback), and it’s been really successful.
+China is number two in terms of users consuming our docs.
+We’re just about to start Webpack Africa as well.
+There’s a billion people about to get on the internet for the first time.
+I’m going to the same thing I did with Webpack China, and help create these leaders who are local and known by their communities to continue to spread the message.
+I run BootstrapCDN.
+It does 1.65 petabytes per month, and the S3 bill alone is $700/month just from the transfer, and we have a 99.9% caching ratio.
+If I didn’t have in-kind sponsorship [StackPath] there’s no way we’d be able to afford it.
+There’s a lot of companies out there that will hook you up if you give them some exposure in your docs or README.
+You’ve got to give them some business value, but the hosting companies and cloud providers are always trying to one-up each other.
+If they’re getting their logo on the README of a project with 22,000 stars, drop the mic.
+You’re so right it’s ridiculous.
+By being a backer or sponsor, you instantly get to have your mark on not only our docs and README, but if you go to our website and scroll down you see our segments of gold sponsors and silver sponsors.
+Every single backer we have from Open Collective shows on our docs page.
+It just reinforces that every single one of these contributions is so important.
+Whether it’s the CEO of Stripe, who secretly is on there giving $10, to Capital One, who was our first ever sponsor.
+Even AG Grid, another open source project, is there.
+I started talking with them at a conference in Copenhagen and said “Hey, you’re trying to build your enterprise and we have lots of hits on our documentation.
+Instead of spending $20,000 to sponsor one conference, you could spend the same for millions of impressions by being on our docs page.” They tell me they get 50–100 clickthroughs daily.
+It’s easy marketing, more impactful than conference sponsorships.
+I never imagined I’d be doing what I’m doing today.
+I started out in tech support.
+But what I’ve carried with me the entire time is: if you stay true to the things you love to do, and you celebrate your mistakes and always put yourself out there, whether you’re rejected or not everything is an opportunity for learning and growth.
+Everything I’ve done with Webpack, successes and failures, has been that model.
+I would encourage others to do the same thing.
+Don’t question what might not be possible.
+We originally said our work would be done if only we had a quarter million dollars for the project.
+Now we’ve got more than that and I feel like we’re just getting started.
+Open source has many blessings, like Open Collective which has been amazing for us.
+If you want to continue to grow your project, always have an idea of where you want to take it, and have your users in mind no matter what.
+“Don’t question what might not be possible.
+We originally said our work would be done if only we had a quarter million dollars.
+Now we’ve got more than that and I feel like we’re just getting started.”
