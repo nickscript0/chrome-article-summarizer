@@ -35,9 +35,9 @@ class LoadingAnimation {
         const loadingClock = document.getElementById('loading-clock');
         // Stop updating if loadingClock's display is set to none
         if (!counterEl || !loadingClock || loadingClock.style.display === 'none') return;
-        const value = counterEl.textContent ? parseInt(counterEl.textContent) + 1 : 0;
+        const value = counterEl.textContent ? (parseFloat(counterEl.textContent) + .01).toFixed(2) : 0;
         counterEl.textContent = value.toString() + 's';
-        setTimeout(LoadingAnimation.updateLoadingCounter, 1000);
+        setTimeout(LoadingAnimation.updateLoadingCounter, 10);
     }
 }
 
