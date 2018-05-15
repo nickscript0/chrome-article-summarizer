@@ -30,7 +30,7 @@ class LoadingAnimation {
     }
 
     private static updateLoadingCounter() {
-        console.log(`updateLoadingCounter!`);
+        // console.log(`updateLoadingCounter!`);
         const counterEl = document.getElementById('loading-counter');
         const loadingClock = document.getElementById('loading-clock');
         // Stop updating if loadingClock's display is set to none
@@ -74,10 +74,24 @@ function display(data: SummaryData, startTime: number) {
     toggleChartButton.text = 'Toggle Details';
     toggleChartButton.href = 'javascript:void(0);';
     // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
-    toggleChartButton.onclick = () => {
+    // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
+    function toggleDetailsView(scroll = false) {
         const detailsEl = document.getElementById('details');
-        if (detailsEl) detailsEl.style.display = detailsEl.style.display === 'none' ? '' : 'none';
+        if (detailsEl) {
+            if (detailsEl.style.display === 'none') {
+                detailsEl.style.display = '';
+                if (scroll) setTimeout(() =>
+                    detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+            } else {
+                detailsEl.style.display = 'none';
+            }
+        }
     };
+    toggleChartButton.onclick = () => toggleDetailsView();
+    document.addEventListener('keypress', (e: KeyboardEvent) => {
+        if (e.key === 'd') toggleDetailsView(true);
+    }, false);
+
     rootDiv.appendChild(document.createElement('br'));
     rootDiv.appendChild(toggleChartButton);
 
@@ -86,9 +100,10 @@ function display(data: SummaryData, startTime: number) {
     details.id = 'details';
     details.style.display = 'none';
     const pre = document.createElement('pre');
-    const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
-    const generatedTimeText = `Summarized in ${getTimeDiffMs(startTime)} ms (${detailedTimeText})`;
-    pre.textContent = [generatedTimeText, data.textStats, data.wordStats].join('\n');
+    // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
+    const total: number = data.timing.reduce((n, el) => n + el.value, 0);
+    const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
+    pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
     pre.className = 'stats-text';
     details.appendChild(pre);
 
