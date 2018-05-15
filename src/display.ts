@@ -107,8 +107,11 @@ function display(data: SummaryData, startTime: number) {
     pre.className = 'stats-text';
     details.appendChild(pre);
 
-    const profilingChart = _createProfilingChart(data.timing);
+    const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
+    const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
     if (profilingChart) details.appendChild(profilingChart);
+    if (profilingNlbChart) details.appendChild(profilingNlbChart);
+
     const chart = _createChart(data.pageRanks, data.numSummarySentences);
     if (chart) details.appendChild(chart);
     rootDiv.appendChild(details);
@@ -174,7 +177,7 @@ function _createChart(prArr: Array<number>, num_summary_sentences: number) {
     return div;
 }
 
-function _createProfilingChart(timings: Timings) {
+function _createProfilingChart(timings: Timings, title: string) {
     const canvasEl = document.createElement('canvas');
     const ctx = canvasEl.getContext('2d');
     if (!ctx) return;
@@ -191,6 +194,10 @@ function _createProfilingChart(timings: Timings) {
             }]
         },
         options: {
+            title: {
+                text: title,
+                display: true
+            },
             scales: {
                 yAxes: [{
                     scaleLabel: {

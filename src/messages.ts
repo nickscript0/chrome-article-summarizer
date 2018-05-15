@@ -55,6 +55,7 @@ export interface SummaryData {
     pageRanks: number[];
     numSummarySentences: number;
     timing: Timings;
+    nlpTiming: Timings;
 }
 
 export interface Sentence {

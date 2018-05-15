@@ -8,7 +8,7 @@ const MIN_WORDS_SENTENCE = 10;
 
 export function summarizeTextBlocks(textBlocks: string[], docTitle: string): SummaryData {
     const t = new Timer();
-    const { sentences, nlpBlocks } = getNlpSentencesBlocks(textBlocks);
+    const { sentences, nlpBlocks, nlpTimer } = getNlpSentencesBlocks(textBlocks);
     t.logTimeAndReset('nlp get sentences');
     const result = summarizeSentences(sentences);
     t.logTimeAndReset('page rank summarize');
@@ -32,7 +32,8 @@ export function summarizeTextBlocks(textBlocks: string[], docTitle: string): Sum
         wordStats,
         pageRanks,
         numSummarySentences,
-        timing: t.serialize()
+        timing: t.serialize(),
+        nlpTiming: nlpTimer.serialize()
     };
 }
 
@@ -68,6 +69,7 @@ Top Nouns: ${topThings}
 interface NlpSubsets {
     sentences: Array<string>;
     nlpBlocks: Array<object>;
+    nlpTimer: Timer;
 }
 
 export function getTextBlocksFromDom(theWindow: Window): string[] {
@@ -81,11 +83,20 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
 }
 
 export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {
+    const t = new Timer();
     const nlpBlocks = textBlocks.map(tb => nlp(tb));
-    const sentences2d = nlpBlocks.map(nb => nb.sentences().data().map(s => s.text.trim()));
+    t.logTimeAndReset('nlp(textBlock) calls');
+    const sentences2d = nlpBlocks.map(nb => nb.sentences().data());
+    t.logTimeAndReset('nlp.sentences() calls');
+    const sentencesUntrimmed = Array.prototype.concat(...sentences2d);
+    t.logTimeAndReset('flatten array');
+    const sentences = sentencesUntrimmed.map(s => s.text.trim());
+    t.logTimeAndReset('trim() calls');
+
     return {
-        sentences: Array.prototype.concat(...sentences2d),
-        nlpBlocks: nlpBlocks
+        sentences,
+        nlpBlocks,
+        nlpTimer: t
     };
 }
 
