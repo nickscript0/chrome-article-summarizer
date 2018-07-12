@@ -83,13 +83,17 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
 }
 
 export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {
+    // TODO: seems simpler to just join the textBlocks into one big string instead of what
+    // I had before, performance difference is minor
     const t = new Timer();
-    const nlpBlocks = textBlocks.map(tb => nlp(tb));
+    const text = textBlocks.join('\n');
+    t.logTimeAndReset('textBlocks.join() call');
+    const nlpBlocks = nlp(text);
     t.logTimeAndReset('nlp(textBlock) calls');
-    const sentences2d = nlpBlocks.map(nb => nb.sentences().data());
+    const sentencesUntrimmed = nlpBlocks.sentences().data();
     t.logTimeAndReset('nlp.sentences() calls');
-    const sentencesUntrimmed = Array.prototype.concat(...sentences2d);
-    t.logTimeAndReset('flatten array');
+    // const sentencesUntrimmed = Array.prototype.concat(...sentences2d);
+    // t.logTimeAndReset('flatten array');
     const sentences = sentencesUntrimmed.map(s => s.text.trim());
     t.logTimeAndReset('trim() calls');
 

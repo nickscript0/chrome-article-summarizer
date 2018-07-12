@@ -5,7 +5,9 @@
 
 /**
 * TODOs:
+* 0. DO THIS NEXT: In summarized view, add button to reveal entire article with textranked sentences in bold!
 * 1. Make num sentences easily adjustable in the UI
+* 2. Allow seeing the context of a sentence (maybe on left-click it shows more and more sentences before and after, and right click hides them again)
 * 5. a. Extract TextRank and <html sentence extraction> to their own repo
 *    b. Add unit tests for TextRank
 * 6. Handle duplicate subset sentences e.g. https://medium.com/sketchdeck-developer-blog/what-i-wish-i-knew-when-i-became-cto-fdc934b790e3
