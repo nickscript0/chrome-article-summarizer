@@ -15,7 +15,7 @@ export function summarizeTextBlocks(textBlocks: string[], docTitle: string): Sum
 
     const title = docTitle;
     const tsub = new Timer();
-    const sentencesR = result.getSentencesOrderedByOccurence(NUM_SUMMARY_SENTENCES);
+    const sentencesR = result.getSentencesOrderedByOccurence();
     tsub.logTimeAndReset('-->getSentencesOrderedByOccurence');
     const textStats = result.getStatsText(NUM_SUMMARY_SENTENCES);
     tsub.logTimeAndReset('-->getStatsText');

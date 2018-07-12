@@ -20,6 +20,10 @@
     display: inline;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .p-rank {
     font-size: 12px;
     /* font-family: "Inconsolata", "Adobe Blank"; */

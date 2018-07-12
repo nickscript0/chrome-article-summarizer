@@ -137,12 +137,15 @@ class SummarizerResult {
         return arr.sort((a, b) => b.pagerank - a.pagerank);
     }
 
-    getSentencesOrderedByOccurence(maxSentences: number): Array<{ content: string, rank: string }> {
-        return this._getTopPrResultOrderedByOccurence(maxSentences)
+    getSentencesOrderedByOccurence(maxSentences: number | undefined = undefined): Array<{ content: string, rank: number }> {
+        // Return all sentences if maxSentences not specified
+        // if (maxSentences === undefined) maxSentences = this.prResultArr.length;
+        const numSentences = maxSentences || this.prResultArr.length;
+        return this._getTopPrResultOrderedByOccurence(numSentences)
             .map(s => {
-                const rank = this.orderIndexToPRMap.get(s.index);
+                const rank = this.orderIndexToPRMap.get(s.index) || numSentences;
                 const rankString = rank ? rank.toString() : '';
-                return { content: s.sentence, rank: rankString };
+                return { content: s.sentence, rank };
             });
     }
 

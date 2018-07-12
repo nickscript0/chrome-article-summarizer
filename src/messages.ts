@@ -60,7 +60,7 @@ export interface SummaryData {
 
 export interface Sentence {
     content: string;
-    rank: string;
+    rank: number;
 }
 
 export enum Commands {

@@ -64,7 +64,7 @@ function display(data: SummaryData, startTime: number) {
 
     let i = 1;
     for (const text of data.sentences) {
-        let p = _createParagraph(text);
+        let p = _createParagraph(text, text.rank < data.numSummarySentences);
         rootDiv.appendChild(p);
         i += 1;
     }
@@ -121,17 +121,17 @@ function display(data: SummaryData, startTime: number) {
     document.body.appendChild(rootDiv);
 }
 
-function _createParagraph(text: Sentence) {
+function _createParagraph(text: Sentence, bold = false) {
     const p = document.createElement('div');
     p.className = 'paragraph';
     const pContent = document.createElement('div');
-    pContent.className = 'p-content';
+    pContent.className = 'p-content' + (bold ? ' bold' : '');
     pContent.textContent = text.content;
     const pRank = document.createElement('div');
     pRank.className = 'p-rank';
     pRank.textContent = `[Rank: ${text.rank}]`;
     p.appendChild(pContent);
-    p.appendChild(pRank);
+    if (bold) p.appendChild(pRank);
     return p;
 }
 
