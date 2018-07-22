@@ -139,13 +139,6 @@ function buildRender(data: SummaryData, startTime: number) {
         const oldRoot = document.getElementById('root-div');
         oldRoot && oldRoot.remove();
 
-        const rootDiv = h('div.page#root-div', [
-            h('h2', [data.title]),
-            data.sentences
-                .filter(s => s.rank < data.numSummarySentences)
-                .map(s => _createParagraphH(s, false))
-        ]);
-
         // TODO 1: CHART
         // // Add toggle button for showing the chart
         // const toggleChartButton = document.createElement('a');
@@ -175,18 +168,14 @@ function buildRender(data: SummaryData, startTime: number) {
 
 
         // TODO 2: DETAILS
-        // // Add details div with stats text and chart
-        // const details = document.createElement('div');
-        // details.id = 'details';
-        // details.style.display = 'none';
-        // const pre = document.createElement('pre');
-        // // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
-        // const total: number = data.timing.reduce((n, el) => n + el.value, 0);
-        // const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
-        // pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
-        // pre.className = 'stats-text';
-        // details.appendChild(pre);
+        // Add details div with stats text and chart
+        const total: number = data.timing.reduce((n, el) => n + el.value, 0);
+        const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
+        const details = h('div#details', { display: 'none' }, [
+            h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')])
+        ]);
 
+        // TODO3: profiling chart
         // const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
         // const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
         // if (profilingChart) details.appendChild(profilingChart);
@@ -197,6 +186,14 @@ function buildRender(data: SummaryData, startTime: number) {
         // rootDiv.appendChild(details);
 
         // document.body.appendChild(rootDiv);
+
+        const rootDiv = h('div.page#root-div', [
+            h('h2', [data.title]),
+            data.sentences
+                .filter(s => s.rank < data.numSummarySentences)
+                .map(s => _createParagraphH(s, false)),
+            details
+        ]);
         return rootDiv;
     };
 }
