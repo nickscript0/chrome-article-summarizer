@@ -77,7 +77,6 @@ function getTimeDiffMs(startTime: number): string {
 //     toggleChartButton.text = 'Toggle Details';
 //     toggleChartButton.href = 'javascript:void(0);';
 //     // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
-//     // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
 //     function toggleDetailsView(scroll = false) {
 //         const detailsEl = document.getElementById('details');
 //         if (detailsEl) {
@@ -125,43 +124,67 @@ function getTimeDiffMs(startTime: number): string {
 
 // }
 
+interface State {
+    showDetails: boolean;
+}
+
 function display2(data, startTime) {
     document.title = data.title + ' - Summary';
 
     const projector = createProjector();
     LoadingAnimation.stop();
-    projector.append(document.body, buildRender(data, startTime));
+
+    const state: State = { showDetails: false };
+
+    // TODO: is this still necessary? Is it working after move to maquette.js?
+    const oldRoot = document.getElementById('root-div');
+    oldRoot && oldRoot.remove();
+
+
+
+    document.addEventListener('keypress', (e: KeyboardEvent) => {
+        if (e.key === 'd') {
+            state.showDetails = !state.showDetails;
+            projector.scheduleRender();
+        }
+    }, false);
+
+
+
+    projector.append(document.body, buildRender(state, data, startTime));
 }
 
-function buildRender(data: SummaryData, startTime: number) {
+function buildRender(state, data: SummaryData, startTime: number) {
+    // const toggleChartButton = h('a', { href: 'javascript:void(0);', onclick: () => toggleDetailsView() }, ['Toggle Details']);
+    const toggleChartButton = h('a',
+        { href: 'javascript:void(0);', onclick: () => { state.showDetails = !state.showDetails; } },
+        ['Toggle Details']
+    );
+
+    function toggleDetailsView(scroll = false) {
+        const detailsEl = document.getElementById('details');
+        if (detailsEl) {
+            if (detailsEl.style.display === 'none') {
+                detailsEl.style.display = '';
+                if (scroll) setTimeout(() =>
+                    detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+            } else {
+                detailsEl.style.display = 'none';
+            }
+        }
+    };
     return () => {
         // Remove any previous state (i.e. cases where the extension page is refreshed)
-        const oldRoot = document.getElementById('root-div');
-        oldRoot && oldRoot.remove();
 
-        // TODO 1: CHART
-        // // Add toggle button for showing the chart
+        // TODO 1: DETAILS BUTTON
+        // Add toggle button for showing the chart
         // const toggleChartButton = document.createElement('a');
         // toggleChartButton.text = 'Toggle Details';
         // toggleChartButton.href = 'javascript:void(0);';
-        // // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
-        // // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
-        // function toggleDetailsView(scroll = false) {
-        //     const detailsEl = document.getElementById('details');
-        //     if (detailsEl) {
-        //         if (detailsEl.style.display === 'none') {
-        //             detailsEl.style.display = '';
-        //             if (scroll) setTimeout(() =>
-        //                 detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
-        //         } else {
-        //             detailsEl.style.display = 'none';
-        //         }
-        //     }
-        // };
-        // toggleChartButton.onclick = () => toggleDetailsView();
-        // document.addEventListener('keypress', (e: KeyboardEvent) => {
-        //     if (e.key === 'd') toggleDetailsView(true);
-        // }, false);
+        // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
+
+
+
 
         // rootDiv.appendChild(document.createElement('br'));
         // rootDiv.appendChild(toggleChartButton);
@@ -171,7 +194,7 @@ function buildRender(data: SummaryData, startTime: number) {
         // Add details div with stats text and chart
         const total: number = data.timing.reduce((n, el) => n + el.value, 0);
         const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
-        const details = h('div#details', { display: 'none' }, [
+        const details = h('div#details', { style: `display: ${state.showDetails ? '' : 'none'}` }, [
             h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')])
         ]);
 
@@ -192,6 +215,7 @@ function buildRender(data: SummaryData, startTime: number) {
             data.sentences
                 .filter(s => s.rank < data.numSummarySentences)
                 .map(s => _createParagraphH(s, false)),
+            toggleChartButton,
             details
         ]);
         return rootDiv;
