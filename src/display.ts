@@ -1,6 +1,7 @@
 // Displays the summarized text in a fresh page
 
 import { Chart } from "chart.js";
+import { h, createProjector } from 'maquette';
 import { SummaryData, Sentence, WorkerPayload, Timings } from './messages';
 
 function setupListeners() {
@@ -10,7 +11,7 @@ function setupListeners() {
     function onMessageListener(request, sender, sendResponse) {
         const workerPayload: WorkerPayload = request.payload;
         console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
-        display(workerPayload.payload, workerPayload.startTime);
+        display2(workerPayload.payload, workerPayload.startTime);
         console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
         chrome.runtime.onMessage.removeListener(onMessageListener);
     };
@@ -47,95 +48,165 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
-function display(data: SummaryData, startTime: number) {
+// function display(data: SummaryData, startTime: number) {
+//     document.title = data.title + ' - Summary';
+
+//     // Remove any previous state (i.e. cases where the extension page is refreshed)
+//     const oldRoot = document.getElementById('root-div');
+//     oldRoot && oldRoot.remove();
+
+//     const rootDiv = document.createElement('div');
+//     rootDiv.className = 'page';
+//     rootDiv.id = 'root-div';
+
+//     const title = document.createElement('h2');
+//     title.textContent = data.title;
+//     rootDiv.appendChild(title);
+
+//     for (const text of data.sentences) {
+//         // TODO: Remove this if later, for now though articles are too hard to read with whole text shown
+//         if (text.rank < data.numSummarySentences) {
+//             // let p = _createParagraph(text, text.rank < data.numSummarySentences);
+//             let p = _createParagraph(text, false);
+//             rootDiv.appendChild(p);
+//         }
+//     }
+
+//     // Add toggle button for showing the chart
+//     const toggleChartButton = document.createElement('a');
+//     toggleChartButton.text = 'Toggle Details';
+//     toggleChartButton.href = 'javascript:void(0);';
+//     // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
+//     // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
+//     function toggleDetailsView(scroll = false) {
+//         const detailsEl = document.getElementById('details');
+//         if (detailsEl) {
+//             if (detailsEl.style.display === 'none') {
+//                 detailsEl.style.display = '';
+//                 if (scroll) setTimeout(() =>
+//                     detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+//             } else {
+//                 detailsEl.style.display = 'none';
+//             }
+//         }
+//     };
+//     toggleChartButton.onclick = () => toggleDetailsView();
+//     document.addEventListener('keypress', (e: KeyboardEvent) => {
+//         if (e.key === 'd') toggleDetailsView(true);
+//     }, false);
+
+//     rootDiv.appendChild(document.createElement('br'));
+//     rootDiv.appendChild(toggleChartButton);
+
+//     // Add details div with stats text and chart
+//     const details = document.createElement('div');
+//     details.id = 'details';
+//     details.style.display = 'none';
+//     const pre = document.createElement('pre');
+//     // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
+//     const total: number = data.timing.reduce((n, el) => n + el.value, 0);
+//     const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
+//     pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
+//     pre.className = 'stats-text';
+//     details.appendChild(pre);
+
+//     const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
+//     const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
+//     if (profilingChart) details.appendChild(profilingChart);
+//     if (profilingNlbChart) details.appendChild(profilingNlbChart);
+
+//     const chart = _createChart(data.pageRanks, data.numSummarySentences);
+//     if (chart) details.appendChild(chart);
+//     rootDiv.appendChild(details);
+
+//     LoadingAnimation.stop();
+
+//     document.body.appendChild(rootDiv);
+
+// }
+
+function display2(data, startTime) {
     document.title = data.title + ' - Summary';
 
-    // Remove any previous state (i.e. cases where the extension page is refreshed)
-    const oldRoot = document.getElementById('root-div');
-    oldRoot && oldRoot.remove();
-
-    const rootDiv = document.createElement('div');
-    rootDiv.className = 'page';
-    rootDiv.id = 'root-div';
-
-    const title = document.createElement('h2');
-    title.textContent = data.title;
-    rootDiv.appendChild(title);
-
-    for (const text of data.sentences) {
-        // TODO: Remove this if later, for now though articles are too hard to read with whole text shown
-        if (text.rank < data.numSummarySentences) {
-            // let p = _createParagraph(text, text.rank < data.numSummarySentences);
-            let p = _createParagraph(text, false);
-            rootDiv.appendChild(p);
-        }
-    }
-
-    // Add toggle button for showing the chart
-    const toggleChartButton = document.createElement('a');
-    toggleChartButton.text = 'Toggle Details';
-    toggleChartButton.href = 'javascript:void(0);';
-    // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
-    // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
-    function toggleDetailsView(scroll = false) {
-        const detailsEl = document.getElementById('details');
-        if (detailsEl) {
-            if (detailsEl.style.display === 'none') {
-                detailsEl.style.display = '';
-                if (scroll) setTimeout(() =>
-                    detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
-            } else {
-                detailsEl.style.display = 'none';
-            }
-        }
-    };
-    toggleChartButton.onclick = () => toggleDetailsView();
-    document.addEventListener('keypress', (e: KeyboardEvent) => {
-        if (e.key === 'd') toggleDetailsView(true);
-    }, false);
-
-    rootDiv.appendChild(document.createElement('br'));
-    rootDiv.appendChild(toggleChartButton);
-
-    // Add details div with stats text and chart
-    const details = document.createElement('div');
-    details.id = 'details';
-    details.style.display = 'none';
-    const pre = document.createElement('pre');
-    // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
-    const total: number = data.timing.reduce((n, el) => n + el.value, 0);
-    const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
-    pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
-    pre.className = 'stats-text';
-    details.appendChild(pre);
-
-    const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
-    const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
-    if (profilingChart) details.appendChild(profilingChart);
-    if (profilingNlbChart) details.appendChild(profilingNlbChart);
-
-    const chart = _createChart(data.pageRanks, data.numSummarySentences);
-    if (chart) details.appendChild(chart);
-    rootDiv.appendChild(details);
-
+    const projector = createProjector();
     LoadingAnimation.stop();
-
-    document.body.appendChild(rootDiv);
+    projector.append(document.body, buildRender(data, startTime));
 }
 
-function _createParagraph(text: Sentence, bold = false) {
-    const p = document.createElement('div');
-    p.className = 'paragraph';
-    const pContent = document.createElement('div');
-    pContent.className = 'p-content' + (bold ? ' bold' : '');
-    pContent.textContent = text.content;
-    const pRank = document.createElement('div');
-    pRank.className = 'p-rank';
-    pRank.textContent = `[Rank: ${text.rank}]`;
-    p.appendChild(pContent);
-    // Temporarily always do this
-    if (bold || true) p.appendChild(pRank);
-    return p;
+function buildRender(data: SummaryData, startTime: number) {
+    return () => {
+        // Remove any previous state (i.e. cases where the extension page is refreshed)
+        const oldRoot = document.getElementById('root-div');
+        oldRoot && oldRoot.remove();
+
+        const rootDiv = h('div.page#root-div', [
+            h('h2', [data.title]),
+            data.sentences
+                .filter(s => s.rank < data.numSummarySentences)
+                .map(s => _createParagraphH(s, false))
+        ]);
+
+        // TODO 1: CHART
+        // // Add toggle button for showing the chart
+        // const toggleChartButton = document.createElement('a');
+        // toggleChartButton.text = 'Toggle Details';
+        // toggleChartButton.href = 'javascript:void(0);';
+        // // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
+        // // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
+        // function toggleDetailsView(scroll = false) {
+        //     const detailsEl = document.getElementById('details');
+        //     if (detailsEl) {
+        //         if (detailsEl.style.display === 'none') {
+        //             detailsEl.style.display = '';
+        //             if (scroll) setTimeout(() =>
+        //                 detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+        //         } else {
+        //             detailsEl.style.display = 'none';
+        //         }
+        //     }
+        // };
+        // toggleChartButton.onclick = () => toggleDetailsView();
+        // document.addEventListener('keypress', (e: KeyboardEvent) => {
+        //     if (e.key === 'd') toggleDetailsView(true);
+        // }, false);
+
+        // rootDiv.appendChild(document.createElement('br'));
+        // rootDiv.appendChild(toggleChartButton);
+
+
+        // TODO 2: DETAILS
+        // // Add details div with stats text and chart
+        // const details = document.createElement('div');
+        // details.id = 'details';
+        // details.style.display = 'none';
+        // const pre = document.createElement('pre');
+        // // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
+        // const total: number = data.timing.reduce((n, el) => n + el.value, 0);
+        // const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
+        // pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
+        // pre.className = 'stats-text';
+        // details.appendChild(pre);
+
+        // const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
+        // const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
+        // if (profilingChart) details.appendChild(profilingChart);
+        // if (profilingNlbChart) details.appendChild(profilingNlbChart);
+
+        // const chart = _createChart(data.pageRanks, data.numSummarySentences);
+        // if (chart) details.appendChild(chart);
+        // rootDiv.appendChild(details);
+
+        // document.body.appendChild(rootDiv);
+        return rootDiv;
+    };
+}
+
+function _createParagraphH(text: Sentence, bold = false) {
+    const boldH = bold ? '.bold' : '';
+    return h('div.paragraph', [
+        h(`div.p-content${boldH}`, [text.content]),
+        h('div.p-rank', [`[Rank: ${text.rank}]`])
+    ]);
 }
 
 function _createChart(prArr: Array<number>, num_summary_sentences: number) {
