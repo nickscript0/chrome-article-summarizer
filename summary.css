@@ -44,7 +44,6 @@
     margin-bottom: 20px;
 }
 
-
 /* Loading Clock modeled off https://codepen.io/GusRuss89/pen/jzbKf */
 
 .loading-clock {
@@ -71,7 +70,6 @@
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-
 /* Animations */
 
 @keyframes rotate {
@@ -83,7 +81,6 @@
     }
 }
 
-
 /* Big hand */
 
 .loading-clock:before {
@@ -94,7 +91,6 @@
     animation: rotate 1s infinite linear;
 }
 
-
 /* Little hand */
 
 .loading-clock:after {
@@ -104,4 +100,37 @@
     transform-origin: 1px 9px;
     animation: rotate 12s infinite linear;
     /* time should be big-hand time * 12 */
+}
+
+/* Slider */
+
+.slider-wrapper {
+    /* display: inline-block; */
+    /* width: 20px; */
+    /* height: 15px; */
+    padding-bottom: 10px;
+    /* display: table-cell; */
+    /* vertical-align: middle; */
+    height: 20px;
+    /* text-align: center; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+}
+
+.slider-wrapper input {
+    vertical-align: middle;
+}
+
+/* .slider-wrapper input {
+    width: 150px;
+    height: 20px;
+    margin: 0;
+    transform-origin: 75px 75px;
+    transform: rotate(-90deg);
+} */
+
+.num-sentences {
+    font-size: 10px;
+    /* color: slategray; */
+    /* vertical-align: middle; */
 }

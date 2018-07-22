@@ -51,9 +51,10 @@ function getTimeDiffMs(startTime: number): string {
 interface State {
     showDetails: boolean;
     queuedScrollIntoView: boolean;
+    showNumSentences: number;
 }
 
-function display(data, startTime) {
+function display(data: SummaryData, startTime: number) {
     document.title = data.title + ' - Summary';
     LoadingAnimation.stop();
 
@@ -63,7 +64,7 @@ function display(data, startTime) {
     oldRoot && oldRoot.remove();
 
 
-    const state: State = { showDetails: false, queuedScrollIntoView: false };
+    const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
     const projector = createProjector();
     document.addEventListener('keypress', (e: KeyboardEvent) => {
         if (e.key === 'd') {
@@ -94,9 +95,24 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
     const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
-
+    const inputSlider = h('input',
+        {
+            style: 'display: inline-block',
+            autofocus: true,
+            type: 'range', min: '3', max: '15', value: '5', step: '1',
+            oninput: (e: any) => {
+                state.showNumSentences = parseInt(e.target.value);
+            }
+        }
+    );
 
     return () => {
+        // Slider
+        const slider = h('div.slider-wrapper', [
+            inputSlider,
+            h('span.num-sentences', [`Sentences: ${state.showNumSentences}`]),
+        ]);
+
         const detailsSection = h('div#details',
             {
                 style: `display: ${state.showDetails ? '' : 'none'}`,
@@ -116,9 +132,10 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
             data.sentences
-                .filter(s => s.rank < data.numSummarySentences)
+                .filter(s => s.rank < (state.showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
+            slider,
             toggleChartButton,
             detailsSection
         ]);
@@ -134,7 +151,7 @@ function _createChartH(chartFunc) {
 
 function _createParagraphH(text: Sentence, bold = false) {
     const boldH = bold ? '.bold' : '';
-    return h('div.paragraph', [
+    return h('div.paragraph', { key: text.rank }, [
         h(`div.p-content${boldH}`, [text.content]),
         h('div.p-rank', [`[Rank: ${text.rank}]`])
     ]);
