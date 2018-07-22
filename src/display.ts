@@ -62,11 +62,13 @@ function display(data: SummaryData, startTime: number) {
     title.textContent = data.title;
     rootDiv.appendChild(title);
 
-    let i = 1;
     for (const text of data.sentences) {
-        let p = _createParagraph(text, text.rank < data.numSummarySentences);
-        rootDiv.appendChild(p);
-        i += 1;
+        // TODO: Remove this if later, for now though articles are too hard to read with whole text shown
+        if (text.rank < data.numSummarySentences) {
+            // let p = _createParagraph(text, text.rank < data.numSummarySentences);
+            let p = _createParagraph(text, false);
+            rootDiv.appendChild(p);
+        }
     }
 
     // Add toggle button for showing the chart
@@ -131,7 +133,8 @@ function _createParagraph(text: Sentence, bold = false) {
     pRank.className = 'p-rank';
     pRank.textContent = `[Rank: ${text.rank}]`;
     p.appendChild(pContent);
-    if (bold) p.appendChild(pRank);
+    // Temporarily always do this
+    if (bold || true) p.appendChild(pRank);
     return p;
 }
 
