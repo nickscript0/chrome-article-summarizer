@@ -50,6 +50,7 @@ function getTimeDiffMs(startTime: number): string {
 
 interface State {
     showDetails: boolean;
+    queuedScrollIntoView: boolean;
 }
 
 function display2(data, startTime) {
@@ -58,7 +59,7 @@ function display2(data, startTime) {
     const projector = createProjector();
     LoadingAnimation.stop();
 
-    const state: State = { showDetails: false };
+    const state: State = { showDetails: false, queuedScrollIntoView: false };
 
     // TODO: is this still necessary? Is it working after move to maquette.js?
     const oldRoot = document.getElementById('root-div');
@@ -68,7 +69,7 @@ function display2(data, startTime) {
 
     document.addEventListener('keypress', (e: KeyboardEvent) => {
         if (e.key === 'd') {
-            state.showDetails = !state.showDetails;
+            _showDetailsEvent(state);
             projector.scheduleRender();
         }
     }, false);
@@ -78,25 +79,17 @@ function display2(data, startTime) {
     projector.append(document.body, buildRender(state, data, startTime));
 }
 
-function buildRender(state, data: SummaryData, startTime: number) {
-    // const toggleChartButton = h('a', { href: 'javascript:void(0);', onclick: () => toggleDetailsView() }, ['Toggle Details']);
+function _showDetailsEvent(state: State) {
+    state.showDetails = !state.showDetails;
+    if (state.showDetails) state.queuedScrollIntoView = true;
+}
+
+function buildRender(state: State, data: SummaryData, startTime: number) {
     const toggleChartButton = h('a',
-        { href: 'javascript:void(0);', onclick: () => { state.showDetails = !state.showDetails; } },
+        { href: 'javascript:void(0);', onclick: () => { _showDetailsEvent(state); } },
         ['Toggle Details']
     );
 
-    function toggleDetailsView(scroll = false) {
-        const detailsEl = document.getElementById('details');
-        if (detailsEl) {
-            if (detailsEl.style.display === 'none') {
-                detailsEl.style.display = '';
-                if (scroll) setTimeout(() =>
-                    detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
-            } else {
-                detailsEl.style.display = 'none';
-            }
-        }
-    };
     return () => {
         // Add Details Section
         const total: number = data.timing.reduce((n, el) => n + el.value, 0);
@@ -107,13 +100,21 @@ function buildRender(state, data: SummaryData, startTime: number) {
         const profilingChart = _createChartH(_createProfilingChart(data.timing, 'Complete Timings'));
         const profilingNlpChart = _createChartH(_createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
         const rankChart = _createChartH(_createChart(data.pageRanks, data.numSummarySentences));
-
-        const detailsSection = h('div#details', { style: `display: ${state.showDetails ? '' : 'none'}` }, [
-            detailsText,
-            rankChart,
-            profilingChart,
-            profilingNlpChart
-        ]);
+        const detailsSection = h('div#details',
+            {
+                style: `display: ${state.showDetails ? '' : 'none'}`,
+                afterUpdate: (el: Element) => {
+                    if (state.queuedScrollIntoView) setTimeout(() =>
+                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+                }
+            },
+            [
+                detailsText,
+                rankChart,
+                profilingChart,
+                profilingNlpChart
+            ]
+        );
 
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
