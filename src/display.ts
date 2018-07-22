@@ -11,7 +11,7 @@ function setupListeners() {
     function onMessageListener(request, sender, sendResponse) {
         const workerPayload: WorkerPayload = request.payload;
         console.log(`Total processing time before Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
-        display2(workerPayload.payload, workerPayload.startTime);
+        display(workerPayload.payload, workerPayload.startTime);
         console.log(`Total processing time after Display : ${getTimeDiffMs(workerPayload.startTime)}ms`);
         chrome.runtime.onMessage.removeListener(onMessageListener);
     };
@@ -53,29 +53,24 @@ interface State {
     queuedScrollIntoView: boolean;
 }
 
-function display2(data, startTime) {
+function display(data, startTime) {
     document.title = data.title + ' - Summary';
-
-    const projector = createProjector();
     LoadingAnimation.stop();
 
-    const state: State = { showDetails: false, queuedScrollIntoView: false };
-
-    // TODO: is this still necessary? Is it working after move to maquette.js?
+    // Remove any previous state (i.e. cases where the extension page is refreshed)
+    // TODO: this no longer seems necessary after testing, can it be removed?
     const oldRoot = document.getElementById('root-div');
     oldRoot && oldRoot.remove();
 
 
-
+    const state: State = { showDetails: false, queuedScrollIntoView: false };
+    const projector = createProjector();
     document.addEventListener('keypress', (e: KeyboardEvent) => {
         if (e.key === 'd') {
             _showDetailsEvent(state);
             projector.scheduleRender();
         }
     }, false);
-
-
-
     projector.append(document.body, buildRender(state, data, startTime));
 }
 
