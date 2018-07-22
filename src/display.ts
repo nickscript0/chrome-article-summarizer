@@ -1,8 +1,8 @@
 // Displays the summarized text in a fresh page
 
-import { Chart } from "chart.js";
 import { h, createProjector } from 'maquette';
-import { SummaryData, Sentence, WorkerPayload, Timings } from './messages';
+import { SummaryData, Sentence, WorkerPayload } from './messages';
+import { createChart, createProfilingChart } from './display-charts';
 
 function setupListeners() {
     chrome.runtime.onMessage.addListener(onMessageListener);
@@ -85,16 +85,18 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         ['Toggle Details']
     );
 
-    return () => {
-        // Add Details Section
-        const total: number = data.timing.reduce((n, el) => n + el.value, 0);
-        const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
-        const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
+    // Add Details Section
+    const total: number = data.timing.reduce((n, el) => n + el.value, 0);
+    const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
+    const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
 
-        // Add Charts Section
-        const profilingChart = _createChartH(_createProfilingChart(data.timing, 'Complete Timings'));
-        const profilingNlpChart = _createChartH(_createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
-        const rankChart = _createChartH(_createChart(data.pageRanks, data.numSummarySentences));
+    // Add Charts Section
+    const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
+    const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
+    const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
+
+
+    return () => {
         const detailsSection = h('div#details',
             {
                 style: `display: ${state.showDetails ? '' : 'none'}`,
@@ -136,67 +138,6 @@ function _createParagraphH(text: Sentence, bold = false) {
         h(`div.p-content${boldH}`, [text.content]),
         h('div.p-rank', [`[Rank: ${text.rank}]`])
     ]);
-}
-
-function _createChart(prArr: Array<number>, num_summary_sentences: number) {
-    return (canvasEl: HTMLCanvasElement) => {
-        const ctx = canvasEl.getContext('2d');
-        if (!ctx) return;
-        const barChartData = {
-            labels: Array.from(Array(prArr.length).keys()).map(x => x.toString()),
-            datasets: [{
-                label: 'Page Rank Values',
-                // backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-                // borderColor: window.chartColors.red,
-                borderWidth: 1,
-                data: prArr,
-                backgroundColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 0.2)'),
-                borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)')
-            }]
-        };
-        new Chart(ctx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                // maintainAspectRatio: false,
-                // responsive: false
-            }
-        });
-    };
-}
-
-function _createProfilingChart(timings: Timings, title: string) {
-    return (canvasEl: HTMLCanvasElement) => {
-        const ctx = canvasEl.getContext('2d');
-        if (!ctx) return;
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: timings.map(t => t.name), //["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [{
-                    label: 'Processing time (ms)',
-                    data: timings.map(t => t.value), // [12, 19, 3, 5, 2, 3],
-                    backgroundColor: Array(timings.length).fill('rgba(75, 192, 192, 0.2)'),
-                    borderColor: Array(timings.length).fill('rgba(75, 192, 192, 1)'),
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                title: {
-                    text: title,
-                    display: true
-                },
-                scales: {
-                    yAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time (ms)'
-                        }
-                    }]
-                }
-            }
-        });
-    };
 }
 
 setupListeners();
