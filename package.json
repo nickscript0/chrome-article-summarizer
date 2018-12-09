@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@types/chart.js": "^2.6.10",
-    "@types/chrome": "0.0.51",
-    "@types/sharedworker": "0.0.27",
     "chart.js": "^2.7.2",
     "compromise": "^11.1.0",
     "maquette": "^3.3.0"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.6.10",
+    "@types/chrome": "0.0.51",
+    "@types/sharedworker": "0.0.27",
     "@types/chai": "^4.0.4",
     "@types/jsdom": "^11.0.3",
     "@types/mocha": "^2.2.44",
