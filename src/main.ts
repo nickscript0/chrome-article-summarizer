@@ -5,7 +5,10 @@
 
 /**
 * TODOs:
-* 0. DO THIS NEXT: In summarized view, add button to reveal entire article with textranked sentences in bold!
+* 0. DO THIS NEXT: 
+   - In summarized view, add button to reveal entire article with textranked sentences in bold!
+   - Also in the reveal entire article view consider shading sentences darkness of grey based on their rank
+   - To do this really right, would need to preserve paragraph structure which is probably much more difficult as I currently don't detect paragraphs just sentences. Could be as easy as detecting <p> elements
 * 1. Make num sentences easily adjustable in the UI
 * 2. Allow seeing the context of a sentence (maybe on left-click it shows more and more sentences before and after, and right click hides them again)
 * 5. a. Extract TextRank and <html sentence extraction> to their own repo

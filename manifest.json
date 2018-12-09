@@ -3,7 +3,7 @@
     "version": "0.1",
     "description": "Summarizes web pages using the Text Rank algorithm.",
     "browser_action": {
-        "name": "Toggle Summary"
+        // "name": "Toggle Summary"
     },
     "content_scripts": [
         {

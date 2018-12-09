@@ -1,7 +1,8 @@
 // Displays the summarized text in a fresh page
 
-import { Chart } from "chart.js";
-import { SummaryData, Sentence, WorkerPayload, Timings } from './messages';
+import { h, createProjector } from 'maquette';
+import { SummaryData, Sentence, WorkerPayload } from './messages';
+import { createChart, createProfilingChart } from './display-charts';
 
 function setupListeners() {
     chrome.runtime.onMessage.addListener(onMessageListener);
@@ -47,174 +48,113 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
+interface State {
+    showDetails: boolean;
+    queuedScrollIntoView: boolean;
+    showNumSentences: number;
+}
+
 function display(data: SummaryData, startTime: number) {
     document.title = data.title + ' - Summary';
+    LoadingAnimation.stop();
 
     // Remove any previous state (i.e. cases where the extension page is refreshed)
+    // TODO: this no longer seems necessary after testing, can it be removed?
     const oldRoot = document.getElementById('root-div');
     oldRoot && oldRoot.remove();
 
-    const rootDiv = document.createElement('div');
-    rootDiv.className = 'page';
-    rootDiv.id = 'root-div';
 
-    const title = document.createElement('h2');
-    title.textContent = data.title;
-    rootDiv.appendChild(title);
-
-    let i = 1;
-    for (const text of data.sentences) {
-        let p = _createParagraph(text);
-        rootDiv.appendChild(p);
-        i += 1;
-    }
-
-    // Add toggle button for showing the chart
-    const toggleChartButton = document.createElement('a');
-    toggleChartButton.text = 'Toggle Details';
-    toggleChartButton.href = 'javascript:void(0);';
-    // yourUl.style.display = yourUl.style.display === 'none' ? '' : 'none';
-    // document.addEventListener("keypress", handle_keypress(nav, highlighter), false);
-    function toggleDetailsView(scroll = false) {
-        const detailsEl = document.getElementById('details');
-        if (detailsEl) {
-            if (detailsEl.style.display === 'none') {
-                detailsEl.style.display = '';
-                if (scroll) setTimeout(() =>
-                    detailsEl.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
-            } else {
-                detailsEl.style.display = 'none';
-            }
-        }
-    };
-    toggleChartButton.onclick = () => toggleDetailsView();
+    const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
+    const projector = createProjector();
     document.addEventListener('keypress', (e: KeyboardEvent) => {
-        if (e.key === 'd') toggleDetailsView(true);
+        if (e.key === 'd') {
+            _showDetailsEvent(state);
+            projector.scheduleRender();
+        }
     }, false);
+    projector.append(document.body, buildRender(state, data, startTime));
+}
 
-    rootDiv.appendChild(document.createElement('br'));
-    rootDiv.appendChild(toggleChartButton);
+function _showDetailsEvent(state: State) {
+    state.showDetails = !state.showDetails;
+    if (state.showDetails) state.queuedScrollIntoView = true;
+}
 
-    // Add details div with stats text and chart
-    const details = document.createElement('div');
-    details.id = 'details';
-    details.style.display = 'none';
-    const pre = document.createElement('pre');
-    // const detailedTimeText = `${data.timing.map(t => t.name + '=' + t.value + 'ms').join(', ')}`;
+function buildRender(state: State, data: SummaryData, startTime: number) {
+    const toggleChartButton = h('a',
+        { href: 'javascript:void(0);', onclick: () => { _showDetailsEvent(state); } },
+        ['Toggle Details']
+    );
+
+    // Add Details Section
     const total: number = data.timing.reduce((n, el) => n + el.value, 0);
     const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
-    pre.textContent = [data.textStats, data.wordStats, generatedTimeText].join('\n');
-    pre.className = 'stats-text';
-    details.appendChild(pre);
+    const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
 
-    const profilingChart = _createProfilingChart(data.timing, 'Complete Timings');
-    const profilingNlbChart = _createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings');
-    if (profilingChart) details.appendChild(profilingChart);
-    if (profilingNlbChart) details.appendChild(profilingNlbChart);
-
-    const chart = _createChart(data.pageRanks, data.numSummarySentences);
-    if (chart) details.appendChild(chart);
-    rootDiv.appendChild(details);
-
-    LoadingAnimation.stop();
-
-    document.body.appendChild(rootDiv);
-}
-
-function _createParagraph(text: Sentence) {
-    const p = document.createElement('div');
-    p.className = 'paragraph';
-    const pContent = document.createElement('div');
-    pContent.className = 'p-content';
-    pContent.textContent = text.content;
-    const pRank = document.createElement('div');
-    pRank.className = 'p-rank';
-    pRank.textContent = `[Rank: ${text.rank}]`;
-    p.appendChild(pContent);
-    p.appendChild(pRank);
-    return p;
-}
-
-function _createChart(prArr: Array<number>, num_summary_sentences: number) {
-    // <canvas id="myChart" width="400" height="400"></canvas>
-    // <script>
-    // var ctx = document.getElementById("myChart").getContext('2d');
-    const canvasEl = document.createElement('canvas');
-    // canvasEl.width = 200;
-    // canvasEl.height = 200;
-    // canvasEl.style.width = '400px';
-    // canvasEl.style.height = '400px';
-    const ctx = canvasEl.getContext('2d');
-    if (!ctx) return;
-    const barChartData = {
-        labels: Array.from(Array(prArr.length).keys()).map(x => x.toString()),
-        datasets: [{
-            label: 'Page Rank Values',
-            // backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-            // borderColor: window.chartColors.red,
-            borderWidth: 1,
-            data: prArr,
-            backgroundColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 0.2)'),
-            borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)')
-        }]
-    };
-    new Chart(ctx, {
-        type: 'bar',
-        data: barChartData,
-        options: {
-            // maintainAspectRatio: false,
-            // responsive: false
-        }
-    });
-
-    const div = document.createElement('div');
-    // div.style.width = '800px';
-    // div.style.height = '400px';
-    div.style.width = '100%';
-    div.style.height = '100%';
-    div.style.textAlign = 'center';
-    div.appendChild(canvasEl);
-    return div;
-}
-
-function _createProfilingChart(timings: Timings, title: string) {
-    const canvasEl = document.createElement('canvas');
-    const ctx = canvasEl.getContext('2d');
-    if (!ctx) return;
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: timings.map(t => t.name), //["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-            datasets: [{
-                label: 'Processing time (ms)',
-                data: timings.map(t => t.value), // [12, 19, 3, 5, 2, 3],
-                backgroundColor: Array(timings.length).fill('rgba(75, 192, 192, 0.2)'),
-                borderColor: Array(timings.length).fill('rgba(75, 192, 192, 1)'),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            title: {
-                text: title,
-                display: true
-            },
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time (ms)'
-                    }
-                }]
+    // Add Charts Section
+    const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
+    const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
+    const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
+    const inputSlider = h('input',
+        {
+            style: 'display: inline-block',
+            autofocus: true,
+            type: 'range', min: '3', max: '15', value: '5', step: '1',
+            oninput: (e: any) => {
+                state.showNumSentences = parseInt(e.target.value);
             }
         }
-    });
+    );
 
-    const div = document.createElement('div');
-    div.style.width = '100%';
-    div.style.height = '100%';
-    div.style.textAlign = 'center';
-    div.appendChild(canvasEl);
-    return div;
+    return () => {
+        // Slider
+        const slider = h('div.slider-wrapper', [
+            inputSlider,
+            h('span.num-sentences', [`Sentences: ${state.showNumSentences}`]),
+        ]);
+
+        const detailsSection = h('div#details',
+            {
+                style: `display: ${state.showDetails ? '' : 'none'}`,
+                afterUpdate: (el: Element) => {
+                    if (state.queuedScrollIntoView) setTimeout(() =>
+                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+                }
+            },
+            [
+                detailsText,
+                rankChart,
+                profilingChart,
+                profilingNlpChart
+            ]
+        );
+
+        const rootDiv = h('div.page#root-div', [
+            h('h2', [data.title]),
+            data.sentences
+                .filter(s => s.rank < (state.showNumSentences + 1))
+                .map(s => _createParagraphH(s, false)),
+            h('br'),
+            slider,
+            toggleChartButton,
+            detailsSection
+        ]);
+        return rootDiv;
+    };
+}
+
+function _createChartH(chartFunc) {
+    return h('div', { style: `width: 100%; height: 100%; textAlign: center;` },
+        [h('canvas', { afterCreate: chartFunc })]
+    );
+}
+
+function _createParagraphH(text: Sentence, bold = false) {
+    const boldH = bold ? '.bold' : '';
+    return h('div.paragraph', { key: text.rank }, [
+        h(`div.p-content${boldH}`, [text.content]),
+        h('div.p-rank', [`[Rank: ${text.rank}]`])
+    ]);
 }
 
 setupListeners();

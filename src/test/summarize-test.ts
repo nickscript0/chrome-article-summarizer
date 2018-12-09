@@ -306,7 +306,7 @@ function newWindowFromString(htmlString: string) {
     const w = new JSDOM(htmlString).window as any;
     // Mock getSelection due to https://github.com/jsdom/jsdom/issues/321
     w.getSelection = () => '';
-    w.performance = { now: () => null };
+    w.performance.now = () => null;
     return w;
 }
 
