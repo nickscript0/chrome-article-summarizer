@@ -6,7 +6,8 @@ module.exports = {
         main: './src/main.ts',
         display: './src/display.ts',
         background: './src/background.ts',
-        summarize_worker: './src/summarize-worker.ts'
+        summarize_worker: './src/summarize-worker.ts',
+        popup: './src/popup.ts'
     },
     output: {
         path: path.resolve(__dirname, 'build'),

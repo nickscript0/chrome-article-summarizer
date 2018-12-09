@@ -67,7 +67,8 @@ export enum Commands {
     Display = 'Display',
     ToggleSummarize = 'ToggleSummarize',
     DisplayTabReady = 'DisplayTabReady',
-    AssignId = 'AssignId'
+    AssignId = 'AssignId',
+    KillStickies = 'kill-sticky-headers'
 }
 
 export type Timings = Array<Timing>;

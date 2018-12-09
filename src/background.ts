@@ -4,24 +4,44 @@ import { Commands, InputPayload, WorkerPayload, WorkerPayloadCommand, InputPaylo
 let activeTabs: { [tabid: number]: string | undefined } = {};
 
 function setupMenus() {
-    chrome.contextMenus.create({
-        title: "Toggle Summarize",
-        id: 'toggle-summarize',
-        contexts: ['page_action']
+    // chrome.contextMenus.create({
+    //     title: "Toggle Summarize",
+    //     id: 'toggle-summarize',
+    //     contexts: ['page_action']
+    // });
+
+    // chrome.contextMenus.onClicked.addListener(function (itemData) {
+    //     console.log(`NDEBUG1: contextMenus.onClicked CALLED!`);
+    //     if (itemData.menuItemId === "toggle-summarize") {
+    //         sendToggleSummaryMessage();
+    //     }
+    // });
+
+    // This is used by the Chrome extension keyboard shortcut cmd+shift+s
+    chrome.commands.onCommand.addListener(function (command) {
+        console.log(`NDEBUG2: onCommand CALLED!`);
+        sendToggleSummaryMessage();
     });
 
-    chrome.contextMenus.onClicked.addListener(function (itemData) {
-        if (itemData.menuItemId === "toggle-summarize") {
+    // chrome.browserAction.onClicked.addListener(function () {
+    //     console.log(`NDEBUG3: browserAction.onClicked CALLED!`);
+    //     sendToggleSummaryMessage();
+    // });
+
+    chrome.runtime.onMessage.addListener(msg => {
+        if (msg.command === 'toggle-summarize') {
             sendToggleSummaryMessage();
         }
-    });
-
-    chrome.commands.onCommand.addListener(function (command) {
-        sendToggleSummaryMessage();
-    });
-
-    chrome.browserAction.onClicked.addListener(function () {
-        sendToggleSummaryMessage();
+        if (msg.command === Commands.KillStickies) {
+            // console.log(`kill-sticky called background`);
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                const mainTabId = tabs[0].id;
+                if (mainTabId) {
+                    chrome.tabs.sendMessage(mainTabId, { command: Commands.KillStickies },
+                        r => { console.log(`background sent kill-sticky to content-script`); });
+                }
+            });
+        }
     });
 }
 

@@ -22,6 +22,8 @@
 
 import { getTextBlocksFromDom } from "./summarize";
 import { Commands, InputPayload, Timer } from './messages';
+import { kill_sticky_headers } from './kill-sticky-headers';
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.ToggleSummarize) {
@@ -33,13 +35,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             textBlocks: textBlocks,
             title: document.title,
             startTime: startTime,
-            url: document.location.href,
+            url: document.location ? document.location.href : '',
             timings: t.serialize()
         };
 
         sendResponse({
             data: payload
         });
+    } else if (request.command === Commands.KillStickies) {
+        kill_sticky_headers();
     }
 });
 

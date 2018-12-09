@@ -9,12 +9,13 @@
     "maquette": "^3.3.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.4",
     "@types/chart.js": "^2.6.10",
     "@types/chrome": "0.0.51",
-    "@types/sharedworker": "0.0.27",
-    "@types/chai": "^4.0.4",
+    "@types/firefox-webext-browser": "^64.0.0",
     "@types/jsdom": "^11.0.3",
     "@types/mocha": "^2.2.44",
+    "@types/sharedworker": "0.0.27",
     "chai": "^4.1.2",
     "jsdom": "^11.11.0",
     "mocha": "^4.0.1",

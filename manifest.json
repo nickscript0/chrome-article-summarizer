@@ -3,7 +3,7 @@
     "version": "0.1",
     "description": "Summarizes web pages using the Text Rank algorithm.",
     "browser_action": {
-        // "name": "Toggle Summary"
+        "default_popup": "popup.html"
     },
     "content_scripts": [
         {
@@ -21,7 +21,7 @@
         ]
     },
     "permissions": [
-        "contextMenus"
+        "contextMenus" // Can be removed probably
     ],
     "commands": {
         "toggle-page-summary": {
@@ -32,5 +32,8 @@
             "description": "Toggle Page Summary"
         }
     },
+    // "content_security_policy": "default-src 'self'; script-src 'self'; object-src 'self'",
+    // "content_security_policy": "script-src 'self'; object-src 'self'",
+    // "content_security_policy": "script-src 'nonce-2726c7f26c'",
     "manifest_version": 2
 }
