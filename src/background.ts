@@ -1,7 +1,10 @@
-import { Commands, InputPayload, WorkerPayload, WorkerPayloadCommand, InputPayloadCommand } from './messages';
+import {
+    Commands, InputPayload, WorkerPayload,
+    WorkerPayloadCommand, InputPayloadCommand, queryCurrentTab
+} from './messages';
 
 // key: tab.id, value: url string or null if not in summary mode
-let activeTabs: { [tabid: number]: string | undefined } = {};
+let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
 
 function setupMenus() {
     // chrome.contextMenus.create({
@@ -19,45 +22,40 @@ function setupMenus() {
 
     // This is used by the Chrome extension keyboard shortcut cmd+shift+s
     chrome.commands.onCommand.addListener(function (command) {
-        console.log(`NDEBUG2: onCommand CALLED!`);
         sendToggleSummaryMessage();
     });
 
-    // chrome.browserAction.onClicked.addListener(function () {
-    //     console.log(`NDEBUG3: browserAction.onClicked CALLED!`);
-    //     sendToggleSummaryMessage();
-    // });
-
-    chrome.runtime.onMessage.addListener(msg => {
+    chrome.runtime.onMessage.addListener(async msg => {
         if (msg.command === 'toggle-summarize') {
-            sendToggleSummaryMessage();
+            sendToggleSummaryMessage(msg.openerTabId);
         }
-        if (msg.command === Commands.KillStickies) {
-            // console.log(`kill-sticky called background`);
-            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                const mainTabId = tabs[0].id;
-                if (mainTabId) {
-                    chrome.tabs.sendMessage(mainTabId, { command: Commands.KillStickies },
-                        r => { console.log(`background sent kill-sticky to content-script`); });
-                }
-            });
+        else if (msg.command === Commands.KillStickies) {
+            const articleTabId = msg.openerTabId || (await queryCurrentTab()).id;
+            chrome.tabs.sendMessage(
+                articleTabId,
+                { command: Commands.KillStickies },
+                r => console.log(`background.ts sent kill-sticky cmd to content-script`)
+            );
         }
     });
 }
 
-function sendToggleSummaryMessage() {
+function sendToggleSummaryMessage(openerTabId?) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const mainTabId = tabs[0].id;
-        if (mainTabId) {
-            if (activeTabs[mainTabId]) {
-                chrome.tabs.update(mainTabId, { url: activeTabs[mainTabId] });
-                delete activeTabs[mainTabId];
+        // If openerTabId exists it means this has been initiated by a popup window opened in its
+        // own tab, and therefore we must use the "tab that opened the popup window"'s tabId
+        const articleTabId = openerTabId || tabs[0].id;
+        if (articleTabId) {
+            if (tabsInSummaryMode[articleTabId]) {
+                chrome.tabs.update(articleTabId, { url: tabsInSummaryMode[articleTabId] });
+                delete tabsInSummaryMode[articleTabId];
             } else {
-                chrome.tabs.sendMessage(mainTabId, { command: Commands.ToggleSummarize }, r => {
+                console.log(`background.ts sendMessage ToggleSummarize to articleTabId`, articleTabId);
+                chrome.tabs.sendMessage(articleTabId, { command: Commands.ToggleSummarize }, r => {
                     // If a user is togglingSummary button when the summary is displayed, r.data will be sent from display.ts and empty
                     if (r) {
                         const payload: InputPayload = r.data;
-                        activeTabs[mainTabId] = payload.url;
+                        tabsInSummaryMode[articleTabId] = payload.url;
                         createDisplayTab(payload);
                         // attachWorker(payload);
                     }
@@ -79,7 +77,7 @@ function createDisplayTab(payload: InputPayload) {
             //  1. This is the currently active tab
             //  2. The display tab is done initializing
             //  3. Display tab is in display mode and not reverting to original url i.e. activeTabs[currentTab.id] is set
-            if (currentTab.id === tabId && info.status === 'complete' && activeTabs[currentTab.id]) {
+            if (currentTab.id === tabId && info.status === 'complete' && tabsInSummaryMode[currentTab.id]) {
                 console.log(`onUpdated for current active tab hit: tabId=${tabId} info=${info.status}: calling Worker..`);
                 // chrome.tabs.query()
                 const currentTabId = currentTab.id;
@@ -103,7 +101,7 @@ function createDisplayTab(payload: InputPayload) {
                 worker.postMessage(ipCommand);
 
             } // Remove the listener when transitioned from Summary Display View --> Original Page View
-            else if (currentTab.id === tabId && info.status === 'complete' && !activeTabs[currentTab.id]) {
+            else if (currentTab.id === tabId && info.status === 'complete' && !tabsInSummaryMode[currentTab.id]) {
                 chrome.tabs.onUpdated.removeListener(onUpdatedListener);
                 onUpdatedListenerCount--;
             }

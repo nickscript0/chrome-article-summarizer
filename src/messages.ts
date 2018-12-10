@@ -68,7 +68,7 @@ export enum Commands {
     ToggleSummarize = 'ToggleSummarize',
     DisplayTabReady = 'DisplayTabReady',
     AssignId = 'AssignId',
-    KillStickies = 'kill-sticky-headers'
+    KillStickies = 'kill-sticky-headers',
 }
 
 export type Timings = Array<Timing>;
@@ -115,4 +115,16 @@ export class Timer {
     private performanceDefined(): boolean {
         return typeof performance !== 'undefined';
     }
+}
+
+export function queryTabs(queryInfo: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab> {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.query(queryInfo, function (tabs) {
+            resolve(tabs[0]);
+        });
+    });
+}
+
+export function queryCurrentTab() {
+    return queryTabs({ active: true, currentWindow: true });
 }

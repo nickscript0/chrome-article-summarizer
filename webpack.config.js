@@ -15,7 +15,7 @@ module.exports = {
         publicPath: '/build/'
     },
     plugins: [
-        new WebpackNotifierPlugin({ excludeWarnings: true, alwaysNotify: true })
+        new WebpackNotifierPlugin({ excludeWarnings: true, alwaysNotify: true, timeout: 1 })
     ],
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.

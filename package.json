@@ -24,7 +24,7 @@
     "typescript": "^2.5.3",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
-    "webpack-notifier": "^1.6.0"
+    "webpack-notifier": "github:nickscript0/webpack-notifier"
   },
   "scripts": {
     "watch": "webpack --watch",
