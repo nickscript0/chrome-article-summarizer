@@ -2,11 +2,19 @@ import {
     Commands, InputPayload, WorkerPayload,
     WorkerPayloadCommand, InputPayloadCommand, queryCurrentTab
 } from './messages';
-
+console.log(`background.ts top of module, should be loaded once`);
 // key: tab.id, value: url string or null if not in summary mode
 let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
+let lastTabId, currentTabId;
+let popupPortConnected = false;
+
+function closeTab(tabId) {
+    console.log(`background.ts chrome.tabs.remove(${tabId})`);
+    chrome.tabs.remove(tabId);
+}
 
 function setupMenus() {
+    console.log(`background.ts setupMenus(), should be loaded once`);
     // chrome.contextMenus.create({
     //     title: "Toggle Summarize",
     //     id: 'toggle-summarize',
@@ -20,31 +28,72 @@ function setupMenus() {
     //     }
     // });
 
+    chrome.runtime.onConnect.addListener((port) => {
+        console.log(`background.ts port ${port.name} connected!`);
+        // port.onMessage.addListener((msg, port) => {
+        //     console.log(`Received msg ${JSON.stringify(msg)} from port ${port.name}`);
+        // });
+        // if (port.name === 'popup-port') {
+        //     console.log(`background.ts popupPortConnected=${JSON.stringify(popupPortConnected)}`);
+        //     if (popupPortConnected) {
+        //         console.log(`background.ts popup-port already connected, ignoring connect`);
+        //         return;
+        //     } else {
+        //         console.log(`background.ts set popupPortConnected=true`);
+        //         popupPortConnected = true;
+        //         port.onDisconnect.addListener((port) => {
+        //             console.log(`background.ts popup-port disconnected`);
+        //             popupPortConnected = false;
+
+        //         });
+        //     }
+        // }
+
+
+        port.onMessage.addListener(async (msg: any) => {
+            console.log(`background.ts onMessage msg.command=${msg.command}`);
+
+            if (msg.command === 'toggle-summarize') {
+                if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
+                sendToggleSummaryMessage(msg.articleTabId);
+            }
+            else if (msg.command === Commands.KillStickies) {
+                // const articleTabId = msg.openerTabId || (await queryCurrentTab()).id;
+                console.log(`background.ts msg.articleTabId=${msg.articleTabId}, lastTabId=${lastTabId}`);
+                if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
+                chrome.tabs.sendMessage(
+                    msg.articleTabId,
+                    { command: Commands.KillStickies },
+                    r => console.log(`background.ts sent kill-sticky cmd to content-script`)
+                );
+            }
+        });
+    });
+
+    chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+        console.log(`background.ts tabs.onUpdated tabId=${tabId} windowId=${windowId}`);
+        lastTabId = currentTabId;
+        currentTabId = tabId;
+    });
+
     // This is used by the Chrome extension keyboard shortcut cmd+shift+s
+    // TODO: Handle this more gracefully in Firefox for Android: gives 'TypeError: chrome.commands is undefined; can't access its "onCommand" property'
     chrome.commands.onCommand.addListener(function (command) {
         sendToggleSummaryMessage();
     });
 
-    chrome.runtime.onMessage.addListener(async msg => {
-        if (msg.command === 'toggle-summarize') {
-            sendToggleSummaryMessage(msg.openerTabId);
-        }
-        else if (msg.command === Commands.KillStickies) {
-            const articleTabId = msg.openerTabId || (await queryCurrentTab()).id;
-            chrome.tabs.sendMessage(
-                articleTabId,
-                { command: Commands.KillStickies },
-                r => console.log(`background.ts sent kill-sticky cmd to content-script`)
-            );
-        }
-    });
+
 }
 
 function sendToggleSummaryMessage(openerTabId?) {
+    console.log(`background.ts got toggle-summarize`);
+
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         // If openerTabId exists it means this has been initiated by a popup window opened in its
         // own tab, and therefore we must use the "tab that opened the popup window"'s tabId
         const articleTabId = openerTabId || tabs[0].id;
+        console.log(`background.ts articleTabId=${articleTabId}, BUT lastTabId=${lastTabId}`);
+
         if (articleTabId) {
             if (tabsInSummaryMode[articleTabId]) {
                 chrome.tabs.update(articleTabId, { url: tabsInSummaryMode[articleTabId] });

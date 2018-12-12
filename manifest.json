@@ -21,6 +21,8 @@
         ]
     },
     "permissions": [
+        "tabs",
+        "tabHide",
         "contextMenus" // Can be removed probably
     ],
     "commands": {
@@ -35,7 +37,12 @@
     // "content_security_policy": "default-src 'self'; script-src 'self'; object-src 'self'",
     // "content_security_policy": "script-src 'self'; object-src 'self'",
     // "content_security_policy": "script-src 'nonce-2726c7f26c'",
-    "browser_specific_settings": {
+    // "browser_specific_settings": {
+    //     "gecko": {
+    //         "id": "chrome-article-summarizer@nickscript0"
+    //     }
+    // },
+    "applications": {
         "gecko": {
             "id": "chrome-article-summarizer@nickscript0"
         }
