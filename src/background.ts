@@ -6,14 +6,13 @@ console.log(`background.ts top of module, should be loaded once`);
 // key: tab.id, value: url string or null if not in summary mode
 let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
 let lastTabId, currentTabId;
-let popupPortConnected = false;
 
 function closeTab(tabId) {
     console.log(`background.ts chrome.tabs.remove(${tabId})`);
     chrome.tabs.remove(tabId);
 }
 
-function setupMenus() {
+function setupListeners() {
     console.log(`background.ts setupMenus(), should be loaded once`);
     // chrome.contextMenus.create({
     //     title: "Toggle Summarize",
@@ -55,17 +54,13 @@ function setupMenus() {
 
             if (msg.command === 'toggle-summarize') {
                 if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
-                sendToggleSummaryMessage(msg.articleTabId);
+                sendToggleSummaryMessageToContentScript(msg.articleTabId);
             }
             else if (msg.command === Commands.KillStickies) {
                 // const articleTabId = msg.openerTabId || (await queryCurrentTab()).id;
                 console.log(`background.ts msg.articleTabId=${msg.articleTabId}, lastTabId=${lastTabId}`);
                 if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
-                chrome.tabs.sendMessage(
-                    msg.articleTabId,
-                    { command: Commands.KillStickies },
-                    r => console.log(`background.ts sent kill-sticky cmd to content-script`)
-                );
+                sendKillStickyMessageToContentScript(msg.articleTabId);
             }
         });
     });
@@ -78,14 +73,27 @@ function setupMenus() {
 
     // This is used by the Chrome extension keyboard shortcut cmd+shift+s
     // TODO: Handle this more gracefully in Firefox for Android: gives 'TypeError: chrome.commands is undefined; can't access its "onCommand" property'
-    chrome.commands.onCommand.addListener(function (command) {
-        sendToggleSummaryMessage();
+    chrome.commands.onCommand.addListener(command => {
+        console.log(`backgrond.ts onCommand `, command);
+
+        // TODO: give these message.ts types, they match the string defined in manifest.json "commands" section
+        if (command === 'toggle-page-summary') sendToggleSummaryMessageToContentScript();
+        else if (command === 'trigger-kill-sticky') sendKillStickyMessageToContentScript(currentTabId);
+        else console.log(`background.ts unnkown command, doing nothing:`, command);
     });
 
 
 }
 
-function sendToggleSummaryMessage(openerTabId?) {
+function sendKillStickyMessageToContentScript(tabId) {
+    chrome.tabs.sendMessage(
+        tabId,
+        { command: Commands.KillStickies },
+        r => console.log(`background.ts sent kill-sticky cmd to content-script`)
+    );
+}
+
+function sendToggleSummaryMessageToContentScript(openerTabId?) {
     console.log(`background.ts got toggle-summarize`);
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -158,4 +166,4 @@ function createDisplayTab(payload: InputPayload) {
     });
 }
 
-setupMenus();
+setupListeners();

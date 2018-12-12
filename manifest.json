@@ -32,6 +32,13 @@
                 "mac": "Command+Shift+S"
             },
             "description": "Toggle Page Summary"
+        },
+        "trigger-kill-sticky": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+K",
+                "mac": "Command+Shift+K"
+            },
+            "description": "Kill Sticky Headers"
         }
     },
     // "content_security_policy": "default-src 'self'; script-src 'self'; object-src 'self'",
