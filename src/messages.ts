@@ -1,5 +1,9 @@
 // Interfaces for message passing between tabs and background script
 
+export enum PortName {
+    popup = 'popup-port'
+}
+
 export interface SimpleCommand {
     command: Commands;
 }
@@ -68,7 +72,14 @@ export enum Commands {
     ToggleSummarize = 'ToggleSummarize',
     DisplayTabReady = 'DisplayTabReady',
     AssignId = 'AssignId',
-    KillStickies = 'kill-sticky-headers',
+    PopupKillStickies = 'popup-kill-sticky-headers',
+    PopupToggleSummarize = 'popup-toggle-summarize'
+}
+
+// This must match the strings defined in manifest.json "commands" section
+export enum KeyboardCommands {
+    ToggleSummarize = 'toggle-page-summary',
+    TriggerKillStickies = 'trigger-kill-sticky'
 }
 
 export type Timings = Array<Timing>;

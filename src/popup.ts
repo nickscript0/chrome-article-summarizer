@@ -1,10 +1,10 @@
-import { Commands, queryCurrentTab } from './messages';
+import { Commands, queryCurrentTab, PortName } from './messages';
 
 async function main() {
     const loadedTab = await queryCurrentTab();
     console.log(`popup.ts loaded (tabId=${loadedTab.id})`);
 
-    const port = chrome.runtime.connect({ name: 'popup-port' });
+    const port = chrome.runtime.connect({ name: PortName.popup });
 
     const summarizeButton = document.getElementById('summarize-button');
     summarizeButton && summarizeButton.addEventListener("click", async (ev) => {
@@ -16,7 +16,7 @@ async function main() {
         // window.close();
         // console.log(`popup.ts sendMessage toggle-summarize to background openerTabId=${currentTab.openerTabId}`);
         const articleTabId = currentTab.id; // TODO: Does this work in desktop? If not consider currentTab.openerTabId || currentTab.id
-        port.postMessage({ command: "toggle-summarize", articleTabId });
+        port.postMessage({ command: Commands.PopupToggleSummarize, articleTabId });
         // currentTab.openerTabId && currentTab.id && browser.tabs.remove(currentTab.id);
 
         // .then(() => {
@@ -31,7 +31,7 @@ async function main() {
 
         window.close();
         const articleTabId = currentTab.id; // TODO: Does this work in desktop? If not consider currentTab.openerTabId || currentTab.id
-        port.postMessage({ command: Commands.KillStickies, articleTabId });
+        port.postMessage({ command: Commands.PopupKillStickies, articleTabId });
         // currentTab.openerTabId && currentTab.id && browser.tabs.remove(currentTab.id);
         // 
         // .then(() => {
