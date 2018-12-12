@@ -1,16 +1,22 @@
 // Interfaces for message passing between tabs and background script
 
+export enum Commands {
+    Display = 'Display',
+    ToggleSummarize = 'ToggleSummarize',
+    DisplayTabReady = 'DisplayTabReady',
+    AssignId = 'AssignId',
+    PopupKillStickies = 'popup-kill-sticky-headers',
+    PopupToggleSummarize = 'popup-toggle-summarize'
+}
+
+// This must match the strings defined in manifest.json "commands" section
+export enum KeyboardCommands {
+    ToggleSummarize = 'toggle-page-summary',
+    TriggerKillStickies = 'trigger-kill-sticky'
+}
+
 export enum PortName {
     popup = 'popup-port'
-}
-
-export interface SimpleCommand {
-    command: Commands;
-}
-
-export interface AssignIdCommand {
-    command: Commands.AssignId;
-    id: string;
 }
 
 export interface WorkerPayloadCommand {
@@ -22,19 +28,6 @@ export interface InputPayloadCommand {
     command: Commands.ToggleSummarize;
     payload: InputPayload;
 }
-
-
-// export interface WorkerCommand {
-//     type: Commands;
-//     url: string;
-//     client: WorkerClients;
-//     payload?: InputPayload;
-// }
-
-// export enum WorkerClients {
-//     BackgroundPage,
-//     DisplayPage
-// }
 
 export interface InputPayload {
     textBlocks: string[];
@@ -65,21 +58,6 @@ export interface SummaryData {
 export interface Sentence {
     content: string;
     rank: number;
-}
-
-export enum Commands {
-    Display = 'Display',
-    ToggleSummarize = 'ToggleSummarize',
-    DisplayTabReady = 'DisplayTabReady',
-    AssignId = 'AssignId',
-    PopupKillStickies = 'popup-kill-sticky-headers',
-    PopupToggleSummarize = 'popup-toggle-summarize'
-}
-
-// This must match the strings defined in manifest.json "commands" section
-export enum KeyboardCommands {
-    ToggleSummarize = 'toggle-page-summary',
-    TriggerKillStickies = 'trigger-kill-sticky'
 }
 
 export type Timings = Array<Timing>;

@@ -104,7 +104,6 @@ function createDisplayTab(payload: InputPayload) {
             //  3. Display tab is in display mode and not reverting to original url i.e. activeTabs[currentTab.id] is set
             if (displayTab.id === tabId && info.status === 'complete' && tabsInSummaryMode[displayTab.id]) {
                 log(`onUpdated for current active tab hit: tabId=${tabId} info=${info.status}: calling Worker..`);
-                // chrome.tabs.query()
                 const displayTabId = displayTab.id;
                 const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
                 worker.onmessage = e => {
