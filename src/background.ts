@@ -68,6 +68,7 @@ function sendKillStickyMessageToContentScript(tabId) {
 function sendToggleSummaryMessageToContentScript(articleTabId?) {
     // We re-query the current highlighted tab here as the user could've changed window focus,
     // which doesn't trigger a tabs.onActivated event and therefore 'currentTabId' is out of date
+    // Note: it'd be cleaner to use "await queryTabs(...)" here, but then get a Uncaught (in promise) TypeError: Cannot read property 'id' of undefined
     chrome.tabs.query({ active: true, currentWindow: true, highlighted: true }, tabs => {
         articleTabId = articleTabId || tabs[0].id;
         // log(`sendToggleSummaryMessageToContentScript tabs.query:`, tabs);
