@@ -1,15 +1,18 @@
 .page {
-    padding: 50px;
+    /* padding: 50px;
     margin-left: 225px;
-    margin-right: 225px;
+    margin-right: 225px; */
+    padding: 5%;
+    margin-left: 20%;
+    margin-right: 20%;
     /* font-family: georgia, "times new roman", times, serif; */
 }
 
 @media (max-width: 1000px) {
     .page {
-        padding: 5px;
-        margin-left: 5px;
-        margin-right: 5px;
+        padding: 5%;
+        margin-left: 5%;
+        margin-right: 5%;
     }
 }
 
