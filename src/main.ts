@@ -45,7 +45,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             data: payload
         });
     } else if (request.command === Commands.PopupKillStickies) {
-        console.log(`main.ts received killsticky command`);
         kill_sticky_headers();
     }
 });
