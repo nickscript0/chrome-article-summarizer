@@ -66,9 +66,15 @@ function display(data: SummaryData, startTime: number) {
 
     const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
     const projector = createProjector();
-    document.addEventListener('keypress', (e: KeyboardEvent) => {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'd') {
             _showDetailsEvent(state);
+            projector.scheduleRender();
+        } else if (e.key === 'ArrowLeft') {
+            state.showNumSentences--;
+            projector.scheduleRender();
+        } else if (e.key === 'ArrowRight') {
+            state.showNumSentences++;
             projector.scheduleRender();
         }
     }, false);
@@ -92,8 +98,8 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
 
     // Add Charts Section
-    const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
-    const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
+    const profilingChart = _createSmallChartH(createProfilingChart(data.timing, 'Complete Timings'));
+    const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
     const inputSlider = h('input',
         {
@@ -107,6 +113,12 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     );
 
     return () => {
+        const numSentenceButtons = h('div', [
+            // <a href="something" class="button6">Ok</a>
+            h('div', {style: 'display: inline-block; font-size: 10px; padding-right: 5px'}, [`Sentences: ${state.showNumSentences}`]),
+            h('a.button-now', { href: '#', onclick: e => { state.showNumSentences--; } }, ['⬅️']),
+            h('a.button-now', { href: '#', onclick: e => { state.showNumSentences++; } }, ['➡️']),
+        ]);
         // Slider
         const slider = h('div.slider-wrapper', [
             inputSlider,
@@ -124,18 +136,22 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             [
                 detailsText,
                 rankChart,
-                profilingChart,
-                profilingNlpChart
+                h('div.profile-charts', [profilingChart, profilingNlpChart])
+
             ]
         );
 
         const rootDiv = h('div.page#root-div', [
-            h('h2', [data.title]),
+            h('div', [
+                h('h2', [data.title]),
+                numSentenceButtons
+            ]),
             data.sentences
                 .filter(s => s.rank < (state.showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
-            slider,
+            // slider,
+            // numSentenceButtons,
             toggleChartButton,
             detailsSection
         ]);
@@ -145,6 +161,12 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
 
 function _createChartH(chartFunc) {
     return h('div', { style: `width: 100%; height: 100%; textAlign: center;` },
+        [h('canvas', { afterCreate: chartFunc })]
+    );
+}
+
+function _createSmallChartH(chartFunc) {
+    return h('div.small-chart', // { style: smallChartStyle },
         [h('canvas', { afterCreate: chartFunc })]
     );
 }

@@ -1,11 +1,22 @@
+.profile-charts {
+    /* display: inline; */
+    /* height: 300px; */
+}
+
 .page {
     /* padding: 50px;
     margin-left: 225px;
     margin-right: 225px; */
-    padding: 5%;
-    margin-left: 20%;
-    margin-right: 20%;
+    padding: 2%;
+    margin-left: 15%;
+    margin-right: 15%;
     /* font-family: georgia, "times new roman", times, serif; */
+}
+
+.small-chart {
+    width: 50%;
+    text-align: center;
+    display: inline-block;
 }
 
 @media (max-width: 1000px) {
@@ -13,6 +24,9 @@
         padding: 3%;
         margin-left: 5%;
         margin-right: 5%;
+    }
+    .small-chart {
+        width: 100%;
     }
 }
 
