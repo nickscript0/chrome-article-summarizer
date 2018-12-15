@@ -1,6 +1,11 @@
-.profile-charts {
-    /* display: inline; */
-    /* height: 300px; */
+.page {
+    /* padding: 50px;
+    margin-left: 225px;
+    margin-right: 225px; */
+    padding: 2%;
+    margin-left: 15%;
+    margin-right: 15%;
+    /* font-family: georgia, "times new roman", times, serif; */
 }
 
 .footer {
@@ -10,7 +15,7 @@
     left: 0;
     width: 100%;
     text-align: center;
-  }
+}
 
 .sentence-buttons {
     display: inline-block;
@@ -25,16 +30,6 @@
 
 .toggle-details:hover {
     text-decoration: underline;
-}
-
-.page {
-    /* padding: 50px;
-    margin-left: 225px;
-    margin-right: 225px; */
-    padding: 2%;
-    margin-left: 15%;
-    margin-right: 15%;
-    /* font-family: georgia, "times new roman", times, serif; */
 }
 
 .small-chart {

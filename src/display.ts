@@ -109,7 +109,7 @@ function _showDetailsEvent(state: State) {
 function buildRender(state: State, data: SummaryData, startTime: number) {
     const toggleChartButton = h('a.toggle-details',
         { href: '#', onclick: () => { _showDetailsEvent(state); } },
-        ['Toggle Details']
+        ['Toggle Stats']
     );
 
     // Add Details Section
@@ -121,16 +121,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const profilingChart = _createSmallChartH(createProfilingChart(data.timing, 'Complete Timings'));
     const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
-    const inputSlider = h('input',
-        {
-            style: 'display: inline-block',
-            autofocus: true,
-            type: 'range', min: '3', max: '15', value: '5', step: '1',
-            oninput: (e: any) => {
-                state._showNumSentences = parseInt(e.target.value);
-            }
-        }
-    );
+
 
     return () => {
         const numSentenceButtons = h('div.sentence-buttons', [
@@ -145,11 +136,6 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             ),
             h('a.icono-arrow2-right', { href: '#', onclick: e => { state.increaseSentences(); } }, ['']),
 
-        ]);
-        // Slider
-        const slider = h('div.slider-wrapper', [
-            inputSlider,
-            h('span.num-sentences', [`Sentences: ${state._showNumSentences}`]),
         ]);
 
         const detailsSection = h('div#details',
@@ -169,15 +155,11 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         );
 
         const rootDiv = h('div.page#root-div', [
-            h('div', [
-                h('h2', [data.title]),
-                // numSentenceButtons
-            ]),
+            h('h2', [data.title]),
             data.sentences
                 .filter(s => s.rank < (state._showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
-            // slider,
             h('div.footer', [
                 numSentenceButtons,
                 toggleChartButton,
@@ -196,7 +178,7 @@ function _createChartH(chartFunc) {
 }
 
 function _createSmallChartH(chartFunc) {
-    return h('div.small-chart', // { style: smallChartStyle },
+    return h('div.small-chart',
         [h('canvas', { afterCreate: chartFunc })]
     );
 }
