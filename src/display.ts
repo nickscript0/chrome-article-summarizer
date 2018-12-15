@@ -122,7 +122,6 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
 
-
     return () => {
         const numSentenceButtons = h('div.sentence-buttons', [
             // <a href="something" class="button6">Ok</a>
