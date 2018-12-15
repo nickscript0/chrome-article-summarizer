@@ -10,9 +10,9 @@ module.exports = {
         popup: './src/popup.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
-        publicPath: '/build/'
+        publicPath: '/dist/'
     },
     plugins: [
         new WebpackNotifierPlugin({ excludeWarnings: true, alwaysNotify: true, timeout: 1 })

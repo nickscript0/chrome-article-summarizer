@@ -3,7 +3,7 @@
     "version": "0.1",
     "description": "Summarizes web pages using the Text Rank algorithm.",
     "browser_action": {
-        "default_popup": "popup.html"
+        "default_popup": "res/popup.html"
     },
     "content_scripts": [
         {
@@ -11,13 +11,13 @@
                 "<all_urls>"
             ],
             "js": [
-                "build/main.bundle.js"
+                "dist/main.bundle.js"
             ]
         }
     ],
     "background": {
         "scripts": [
-            "build/background.bundle.js"
+            "dist/background.bundle.js"
         ]
     },
     "permissions": [

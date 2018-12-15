@@ -91,7 +91,7 @@ function sendToggleSummaryMessageToContentScript(articleTabId?) {
 let onUpdatedListenerCount = 0; // debug
 
 function createDisplayTab(payload: InputPayload) {
-    const url = chrome.extension.getURL("summary.html");
+    const url = chrome.extension.getURL("html/summary.html");
     chrome.tabs.update({ url: url }, (displayTab: chrome.tabs.Tab) => {
         log(`onUpdate.addListener count ${++onUpdatedListenerCount}`);
         chrome.tabs.onUpdated.addListener(onUpdatedListener);
@@ -103,7 +103,7 @@ function createDisplayTab(payload: InputPayload) {
             if (displayTab.id === tabId && info.status === 'complete' && tabsInSummaryMode[displayTab.id]) {
                 log(`onUpdated for current active tab hit: tabId=${tabId} info=${info.status}: calling Worker..`);
                 const displayTabId = displayTab.id;
-                const worker = new Worker(chrome.runtime.getURL('build/summarize_worker.bundle.js'));
+                const worker = new Worker(chrome.runtime.getURL('dist/summarize_worker.bundle.js'));
                 worker.onmessage = e => {
                     const workerPayload: WorkerPayload = e.data;
                     const wpCommand: WorkerPayloadCommand = {
