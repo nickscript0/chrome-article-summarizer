@@ -30,8 +30,7 @@ export function createChart(prArr: Array<number>, num_summary_sentences: number)
 }
 
 
-const betterChartColors = ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)", 'red'];
-const pieChartColors = ['red', 'blue', 'yellow', 'green', 'purple', 'orange'];
+const pieChartColors = ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)", 'red'];
 export function createProfilingChart(timings: Timings, title: string) {
     return (canvasEl: HTMLCanvasElement) => {
         const ctx = canvasEl.getContext('2d');
@@ -39,14 +38,11 @@ export function createProfilingChart(timings: Timings, title: string) {
         new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: timings.map(t => t.name), //["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: timings.map(t => t.name),
                 datasets: [{
                     label: 'Processing time (ms)',
-                    data: timings.map(t => t.value), // [12, 19, 3, 5, 2, 3],
-                    backgroundColor: betterChartColors.slice(0, timings.length) //Array(timings.length).fill('rgba(75, 192, 192, 0.2)'),
-                    // backgroundColor: Array(timings.length).fill('rgba(75, 192, 192, 0.2)'),
-                    // borderColor: Array(timings.length).fill('rgba(75, 192, 192, 1)'),
-                    // borderWidth: 1
+                    data: timings.map(t => t.value),
+                    backgroundColor: pieChartColors.slice(0, timings.length)
                 }]
             },
             options: {
@@ -62,22 +58,7 @@ export function createProfilingChart(timings: Timings, title: string) {
                         boxWidth: 10,
                         usePointStyle: true
                     } as any
-                },
-                // tooltips: {
-                //     callbacks: {
-                //         label: function (tooltipItem, data) {
-                //             return 'label';
-                //         }
-                //     }
-                // }                
-                // scales: {
-                //     yAxes: [{
-                //         scaleLabel: {
-                //             display: true,
-                //             labelString: 'Time (ms)'
-                //         }
-                //     }]
-                // }
+                }
             }
         });
     };
