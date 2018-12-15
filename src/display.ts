@@ -48,10 +48,30 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
-interface State {
+class State {
     showDetails: boolean;
     queuedScrollIntoView: boolean;
-    showNumSentences: number;
+    _showNumSentences: number;
+    totalSentences: number;
+
+    constructor(showDetails, queuedScrollIntoView, showNumSentences, totalSentences) {
+        this.showDetails = showDetails;
+        this.queuedScrollIntoView = queuedScrollIntoView;
+        this._showNumSentences = (showNumSentences < totalSentences) ? showNumSentences : totalSentences;
+        this.totalSentences = totalSentences;
+    }
+
+    increaseSentences() {
+        if (this._showNumSentences < this.totalSentences) this._showNumSentences++;
+    }
+
+    decreaseSentences() {
+        if (this._showNumSentences > 1) this._showNumSentences--;
+    }
+
+    get showNumSentences() {
+        return this._showNumSentences;
+    }
 }
 
 function display(data: SummaryData, startTime: number) {
@@ -64,17 +84,17 @@ function display(data: SummaryData, startTime: number) {
     oldRoot && oldRoot.remove();
 
 
-    const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
+    const state: State = new State(false, false, data.numSummarySentences, data.sentences.length);
     const projector = createProjector();
     document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'd') {
             _showDetailsEvent(state);
             projector.scheduleRender();
         } else if (e.key === 'ArrowLeft') {
-            state.showNumSentences--;
+            state.decreaseSentences();
             projector.scheduleRender();
         } else if (e.key === 'ArrowRight') {
-            state.showNumSentences++;
+            state.increaseSentences();
             projector.scheduleRender();
         }
     }, false);
@@ -87,8 +107,8 @@ function _showDetailsEvent(state: State) {
 }
 
 function buildRender(state: State, data: SummaryData, startTime: number) {
-    const toggleChartButton = h('a',
-        { href: 'javascript:void(0);', onclick: () => { _showDetailsEvent(state); } },
+    const toggleChartButton = h('a.toggle-details',
+        { href: '#', onclick: () => { _showDetailsEvent(state); } },
         ['Toggle Details']
     );
 
@@ -107,22 +127,29 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             autofocus: true,
             type: 'range', min: '3', max: '15', value: '5', step: '1',
             oninput: (e: any) => {
-                state.showNumSentences = parseInt(e.target.value);
+                state._showNumSentences = parseInt(e.target.value);
             }
         }
     );
 
     return () => {
-        const numSentenceButtons = h('div', [
+        const numSentenceButtons = h('div.sentence-buttons', [
             // <a href="something" class="button6">Ok</a>
-            h('div', {style: 'display: inline-block; font-size: 10px; padding-right: 5px'}, [`Sentences: ${state.showNumSentences}`]),
-            h('a.button-now', { href: '#', onclick: e => { state.showNumSentences--; } }, ['⬅️']),
-            h('a.button-now', { href: '#', onclick: e => { state.showNumSentences++; } }, ['➡️']),
+            h('a.icono-arrow2-left', { href: '#', onclick: e => { state.decreaseSentences(); } }, ['']),
+
+            h('div', { style: 'display: inline-block; font-size: 10px; padding-right: 5px; padding-left: 5px;' },
+                [
+                    h('span', [`Sentences: `]),
+                    h('span', { style: 'display: inline-block; width: 30px;' }, [`${state._showNumSentences}/${state.totalSentences}`])
+                ]
+            ),
+            h('a.icono-arrow2-right', { href: '#', onclick: e => { state.increaseSentences(); } }, ['']),
+
         ]);
         // Slider
         const slider = h('div.slider-wrapper', [
             inputSlider,
-            h('span.num-sentences', [`Sentences: ${state.showNumSentences}`]),
+            h('span.num-sentences', [`Sentences: ${state._showNumSentences}`]),
         ]);
 
         const detailsSection = h('div#details',
@@ -144,15 +171,18 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         const rootDiv = h('div.page#root-div', [
             h('div', [
                 h('h2', [data.title]),
-                numSentenceButtons
+                // numSentenceButtons
             ]),
             data.sentences
-                .filter(s => s.rank < (state.showNumSentences + 1))
+                .filter(s => s.rank < (state._showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
             // slider,
-            // numSentenceButtons,
-            toggleChartButton,
+            h('div.footer', [
+                numSentenceButtons,
+                toggleChartButton,
+            ]),
+
             detailsSection
         ]);
         return rootDiv;

@@ -3,6 +3,30 @@
     /* height: 300px; */
 }
 
+.footer {
+    position: fixed;
+    /* left: 0; */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+.sentence-buttons {
+    display: inline-block;
+}
+
+.toggle-details {
+    text-decoration: none;
+    font-size: 10px;
+    color: black;
+    display: inline-block;
+}
+
+.toggle-details:hover {
+    text-decoration: underline;
+}
+
 .page {
     /* padding: 50px;
     margin-left: 225px;
@@ -156,6 +180,7 @@
 
 .num-sentences {
     font-size: 10px;
+    /* width: 20px; */
     /* color: slategray; */
     /* vertical-align: middle; */
 }
