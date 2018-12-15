@@ -48,10 +48,30 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
-interface State {
+class State {
     showDetails: boolean;
     queuedScrollIntoView: boolean;
-    showNumSentences: number;
+    _showNumSentences: number;
+    totalSentences: number;
+
+    constructor(showDetails, queuedScrollIntoView, showNumSentences, totalSentences) {
+        this.showDetails = showDetails;
+        this.queuedScrollIntoView = queuedScrollIntoView;
+        this._showNumSentences = (showNumSentences < totalSentences) ? showNumSentences : totalSentences;
+        this.totalSentences = totalSentences;
+    }
+
+    increaseSentences() {
+        if (this._showNumSentences < this.totalSentences) this._showNumSentences++;
+    }
+
+    decreaseSentences() {
+        if (this._showNumSentences > 1) this._showNumSentences--;
+    }
+
+    get showNumSentences() {
+        return this._showNumSentences;
+    }
 }
 
 function display(data: SummaryData, startTime: number) {
@@ -64,11 +84,17 @@ function display(data: SummaryData, startTime: number) {
     oldRoot && oldRoot.remove();
 
 
-    const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
+    const state: State = new State(false, false, data.numSummarySentences, data.sentences.length);
     const projector = createProjector();
-    document.addEventListener('keypress', (e: KeyboardEvent) => {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'd') {
             _showDetailsEvent(state);
+            projector.scheduleRender();
+        } else if (e.key === 'ArrowLeft') {
+            state.decreaseSentences();
+            projector.scheduleRender();
+        } else if (e.key === 'ArrowRight') {
+            state.increaseSentences();
             projector.scheduleRender();
         }
     }, false);
@@ -81,9 +107,9 @@ function _showDetailsEvent(state: State) {
 }
 
 function buildRender(state: State, data: SummaryData, startTime: number) {
-    const toggleChartButton = h('a',
-        { href: 'javascript:void(0);', onclick: () => { _showDetailsEvent(state); } },
-        ['Toggle Details']
+    const toggleChartButton = h('a.toggle-details',
+        { href: '#', onclick: () => { _showDetailsEvent(state); } },
+        ['Toggle Stats']
     );
 
     // Add Details Section
@@ -92,25 +118,23 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
 
     // Add Charts Section
-    const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
-    const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
+    const profilingChart = _createSmallChartH(createProfilingChart(data.timing, 'Complete Timings'));
+    const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
-    const inputSlider = h('input',
-        {
-            style: 'display: inline-block',
-            autofocus: true,
-            type: 'range', min: '3', max: '15', value: '5', step: '1',
-            oninput: (e: any) => {
-                state.showNumSentences = parseInt(e.target.value);
-            }
-        }
-    );
 
     return () => {
-        // Slider
-        const slider = h('div.slider-wrapper', [
-            inputSlider,
-            h('span.num-sentences', [`Sentences: ${state.showNumSentences}`]),
+        const numSentenceButtons = h('div.sentence-buttons', [
+            // <a href="something" class="button6">Ok</a>
+            h('a.icono-arrow2-left', { href: '#', onclick: e => { state.decreaseSentences(); } }, ['']),
+
+            h('div', { style: 'display: inline-block; font-size: 10px; padding-right: 5px; padding-left: 5px;' },
+                [
+                    h('span', [`Sentences: `]),
+                    h('span', { style: 'display: inline-block; width: 30px;' }, [`${state._showNumSentences}/${state.totalSentences}`])
+                ]
+            ),
+            h('a.icono-arrow2-right', { href: '#', onclick: e => { state.increaseSentences(); } }, ['']),
+
         ]);
 
         const detailsSection = h('div#details',
@@ -124,19 +148,22 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             [
                 detailsText,
                 rankChart,
-                profilingChart,
-                profilingNlpChart
+                h('div.profile-charts', [profilingChart, profilingNlpChart])
+
             ]
         );
 
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
             data.sentences
-                .filter(s => s.rank < (state.showNumSentences + 1))
+                .filter(s => s.rank < (state._showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
-            slider,
-            toggleChartButton,
+            h('div.footer', [
+                numSentenceButtons,
+                toggleChartButton,
+            ]),
+
             detailsSection
         ]);
         return rootDiv;
@@ -145,6 +172,12 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
 
 function _createChartH(chartFunc) {
     return h('div', { style: `width: 100%; height: 100%; textAlign: center;` },
+        [h('canvas', { afterCreate: chartFunc })]
+    );
+}
+
+function _createSmallChartH(chartFunc) {
+    return h('div.small-chart',
         [h('canvas', { afterCreate: chartFunc })]
     );
 }

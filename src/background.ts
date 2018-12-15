@@ -5,7 +5,7 @@ import {
 
 // key: tab.id, value: url string or null if not in summary mode
 let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
-let lastTabId, currentTabId;
+let currentTabId;
 
 function closeTab(tabId) {
     log(`chrome.tabs.remove(${tabId})`);
@@ -20,7 +20,7 @@ function setupListeners() {
         log(`runtime.onConnect port ${port.name}`);
         if (port.name === PortName.popup) {
             port.onMessage.addListener(async (msg: any) => {
-                log(`onMessage msg.command=${msg.command}`);
+                log(`[popup port] onMessage msg.command=${msg.command}`);
                 if (msg.command === Commands.PopupToggleSummarize) {
                     if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
                     sendToggleSummaryMessageToContentScript(msg.articleTabId);
@@ -38,7 +38,6 @@ function setupListeners() {
      */
     chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
         log(`tabs.onUpdated tabId=${tabId} windowId=${windowId}`);
-        lastTabId = currentTabId;
         currentTabId = tabId;
     });
 
@@ -48,13 +47,11 @@ function setupListeners() {
      *
      * Note: Firefox for Android does not have chrome.commands defined, so checks this
      */
-    chrome.commands.onCommand.addListener(command => {
+    chrome.commands && chrome.commands.onCommand.addListener(command => {
         if (command === KeyboardCommands.ToggleSummarize) sendToggleSummaryMessageToContentScript();
         else if (command === KeyboardCommands.TriggerKillStickies) sendKillStickyMessageToContentScript(currentTabId);
         else log(`unnkown keyboard command, doing nothing:`, command);
     });
-
-
 }
 
 function sendKillStickyMessageToContentScript(tabId) {
