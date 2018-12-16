@@ -5,10 +5,10 @@
 
 /**
 * TODOs:
-* Firefox only with packed xpi extension error: everything works except Desktop Firefox only popup links are broken with
+* BUG: Firefox only with packed xpi extension error: everything works except Desktop Firefox only popup links are broken with
   TypeError: Argument 1 of StructuredCloneHolder.deserialize is not an object.
-
   Reading online: seems could be related to the popup tab being closed
+
 * 0. DO THIS NEXT:
    - In summarized view, add button to reveal entire article with textranked sentences in bold!
    - Also in the reveal entire article view consider shading sentences darkness of grey based on their rank
