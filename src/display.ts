@@ -141,11 +141,14 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             {
                 style: `display: ${state.showDetails ? '' : 'none'}`,
                 afterUpdate: (el: Element) => {
-                    if (state.queuedScrollIntoView) setTimeout(() =>
-                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+                    if (state.queuedScrollIntoView) setTimeout(() => {
+                        state.queuedScrollIntoView = false;
+                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' });
+                    }, 50);
                 }
             },
             [
+                h('h3', ['Page Stats']),
                 detailsText,
                 rankChart,
                 h('div.profile-charts', [profilingChart, profilingNlpChart])
