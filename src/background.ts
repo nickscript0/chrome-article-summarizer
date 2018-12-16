@@ -1,15 +1,16 @@
 import {
     Commands, InputPayload, WorkerPayload,
-    WorkerPayloadCommand, InputPayloadCommand, PortName, KeyboardCommands
+    WorkerPayloadCommand, InputPayloadCommand, PortName, KeyboardCommands,
+    queryCurrentTab
 } from './messages';
 
 // key: tab.id, value: url string or null if not in summary mode
 let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
 let currentTabId;
 
-function closeTab(tabId) {
+function closeTab(tabId: number | undefined) {
     log(`chrome.tabs.remove(${tabId})`);
-    chrome.tabs.remove(tabId);
+    if (tabId) chrome.tabs.remove(tabId);
 }
 
 function setupListeners() {
@@ -21,12 +22,16 @@ function setupListeners() {
         if (port.name === PortName.popup) {
             port.onMessage.addListener(async (msg: any) => {
                 log(`[popup port] onMessage msg.command=${msg.command}`);
+                const queriedTab = await queryCurrentTab();
+
                 if (msg.command === Commands.PopupToggleSummarize) {
-                    if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
+                    // In Firefox Mobile queriedTab is the article tab, currentTabId is the popup tab
+                    // In Firefox Desktop queriedTab and currentTabId are both the article tab
+                    if (queriedTab.id !== currentTabId) closeTab(currentTabId);
                     sendToggleSummaryMessageToContentScript(msg.articleTabId);
                 }
                 else if (msg.command === Commands.PopupKillStickies) {
-                    if (msg.articleTabId !== currentTabId) closeTab(currentTabId);
+                    if (queriedTab.id !== currentTabId) closeTab(currentTabId);
                     sendKillStickyMessageToContentScript(msg.articleTabId);
                 }
             });
