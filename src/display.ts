@@ -53,12 +53,14 @@ class State {
     queuedScrollIntoView: boolean;
     _showNumSentences: number;
     totalSentences: number;
+    orderByRank: boolean;
 
     constructor(showDetails, queuedScrollIntoView, showNumSentences, totalSentences) {
         this.showDetails = showDetails;
         this.queuedScrollIntoView = queuedScrollIntoView;
         this._showNumSentences = (showNumSentences < totalSentences) ? showNumSentences : totalSentences;
         this.totalSentences = totalSentences;
+        this.orderByRank = false;
     }
 
     increaseSentences() {
@@ -71,6 +73,10 @@ class State {
 
     get showNumSentences() {
         return this._showNumSentences;
+    }
+
+    toggleOrderByRank() {
+        this.orderByRank = !this.orderByRank;
     }
 }
 
@@ -122,6 +128,29 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
 
+    // Sentence order control
+    const sentenceOrderSwitch = h('div.onoffswitch', [
+        h(
+            'input.onoffswitch-checkbox#order-rank-switch',
+            {
+                type: 'checkbox', name: 'onoffswitch', checked: false, onchange: e => {
+                    state.toggleOrderByRank();
+                }
+            }
+        ),
+        h('label.onoffswitch-label', { for: 'order-rank-switch' }, [
+            h('span.onoffswitch-inner'),
+            h('span.onoffswitch-switch')
+        ])
+    ]);
+    const sentenceOrderControl = h('div.sentence-order-control', [
+        sentenceOrderSwitch,
+        h('span', ['Order by rank'])
+    ]);
+
+    const rankOrderedSentences = data.sentences.slice(0)
+        .sort((a, b) => a.rank - b.rank);
+
     return () => {
         const numSentenceButtons = h('div.sentence-buttons', [
             // <a href="something" class="button6">Ok</a>
@@ -156,15 +185,17 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             ]
         );
 
+        const sentences = (state.orderByRank) ? rankOrderedSentences : data.sentences;
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
-            data.sentences
+            sentences
                 .filter(s => s.rank < (state._showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
             h('div.footer', [
                 numSentenceButtons,
                 toggleChartButton,
+                sentenceOrderControl
             ]),
 
             detailsSection

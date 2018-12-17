@@ -17,6 +17,11 @@
     background-color: white;
 }
 
+.sentence-order-control {
+    display: inline-block;
+    font-size: 10px;
+}
+
 .sentence-buttons {
     display: inline-block;
 }
