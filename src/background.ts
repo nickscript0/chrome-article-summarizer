@@ -32,7 +32,11 @@ function setupListeners() {
                 }
                 else if (msg.command === Commands.PopupKillStickies) {
                     if (queriedTab.id !== currentTabId) closeTab(currentTabId);
-                    sendKillStickyMessageToContentScript(msg.articleTabId);
+                    if (queriedTab.id) {
+                        sendKillStickyMessageToContentScript(queriedTab.id);
+                    } else {
+                        log(`KillStickyMessage dropped queriedTab.id as is undefined`)
+                    }
                 }
             });
         }
@@ -59,7 +63,7 @@ function setupListeners() {
     });
 }
 
-function sendKillStickyMessageToContentScript(tabId) {
+function sendKillStickyMessageToContentScript(tabId: number) {
     chrome.tabs.sendMessage(
         tabId,
         { command: Commands.PopupKillStickies },

@@ -115,6 +115,5 @@ export function queryTabs(queryInfo: chrome.tabs.QueryInfo): Promise<chrome.tabs
 }
 
 export function queryCurrentTab() {
-    // TODO: Should probably also query for 'highlighted: true' too here, but need to test with Firefox for Android
-    return queryTabs({ active: true, currentWindow: true });
+    return queryTabs({ active: true, currentWindow: true, highlighted: true });
 }

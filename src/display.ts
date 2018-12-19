@@ -1,6 +1,6 @@
 // Displays the summarized text in a fresh page
 
-import { h, createProjector } from 'maquette';
+import { h, createProjector, Projector } from 'maquette';
 import { SummaryData, Sentence, WorkerPayload } from './messages';
 import { createChart, createProfilingChart } from './display-charts';
 
@@ -96,6 +96,8 @@ function display(data: SummaryData, startTime: number) {
         if (e.key === 'd') {
             _showDetailsEvent(state);
             projector.scheduleRender();
+        } else if (e.key === 'r') {
+            flipOrderByRankSwitch(state, projector);
         } else if (e.key === 'ArrowLeft') {
             state.decreaseSentences();
             projector.scheduleRender();
@@ -105,6 +107,13 @@ function display(data: SummaryData, startTime: number) {
         }
     }, false);
     projector.append(document.body, buildRender(state, data, startTime));
+}
+
+function flipOrderByRankSwitch(state: State, projector: Projector | undefined) {
+    state.toggleOrderByRank();
+    const orSwitch = document.getElementById('order-rank-switch');
+    if (orSwitch) (orSwitch as any).checked = state.orderByRank;
+    if (projector) projector.scheduleRender();
 }
 
 function _showDetailsEvent(state: State) {
@@ -134,6 +143,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             'input.onoffswitch-checkbox#order-rank-switch',
             {
                 type: 'checkbox', name: 'onoffswitch', checked: false, onchange: e => {
+                    console.log(`switch onchange`);
                     state.toggleOrderByRank();
                 }
             }
@@ -143,10 +153,13 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             h('span.onoffswitch-switch')
         ])
     ]);
-    const sentenceOrderControl = h('div.sentence-order-control', [
-        sentenceOrderSwitch,
-        h('span', ['Order by rank'])
-    ]);
+    const sentenceOrderControl = h(
+        'div.sentence-order-control',
+        [
+            sentenceOrderSwitch,
+            h('span', { onclick: e => flipOrderByRankSwitch(state, undefined) }, ['Order by rank'])
+        ]
+    );
 
     const rankOrderedSentences = data.sentences.slice(0)
         .sort((a, b) => a.rank - b.rank);
@@ -185,6 +198,9 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             ]
         );
 
+        const separator = key =>
+            h('div.separator', { key, style: 'display: inline-block; padding-left: 8px; padding-right: 8px;' }, ['']);
+
         const sentences = (state.orderByRank) ? rankOrderedSentences : data.sentences;
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
@@ -194,7 +210,9 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
             h('br'),
             h('div.footer', [
                 numSentenceButtons,
+                separator(1),
                 toggleChartButton,
+                separator(2),
                 sentenceOrderControl
             ]),
 

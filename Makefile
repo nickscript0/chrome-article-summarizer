@@ -3,7 +3,7 @@ all: clean build
 # Build the final extensions to packed/ folder (.xpi for Firefox, .zip for Chrome)
 extensions: clean build bundle-xpi bundle-zip
 
-build:
+build: src/*
 	npm run build
 
 clean: 
