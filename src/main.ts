@@ -11,6 +11,9 @@
 
 * BUG: this page is too large and crashes the extension after a while https://www.gnu.org/software/make/manual/make.html
 * 0. DO THIS NEXT:
+   - Add previously defined feature:
+     - if keyboard initiated show it in the RHS margin
+     - if mobile initiated (select text, buttons list), show it inline
    - In summarized view, add button to reveal entire article with textranked sentences in bold!
    - Also in the reveal entire article view consider shading sentences darkness of grey based on their rank
    - To do this really right, would need to preserve paragraph structure which is probably much more difficult as I currently don't detect paragraphs just sentences. Could be as easy as detecting <p> elements

@@ -157,7 +157,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         'div.sentence-order-control',
         [
             sentenceOrderSwitch,
-            h('span', { onclick: e => flipOrderByRankSwitch(state, undefined) }, ['Order by rank'])
+            h('span', { onclick: e => flipOrderByRankSwitch(state, undefined) }, ['Order by ', h('u', ['R']), 'ank'])
         ]
     );
 
