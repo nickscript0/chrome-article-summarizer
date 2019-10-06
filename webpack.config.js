@@ -6,15 +6,16 @@ module.exports = {
         main: './src/main.ts',
         display: './src/display.ts',
         background: './src/background.ts',
-        summarize_worker: './src/summarize-worker.ts'
+        summarize_worker: './src/summarize-worker.ts',
+        popup: './src/popup.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
-        publicPath: '/build/'
+        publicPath: '/dist/'
     },
     plugins: [
-        new WebpackNotifierPlugin({ excludeWarnings: true, alwaysNotify: true })
+        new WebpackNotifierPlugin({ excludeWarnings: true, alwaysNotify: true, timeout: 1 })
     ],
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.
@@ -25,5 +26,7 @@ module.exports = {
             // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
             { test: /\.tsx?$/, loader: 'ts-loader' }
         ]
-    }
+    },
+    mode: 'development',
+    devtool: 'source-map'
 }

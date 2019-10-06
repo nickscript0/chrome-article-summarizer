@@ -1,12 +1,27 @@
 // Interfaces for message passing between tabs and background script
 
-export interface SimpleCommand {
-    command: Commands;
+export enum Commands {
+    Display = 'Display',
+    ToggleSummarize = 'ToggleSummarize',
+    DisplayTabReady = 'DisplayTabReady',
+    AssignId = 'AssignId',
+    PopupKillStickies = 'popup-kill-sticky-headers',
+    PopupToggleSummarize = 'popup-toggle-summarize'
 }
 
-export interface AssignIdCommand {
-    command: Commands.AssignId;
-    id: string;
+// This must match the strings defined in manifest.json "commands" section
+export enum KeyboardCommands {
+    ToggleSummarize = 'toggle-page-summary',
+    TriggerKillStickies = 'trigger-kill-sticky'
+}
+
+export enum ContextCommands {
+    ToggleSummarize = 'context-toggle-page-summary',
+    TriggerKillStickies = 'context-trigger-kill-sticky'
+}
+
+export enum PortName {
+    popup = 'popup-port'
 }
 
 export interface WorkerPayloadCommand {
@@ -18,19 +33,6 @@ export interface InputPayloadCommand {
     command: Commands.ToggleSummarize;
     payload: InputPayload;
 }
-
-
-// export interface WorkerCommand {
-//     type: Commands;
-//     url: string;
-//     client: WorkerClients;
-//     payload?: InputPayload;
-// }
-
-// export enum WorkerClients {
-//     BackgroundPage,
-//     DisplayPage
-// }
 
 export interface InputPayload {
     textBlocks: string[];
@@ -61,13 +63,6 @@ export interface SummaryData {
 export interface Sentence {
     content: string;
     rank: number;
-}
-
-export enum Commands {
-    Display = 'Display',
-    ToggleSummarize = 'ToggleSummarize',
-    DisplayTabReady = 'DisplayTabReady',
-    AssignId = 'AssignId'
 }
 
 export type Timings = Array<Timing>;
@@ -114,4 +109,16 @@ export class Timer {
     private performanceDefined(): boolean {
         return typeof performance !== 'undefined';
     }
+}
+
+export function queryTabs(queryInfo: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab> {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.query(queryInfo, function (tabs) {
+            resolve(tabs[0]);
+        });
+    });
+}
+
+export function queryCurrentTab() {
+    return queryTabs({ active: true, currentWindow: true, highlighted: true });
 }

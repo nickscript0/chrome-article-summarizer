@@ -3,7 +3,7 @@
     "version": "0.1",
     "description": "Summarizes web pages using the Text Rank algorithm.",
     "browser_action": {
-        // "name": "Toggle Summary"
+        "default_popup": "html/popup.html"
     },
     "content_scripts": [
         {
@@ -11,16 +11,18 @@
                 "<all_urls>"
             ],
             "js": [
-                "build/main.bundle.js"
+                "dist/main.bundle.js"
             ]
         }
     ],
     "background": {
         "scripts": [
-            "build/background.bundle.js"
+            "dist/background.bundle.js"
         ]
     },
     "permissions": [
+        "tabs",
+        "tabHide",
         "contextMenus"
     ],
     "commands": {
@@ -30,6 +32,18 @@
                 "mac": "Command+Shift+S"
             },
             "description": "Toggle Page Summary"
+        },
+        "trigger-kill-sticky": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+K",
+                "mac": "Command+Shift+K"
+            },
+            "description": "Kill Sticky Headers"
+        }
+    },
+    "applications": {
+        "gecko": {
+            "id": "chrome-article-summarizer@nickscript0"
         }
     },
     "manifest_version": 2

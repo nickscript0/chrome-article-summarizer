@@ -1,6 +1,6 @@
 // Displays the summarized text in a fresh page
 
-import { h, createProjector } from 'maquette';
+import { h, createProjector, Projector } from 'maquette';
 import { SummaryData, Sentence, WorkerPayload } from './messages';
 import { createChart, createProfilingChart } from './display-charts';
 
@@ -48,10 +48,36 @@ function getTimeDiffMs(startTime: number): string {
     return diff;
 }
 
-interface State {
+class State {
     showDetails: boolean;
     queuedScrollIntoView: boolean;
-    showNumSentences: number;
+    _showNumSentences: number;
+    totalSentences: number;
+    orderByRank: boolean;
+
+    constructor(showDetails, queuedScrollIntoView, showNumSentences, totalSentences) {
+        this.showDetails = showDetails;
+        this.queuedScrollIntoView = queuedScrollIntoView;
+        this._showNumSentences = (showNumSentences < totalSentences) ? showNumSentences : totalSentences;
+        this.totalSentences = totalSentences;
+        this.orderByRank = false;
+    }
+
+    increaseSentences() {
+        if (this._showNumSentences < this.totalSentences) this._showNumSentences++;
+    }
+
+    decreaseSentences() {
+        if (this._showNumSentences > 1) this._showNumSentences--;
+    }
+
+    get showNumSentences() {
+        return this._showNumSentences;
+    }
+
+    toggleOrderByRank() {
+        this.orderByRank = !this.orderByRank;
+    }
 }
 
 function display(data: SummaryData, startTime: number) {
@@ -64,15 +90,30 @@ function display(data: SummaryData, startTime: number) {
     oldRoot && oldRoot.remove();
 
 
-    const state: State = { showDetails: false, queuedScrollIntoView: false, showNumSentences: data.numSummarySentences };
+    const state: State = new State(false, false, data.numSummarySentences, data.sentences.length);
     const projector = createProjector();
-    document.addEventListener('keypress', (e: KeyboardEvent) => {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'd') {
             _showDetailsEvent(state);
+            projector.scheduleRender();
+        } else if (e.key === 'r') {
+            flipOrderByRankSwitch(state, projector);
+        } else if (e.key === 'ArrowLeft') {
+            state.decreaseSentences();
+            projector.scheduleRender();
+        } else if (e.key === 'ArrowRight') {
+            state.increaseSentences();
             projector.scheduleRender();
         }
     }, false);
     projector.append(document.body, buildRender(state, data, startTime));
+}
+
+function flipOrderByRankSwitch(state: State, projector: Projector | undefined) {
+    state.toggleOrderByRank();
+    const orSwitch = document.getElementById('order-rank-switch');
+    if (orSwitch) (orSwitch as any).checked = state.orderByRank;
+    if (projector) projector.scheduleRender();
 }
 
 function _showDetailsEvent(state: State) {
@@ -81,9 +122,9 @@ function _showDetailsEvent(state: State) {
 }
 
 function buildRender(state: State, data: SummaryData, startTime: number) {
-    const toggleChartButton = h('a',
-        { href: 'javascript:void(0);', onclick: () => { _showDetailsEvent(state); } },
-        ['Toggle Details']
+    const toggleChartButton = h('a.toggle-details',
+        { href: '#', onclick: () => { _showDetailsEvent(state); } },
+        ['Toggle Stats']
     );
 
     // Add Details Section
@@ -92,51 +133,89 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     const detailsText = h('pre.stats-text', [[data.textStats, data.wordStats, generatedTimeText].join('\n')]);
 
     // Add Charts Section
-    const profilingChart = _createChartH(createProfilingChart(data.timing, 'Complete Timings'));
-    const profilingNlpChart = _createChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
+    const profilingChart = _createSmallChartH(createProfilingChart(data.timing, 'Complete Timings'));
+    const profilingNlpChart = _createSmallChartH(createProfilingChart(data.nlpTiming, 'Nlp Get Sentences Timings'));
     const rankChart = _createChartH(createChart(data.pageRanks, data.numSummarySentences));
-    const inputSlider = h('input',
-        {
-            style: 'display: inline-block',
-            autofocus: true,
-            type: 'range', min: '3', max: '15', value: '5', step: '1',
-            oninput: (e: any) => {
-                state.showNumSentences = parseInt(e.target.value);
+
+    // Sentence order control
+    const sentenceOrderSwitch = h('div.onoffswitch', [
+        h(
+            'input.onoffswitch-checkbox#order-rank-switch',
+            {
+                type: 'checkbox', name: 'onoffswitch', checked: false, onchange: e => {
+                    console.log(`switch onchange`);
+                    state.toggleOrderByRank();
+                }
             }
-        }
+        ),
+        h('label.onoffswitch-label', { for: 'order-rank-switch' }, [
+            h('span.onoffswitch-inner'),
+            h('span.onoffswitch-switch')
+        ])
+    ]);
+    const sentenceOrderControl = h(
+        'div.sentence-order-control',
+        [
+            sentenceOrderSwitch,
+            h('span', { onclick: e => flipOrderByRankSwitch(state, undefined) }, ['Order by ', h('u', ['R']), 'ank'])
+        ]
     );
 
+    const rankOrderedSentences = data.sentences.slice(0)
+        .sort((a, b) => a.rank - b.rank);
+
     return () => {
-        // Slider
-        const slider = h('div.slider-wrapper', [
-            inputSlider,
-            h('span.num-sentences', [`Sentences: ${state.showNumSentences}`]),
+        const numSentenceButtons = h('div.sentence-buttons', [
+            // <a href="something" class="button6">Ok</a>
+            h('a.icono-arrow2-left', { href: '#', onclick: e => { state.decreaseSentences(); } }, ['']),
+
+            h('div', { style: 'display: inline-block; font-size: 10px; padding-right: 5px; padding-left: 5px;' },
+                [
+                    h('span', [`Sentences: `]),
+                    h('span', { style: 'display: inline-block; width: 30px;' }, [`${state._showNumSentences}/${state.totalSentences}`])
+                ]
+            ),
+            h('a.icono-arrow2-right', { href: '#', onclick: e => { state.increaseSentences(); } }, ['']),
+
         ]);
 
         const detailsSection = h('div#details',
             {
                 style: `display: ${state.showDetails ? '' : 'none'}`,
                 afterUpdate: (el: Element) => {
-                    if (state.queuedScrollIntoView) setTimeout(() =>
-                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' }), 50);
+                    if (state.queuedScrollIntoView) setTimeout(() => {
+                        state.queuedScrollIntoView = false;
+                        el.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' });
+                    }, 50);
                 }
             },
             [
+                h('h3', ['Page Stats']),
                 detailsText,
                 rankChart,
-                profilingChart,
-                profilingNlpChart
+                h('div.profile-charts', [profilingChart, profilingNlpChart])
+
             ]
         );
 
+        const separator = key =>
+            h('div.separator', { key, style: 'display: inline-block; padding-left: 8px; padding-right: 8px;' }, ['']);
+
+        const sentences = (state.orderByRank) ? rankOrderedSentences : data.sentences;
         const rootDiv = h('div.page#root-div', [
             h('h2', [data.title]),
-            data.sentences
-                .filter(s => s.rank < (state.showNumSentences + 1))
+            sentences
+                .filter(s => s.rank < (state._showNumSentences + 1))
                 .map(s => _createParagraphH(s, false)),
             h('br'),
-            slider,
-            toggleChartButton,
+            h('div.footer', [
+                numSentenceButtons,
+                separator(1),
+                toggleChartButton,
+                separator(2),
+                sentenceOrderControl
+            ]),
+
             detailsSection
         ]);
         return rootDiv;
@@ -145,6 +224,12 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
 
 function _createChartH(chartFunc) {
     return h('div', { style: `width: 100%; height: 100%; textAlign: center;` },
+        [h('canvas', { afterCreate: chartFunc })]
+    );
+}
+
+function _createSmallChartH(chartFunc) {
+    return h('div.small-chart',
         [h('canvas', { afterCreate: chartFunc })]
     );
 }
