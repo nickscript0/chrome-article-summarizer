@@ -201,11 +201,11 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle nytimes format', async () => {
         const site = Site.NYTIMES;
-        const testwin = await newWindowFromFile('src/test/res/nytimes1.html');
+        const testwin = await newWindowFromFile('src/test/testdata/nytimes1.html');
         timers.start(site);
         const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/nytimes1.sentences');
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/nytimes1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -213,11 +213,11 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle medium format', async () => {
         const site = Site.MEDIUM;
-        const testwin = await newWindowFromFile('src/test/res/medium1.html');
+        const testwin = await newWindowFromFile('src/test/testdata/medium1.html');
         timers.start(site);
         const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium1.sentences');
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/medium1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -225,11 +225,11 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle medium format #2', async () => {
         const site = Site.MEDIUM2;
-        const testwin = await newWindowFromFile('src/test/res/medium2.html');
+        const testwin = await newWindowFromFile('src/test/testdata/medium2.html');
         timers.start(site);
         const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/medium2.sentences');
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/medium2.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -237,11 +237,11 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle verge format', async () => {
         const site = Site.VERGE;
-        const testwin = await newWindowFromFile('src/test/res/verge1.html');
+        const testwin = await newWindowFromFile('src/test/testdata/verge1.html');
         timers.start(site);
         const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/verge1.sentences');
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/verge1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -249,11 +249,11 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle cbc format', async () => {
         const site = Site.CBC;
-        const testwin = await newWindowFromFile('src/test/res/cbc1.html');
+        const testwin = await newWindowFromFile('src/test/testdata/cbc1.html');
         timers.start(site);
         const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
         // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/res/cbc1.sentences');
+        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/cbc1.sentences');
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);

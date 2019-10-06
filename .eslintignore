@@ -1,2 +1,2 @@
-src/test/res/*
-src/test/res/**
+src/test/testdata/*
+src/test/testdata/**
