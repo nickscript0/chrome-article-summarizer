@@ -22,7 +22,8 @@
     },
     "permissions": [
         "tabs",
-        "tabHide"
+        "tabHide",
+        "contextMenus"
     ],
     "commands": {
         "toggle-page-summary": {

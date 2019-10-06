@@ -9,7 +9,9 @@
   TypeError: Argument 1 of StructuredCloneHolder.deserialize is not an object.
   Reading online: seems could be related to the popup tab being closed
 
-* BUG: this page is too large and crashes the extension after a while https://www.gnu.org/software/make/manual/make.html
+* BUGS: 
+*  1. this page is too large and crashes the extension after a while https://www.gnu.org/software/make/manual/make.html
+*  2. Firefox reader view, summarize doesn't work (extension is trigerred but seems to be updating wrong tabId?)
 * 0. DO THIS NEXT:
    - Add previously defined feature:
      - if keyboard initiated show it in the RHS margin

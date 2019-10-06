@@ -1,7 +1,7 @@
 import {
     Commands, InputPayload, WorkerPayload,
     WorkerPayloadCommand, InputPayloadCommand, PortName, KeyboardCommands,
-    queryCurrentTab
+    queryCurrentTab, ContextCommands
 } from './messages';
 
 // key: tab.id, value: url string or null if not in summary mode
@@ -60,6 +60,27 @@ function setupListeners() {
         if (command === KeyboardCommands.ToggleSummarize) sendToggleSummaryMessageToContentScript();
         else if (command === KeyboardCommands.TriggerKillStickies) sendKillStickyMessageToContentScript(currentTabId);
         else log(`unnkown keyboard command, doing nothing:`, command);
+    });
+
+    /**
+     * Add context menu items that trigger Summarize and Kill Sticky actions
+     */
+    chrome.contextMenus.create({
+        id: ContextCommands.ToggleSummarize,
+        title: "Summarize",
+        contexts: ["all"],
+    });
+    chrome.contextMenus.create({
+        id: ContextCommands.TriggerKillStickies,
+        title: "Kill Stickies",
+        contexts: ["all"],
+    });
+    chrome.contextMenus.onClicked.addListener((info, tab) => {
+        if (info.menuItemId === ContextCommands.ToggleSummarize) {
+            sendToggleSummaryMessageToContentScript();
+        } else if (info.menuItemId === ContextCommands.TriggerKillStickies) {
+            sendKillStickyMessageToContentScript(currentTabId);
+        }
     });
 }
 

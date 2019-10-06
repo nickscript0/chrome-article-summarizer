@@ -15,6 +15,11 @@ export enum KeyboardCommands {
     TriggerKillStickies = 'trigger-kill-sticky'
 }
 
+export enum ContextCommands {
+    ToggleSummarize = 'context-toggle-page-summary',
+    TriggerKillStickies = 'context-trigger-kill-sticky'
+}
+
 export enum PortName {
     popup = 'popup-port'
 }
