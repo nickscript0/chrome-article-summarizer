@@ -32,7 +32,7 @@
 
 import { getTextBlocksFromDom } from "./summarize";
 import { Commands, InputPayload, Timer } from './messages';
-import { kill_sticky_headers } from './kill-sticky-headers';
+import { killStickyHeaders } from './kill-sticky-headers';
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -53,6 +53,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             data: payload
         });
     } else if (request.command === Commands.PopupKillStickies) {
-        kill_sticky_headers();
+        killStickyHeaders();
     }
 });

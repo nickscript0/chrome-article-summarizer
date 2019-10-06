@@ -2,7 +2,7 @@ import { Chart } from "chart.js";
 import { Timings } from './messages';
 
 
-export function createChart(prArr: Array<number>, num_summary_sentences: number) {
+export function createChart(prArr: Array<number>, numSummarySentences: number) {
     return (canvasEl: HTMLCanvasElement) => {
         const ctx = canvasEl.getContext('2d');
         if (!ctx) return;
@@ -14,8 +14,8 @@ export function createChart(prArr: Array<number>, num_summary_sentences: number)
                 // borderColor: window.chartColors.red,
                 borderWidth: 1,
                 data: prArr,
-                backgroundColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 0.2)'),
-                borderColor: Array(num_summary_sentences).fill('rgba(75, 192, 192, 1)')
+                backgroundColor: Array(numSummarySentences).fill('rgba(75, 192, 192, 0.2)'),
+                borderColor: Array(numSummarySentences).fill('rgba(75, 192, 192, 1)')
             }]
         };
         new Chart(ctx, {

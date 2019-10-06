@@ -86,12 +86,11 @@ export function calculatePageRank(graph, maxIterations,
             totalWeight[idx] += item["weight"];
         });
     }
-    let converged = false;
+
     for (let iter = 0; iter < maxIterations; ++iter) {
-        let maxPRChange = runPageRankOnce(graph, pageRankStruct,
+        const maxPRChange = runPageRankOnce(graph, pageRankStruct,
             totalWeight, totalNumNodes, dampingFactor);
         if (maxPRChange <= (delta / totalNumNodes)) {
-            converged = true;
             break;
         }
     }
@@ -137,14 +136,13 @@ class SummarizerResult {
         return arr.sort((a, b) => b.pagerank - a.pagerank);
     }
 
-    getSentencesOrderedByOccurence(maxSentences: number | undefined = undefined): Array<{ content: string, rank: number }> {
+    getSentencesOrderedByOccurence(maxSentences: number | undefined = undefined): Array<{ content: string; rank: number }> {
         // Return all sentences if maxSentences not specified
         // if (maxSentences === undefined) maxSentences = this.prResultArr.length;
         const numSentences = maxSentences || this.prResultArr.length;
         return this._getTopPrResultOrderedByOccurence(numSentences)
             .map(s => {
                 const rank = this.orderIndexToPRMap.get(s.index) || numSentences;
-                const rankString = rank ? rank.toString() : '';
                 return { content: s.sentence, rank };
             });
     }
@@ -195,19 +193,19 @@ function runPageRankOnce(graph, pageRankStruct,
     }
     // Apply the sink contrib overall.
     sinkContrib /= totalNumNodes;
-    let max_pr_change = 0.0;
+    let maxPrChange = 0.0;
     for (let idx = 0; idx < totalNumNodes; ++idx) {
         pageRankStruct[idx]["newPR"] += sinkContrib;
         // Report back the max PR change.
-        let change = Math.abs(pageRankStruct[idx]["newPR"] - pageRankStruct[idx][
+        const change = Math.abs(pageRankStruct[idx]["newPR"] - pageRankStruct[idx][
             "oldPR"
         ]);
-        if (change > max_pr_change) {
-            max_pr_change = change;
+        if (change > maxPrChange) {
+            maxPrChange = change;
         }
         // Set old PR to new PR for next iteration.
         pageRankStruct[idx]["oldPR"] = pageRankStruct[idx]["newPR"];
         pageRankStruct[idx]["newPR"] = 0.0;
     }
-    return max_pr_change;
+    return maxPrChange;
 }

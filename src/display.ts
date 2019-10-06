@@ -121,7 +121,7 @@ function _showDetailsEvent(state: State) {
     if (state.showDetails) state.queuedScrollIntoView = true;
 }
 
-function buildRender(state: State, data: SummaryData, startTime: number) {
+function buildRender(state: State, data: SummaryData, _startTime: number) {
     const toggleChartButton = h('a.toggle-details',
         { href: '#', onclick: () => { _showDetailsEvent(state); } },
         ['Toggle Stats']
@@ -142,7 +142,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         h(
             'input.onoffswitch-checkbox#order-rank-switch',
             {
-                type: 'checkbox', name: 'onoffswitch', checked: false, onchange: e => {
+                type: 'checkbox', name: 'onoffswitch', checked: false, onchange: _e => {
                     console.log(`switch onchange`);
                     state.toggleOrderByRank();
                 }
@@ -157,7 +157,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
         'div.sentence-order-control',
         [
             sentenceOrderSwitch,
-            h('span', { onclick: e => flipOrderByRankSwitch(state, undefined) }, ['Order by ', h('u', ['R']), 'ank'])
+            h('span', { onclick: _e => flipOrderByRankSwitch(state, undefined) }, ['Order by ', h('u', ['R']), 'ank'])
         ]
     );
 
@@ -167,7 +167,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
     return () => {
         const numSentenceButtons = h('div.sentence-buttons', [
             // <a href="something" class="button6">Ok</a>
-            h('a.icono-arrow2-left', { href: '#', onclick: e => { state.decreaseSentences(); } }, ['']),
+            h('a.icono-arrow2-left', { href: '#', onclick: _e => { state.decreaseSentences(); } }, ['']),
 
             h('div', { style: 'display: inline-block; font-size: 10px; padding-right: 5px; padding-left: 5px;' },
                 [
@@ -175,7 +175,7 @@ function buildRender(state: State, data: SummaryData, startTime: number) {
                     h('span', { style: 'display: inline-block; width: 30px;' }, [`${state._showNumSentences}/${state.totalSentences}`])
                 ]
             ),
-            h('a.icono-arrow2-right', { href: '#', onclick: e => { state.increaseSentences(); } }, ['']),
+            h('a.icono-arrow2-right', { href: '#', onclick: _e => { state.increaseSentences(); } }, ['']),
 
         ]);
 

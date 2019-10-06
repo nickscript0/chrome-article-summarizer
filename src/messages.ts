@@ -112,7 +112,7 @@ export class Timer {
 }
 
 export function queryTabs(queryInfo: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
         chrome.tabs.query(queryInfo, function (tabs) {
             resolve(tabs[0]);
         });

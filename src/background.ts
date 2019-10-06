@@ -5,7 +5,7 @@ import {
 } from './messages';
 
 // key: tab.id, value: url string or null if not in summary mode
-let tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
+const tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
 let currentTabId;
 
 function closeTab(tabId: number | undefined) {
@@ -20,24 +20,26 @@ function setupListeners() {
     chrome.runtime.onConnect.addListener((port) => {
         log(`runtime.onConnect port ${port.name}`);
         if (port.name === PortName.popup) {
-            port.onMessage.addListener(async (msg: any) => {
+            port.onMessage.addListener((msg: any) => {
                 log(`[popup port] onMessage msg.command=${msg.command}`);
-                const queriedTab = await queryCurrentTab();
-
-                if (msg.command === Commands.PopupToggleSummarize) {
-                    // In Firefox Mobile queriedTab is the article tab, currentTabId is the popup tab
-                    // In Firefox Desktop queriedTab and currentTabId are both the article tab
-                    if (queriedTab.id !== currentTabId) closeTab(currentTabId);
-                    sendToggleSummaryMessageToContentScript(msg.articleTabId);
-                }
-                else if (msg.command === Commands.PopupKillStickies) {
-                    if (queriedTab.id !== currentTabId) closeTab(currentTabId);
-                    if (queriedTab.id) {
-                        sendKillStickyMessageToContentScript(queriedTab.id);
-                    } else {
-                        log(`KillStickyMessage dropped queriedTab.id as is undefined`)
+                queryCurrentTab().then(queriedTab => {
+                    if (msg.command === Commands.PopupToggleSummarize) {
+                        // In Firefox Mobile queriedTab is the article tab, currentTabId is the popup tab
+                        // In Firefox Desktop queriedTab and currentTabId are both the article tab
+                        if (queriedTab.id !== currentTabId) closeTab(currentTabId);
+                        sendToggleSummaryMessageToContentScript(msg.articleTabId);
                     }
-                }
+                    else if (msg.command === Commands.PopupKillStickies) {
+                        if (queriedTab.id !== currentTabId) closeTab(currentTabId);
+                        if (queriedTab.id) {
+                            sendKillStickyMessageToContentScript(queriedTab.id);
+                        } else {
+                            log(`KillStickyMessage dropped queriedTab.id as is undefined`)
+                        }
+                    }
+                });
+
+
             });
         }
     });
@@ -75,7 +77,7 @@ function setupListeners() {
         title: "Kill Stickies",
         contexts: ["all"],
     });
-    chrome.contextMenus.onClicked.addListener((info, tab) => {
+    chrome.contextMenus.onClicked.addListener((info, _tab) => {
         if (info.menuItemId === ContextCommands.ToggleSummarize) {
             sendToggleSummaryMessageToContentScript();
         } else if (info.menuItemId === ContextCommands.TriggerKillStickies) {
@@ -88,7 +90,7 @@ function sendKillStickyMessageToContentScript(tabId: number) {
     chrome.tabs.sendMessage(
         tabId,
         { command: Commands.PopupKillStickies },
-        r => log(`sent kill-sticky cmd to content-script`)
+        (_r) => log(`sent kill-sticky cmd to content-script`)
     );
 }
 
@@ -157,7 +159,7 @@ function createDisplayTab(payload: InputPayload) {
                 chrome.tabs.onUpdated.removeListener(onUpdatedListener);
                 onUpdatedListenerCount--;
             }
-        };
+        }
     });
 }
 

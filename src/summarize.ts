@@ -73,7 +73,8 @@ interface NlpSubsets {
 }
 
 export function getTextBlocksFromDom(theWindow: Window): string[] {
-    const selection = theWindow.getSelection().toString().trim();
+    const rawSelection = theWindow.getSelection();
+    const selection = rawSelection ? rawSelection.toString().trim() : '';
     const theDocument = theWindow.document;
 
     const t = new Timer();
@@ -173,9 +174,9 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
     const skipCounter = new StringCounter();
-    const matched_nodes: Set<string> = new Set();
+    const matchedNodes: Set<string> = new Set();
 
-    const filter_by_word: NodeFilter = {
+    const filterByWord: NodeFilter = {
         acceptNode: n => {
             if (_classBlacklisted(n)) {
                 n.parentNode && _removeTree(n.parentNode);
@@ -187,13 +188,13 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
                 const pText = n.parentNode.textContent;
                 if (pText && _wordCount(pText) >= minWords) {
                     acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                    matched_nodes.add(pText);
+                    matchedNodes.add(pText);
                 }
                 // We are done with this node subtree as n.parentNode.textContent will contain all text in the subtree
                 return FILTER_REJECT;
             } else if (_wordCount(n.textContent) >= minWords) {
                 acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                if (n.textContent) matched_nodes.add(n.textContent);
+                if (n.textContent) matchedNodes.add(n.textContent);
                 return FILTER_ACCEPT;
             } else {
                 skipCounter.incr(n.parentNode && n.parentNode.nodeName);
@@ -206,18 +207,18 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
         theDocument.body,
         SHOW_TEXT,
         // SHOW_ALL,
-        filter_by_word,
+        filterByWord,
         false
     );
 
-    let n;
-    while (n = walker.nextNode()) {
+    while (walker.nextNode()) { 
+        // Do Nothing
     }
 
     // console.log(`Accepted Nodes:\n${acceptCounter.toString()}`);
     // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
     // console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
-    return Array.from(matched_nodes);
+    return Array.from(matchedNodes);
 }
 
 function _removeTree(node: Node) {
@@ -228,7 +229,7 @@ function _removeTree(node: Node) {
 
 function _classBlacklisted(n: Node | null): boolean {
     if (!n) return false;
-    const el = (<HTMLElement>n.parentNode);
+    const el = (n.parentNode as HTMLElement);
     // if (el.className) console.log(`CLASSNAME is ${el.className}`);
     if (el.className !== undefined && el.className.includes && el.className.includes('comments-panel')) {
         // console.log(`BLACKLISTED CLASSNAME is ${el.className}`);
