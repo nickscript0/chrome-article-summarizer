@@ -1,7 +1,12 @@
-import { Commands, InputPayload, WorkerPayload, InputPayloadCommand } from './messages';
+import {
+    Commands,
+    InputPayload,
+    WorkerPayload,
+    InputPayloadCommand
+} from './messages';
 import { summarizeTextBlocks } from './summarize';
 
-onmessage = function (event) {
+onmessage = function(event) {
     const ipCommand: InputPayloadCommand = event.data;
     if (ipCommand.command === Commands.ToggleSummarize) {
         const payload: InputPayload = ipCommand.payload;

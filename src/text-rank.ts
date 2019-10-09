@@ -16,14 +16,13 @@
 // Get sentences from text.
 export function getSentences(text: string): Array<string> {
     const sentences = text.split(/\. |\.|\?|!|\n/g);
-    return sentences.map(s => s.trim())
-        .filter(s => s.length > 0);
+    return sentences.map(s => s.trim()).filter(s => s.length > 0);
 }
 
 // Calculate similarity between 2 sentences.
 function calculateSimilarity(sentence1, sentence2) {
-    const words1 = sentence1.split(" ");
-    const words2set = new Set(sentence2.split(" "));
+    const words1 = sentence1.split(' ');
+    const words2set = new Set(sentence2.split(' '));
     const intersection = new Set(words1.filter(x => words2set.has(x)));
     const sumOfLengths = Math.log(words1.length) + Math.log(words2set.size);
     if (sumOfLengths === 0) {
@@ -46,14 +45,16 @@ export function makeGraph(sentences) {
                 graph[idx2] = [];
             }
             const similarityScore = calculateSimilarity(
-                sentences[idx1], sentences[idx2]);
+                sentences[idx1],
+                sentences[idx2]
+            );
             graph[idx1].push({
-                "node": idx2,
-                "weight": similarityScore
+                node: idx2,
+                weight: similarityScore
             });
             graph[idx2].push({
-                "node": idx1,
-                "weight": similarityScore
+                node: idx1,
+                weight: similarityScore
             });
         }
     }
@@ -63,15 +64,19 @@ export function makeGraph(sentences) {
 }
 
 // Page Rank calculation driver.
-export function calculatePageRank(graph, maxIterations,
-    dampingFactor, delta): SummarizerResult {
+export function calculatePageRank(
+    graph,
+    maxIterations,
+    dampingFactor,
+    delta
+): SummarizerResult {
     const pageRankStruct = {};
     const totalWeight = {};
     const totalNumNodes = graph.sentenceIdLookup.length; // Number of nodes.
     for (let idx = 0; idx < totalNumNodes; ++idx) {
         pageRankStruct[idx] = {
-            "oldPR": 1.0,
-            "newPR": 0.0
+            oldPR: 1.0,
+            newPR: 0.0
         };
         totalWeight[idx] = 0.0;
     }
@@ -82,30 +87,36 @@ export function calculatePageRank(graph, maxIterations,
         }
         // The adjacency list is an array containg objects that contain the neighbours' index as
         // key and similarity score as the weight.
-        adjacencyList.forEach(function (item) {
-            totalWeight[idx] += item["weight"];
+        adjacencyList.forEach(function(item) {
+            totalWeight[idx] += item['weight'];
         });
     }
 
     for (let iter = 0; iter < maxIterations; ++iter) {
-        const maxPRChange = runPageRankOnce(graph, pageRankStruct,
-            totalWeight, totalNumNodes, dampingFactor);
-        if (maxPRChange <= (delta / totalNumNodes)) {
+        const maxPRChange = runPageRankOnce(
+            graph,
+            pageRankStruct,
+            totalWeight,
+            totalNumNodes,
+            dampingFactor
+        );
+        if (maxPRChange <= delta / totalNumNodes) {
             break;
         }
     }
     const pageRankResults: Array<PageRankResult> = [];
     for (let idx = 0; idx < totalNumNodes; ++idx) {
-
         // pageRankResults[idx] = {
         //     "PR": pageRankStruct[idx]["oldPR"] / totalNumNodes,
         //     "sentence": graph.sentenceIdLookup[idx]
         // };
-        pageRankResults.push(new PageRankResult(
-            pageRankStruct[idx]["oldPR"] / totalNumNodes,
-            graph.sentenceIdLookup[idx],
-            idx
-        ));
+        pageRankResults.push(
+            new PageRankResult(
+                pageRankStruct[idx]['oldPR'] / totalNumNodes,
+                graph.sentenceIdLookup[idx],
+                idx
+            )
+        );
     }
     return new SummarizerResult(pageRankResults);
 }
@@ -128,7 +139,9 @@ class SummarizerResult {
     constructor(prResultArr: Array<PageRankResult>) {
         this.prResultArr = this._sortByPR(prResultArr);
         this.orderIndexToPRMap = new Map();
-        this.prResultArr.forEach((el, i) => this.orderIndexToPRMap.set(el.index, i + 1));
+        this.prResultArr.forEach((el, i) =>
+            this.orderIndexToPRMap.set(el.index, i + 1)
+        );
     }
 
     private _sortByPR(arr: Array<PageRankResult>): Array<PageRankResult> {
@@ -136,24 +149,28 @@ class SummarizerResult {
         return arr.sort((a, b) => b.pagerank - a.pagerank);
     }
 
-    getSentencesOrderedByOccurence(maxSentences: number | undefined = undefined): Array<{ content: string; rank: number }> {
+    getSentencesOrderedByOccurence(
+        maxSentences: number | undefined = undefined
+    ): Array<{ content: string; rank: number }> {
         // Return all sentences if maxSentences not specified
         // if (maxSentences === undefined) maxSentences = this.prResultArr.length;
         const numSentences = maxSentences || this.prResultArr.length;
-        return this._getTopPrResultOrderedByOccurence(numSentences)
-            .map(s => {
-                const rank = this.orderIndexToPRMap.get(s.index) || numSentences;
-                return { content: s.sentence, rank };
-            });
+        return this._getTopPrResultOrderedByOccurence(numSentences).map(s => {
+            const rank = this.orderIndexToPRMap.get(s.index) || numSentences;
+            return { content: s.sentence, rank };
+        });
     }
 
-    _getTopPrResultOrderedByOccurence(maxSentences: number): Array<PageRankResult> {
+    _getTopPrResultOrderedByOccurence(
+        maxSentences: number
+    ): Array<PageRankResult> {
         const sentences = this.prResultArr.slice(0, maxSentences);
         return sentences.sort((a, b) => a.index - b.index);
     }
 
     allPageRanks() {
-        return this.prResultArr.slice(0, this.prResultArr.length)
+        return this.prResultArr
+            .slice(0, this.prResultArr.length)
             .map(s => s.pagerank);
     }
 
@@ -167,45 +184,53 @@ class SummarizerResult {
 }
 
 // Single iteration of Page Rank.
-function runPageRankOnce(graph, pageRankStruct,
-    totalWeight, totalNumNodes, dampingFactor) {
+function runPageRankOnce(
+    graph,
+    pageRankStruct,
+    totalWeight,
+    totalNumNodes,
+    dampingFactor
+) {
     let sinkContrib = 0.0;
     for (let idx = 0; idx < totalNumNodes; ++idx) {
         if (graph[idx] === undefined || graph[idx].length === 0) {
             // Sink.
-            sinkContrib += pageRankStruct[idx]["oldPR"];
+            sinkContrib += pageRankStruct[idx]['oldPR'];
             continue;
         }
         let wt = 0.0;
         // Now iterate over all the nodes that are pointing to this node.
-        graph[idx].forEach(function (adjNode) {
-            const node = adjNode["node"];
+        graph[idx].forEach(function(adjNode) {
+            const node = adjNode['node'];
             // Get the total weight shared by this adjacent node and its neighbours.
             const sharedWt = totalWeight[node];
-            if (sharedWt !== 0) { // To prevent NaN
-                wt += (adjNode["weight"] / sharedWt) * pageRankStruct[node]["oldPR"];
+            if (sharedWt !== 0) {
+                // To prevent NaN
+                wt +=
+                    (adjNode['weight'] / sharedWt) *
+                    pageRankStruct[node]['oldPR'];
             }
         });
         wt *= dampingFactor;
-        wt += (1 - dampingFactor);
+        wt += 1 - dampingFactor;
         // Update the structure w/ the new PR.
-        pageRankStruct[idx]["newPR"] = wt;
+        pageRankStruct[idx]['newPR'] = wt;
     }
     // Apply the sink contrib overall.
     sinkContrib /= totalNumNodes;
     let maxPrChange = 0.0;
     for (let idx = 0; idx < totalNumNodes; ++idx) {
-        pageRankStruct[idx]["newPR"] += sinkContrib;
+        pageRankStruct[idx]['newPR'] += sinkContrib;
         // Report back the max PR change.
-        const change = Math.abs(pageRankStruct[idx]["newPR"] - pageRankStruct[idx][
-            "oldPR"
-        ]);
+        const change = Math.abs(
+            pageRankStruct[idx]['newPR'] - pageRankStruct[idx]['oldPR']
+        );
         if (change > maxPrChange) {
             maxPrChange = change;
         }
         // Set old PR to new PR for next iteration.
-        pageRankStruct[idx]["oldPR"] = pageRankStruct[idx]["newPR"];
-        pageRankStruct[idx]["newPR"] = 0.0;
+        pageRankStruct[idx]['oldPR'] = pageRankStruct[idx]['newPR'];
+        pageRankStruct[idx]['newPR'] = 0.0;
     }
     return maxPrChange;
 }

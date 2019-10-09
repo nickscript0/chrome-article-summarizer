@@ -30,10 +30,9 @@
 * 11. Consider using document.querySelectorAll("body *") etc.. instead of treeWalker, is this more efficient??
 */
 
-import { getTextBlocksFromDom } from "./summarize";
+import { getTextBlocksFromDom } from './summarize';
 import { Commands, InputPayload, Timer } from './messages';
 import { killStickyHeaders } from './kill-sticky-headers';
-
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.command === Commands.ToggleSummarize) {

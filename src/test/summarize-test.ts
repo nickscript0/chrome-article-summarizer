@@ -14,10 +14,14 @@ import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 
-import { findNodesWithNWords, getTextBlocksFromDom, getNlpSentencesBlocks } from "../summarize";
+import {
+    findNodesWithNWords,
+    getTextBlocksFromDom,
+    getNlpSentencesBlocks
+} from '../summarize';
 
 // const document: Document = new JSDOM(`<!DOCTYPE html>`).window.document;
-const window = newWindowFromString(`<!DOCTYPE html>`) as any;
+const window = newWindowFromString(`<!DOCTYPE html>`);
 const document = window.document;
 
 window.getSelection = () => '';
@@ -26,7 +30,8 @@ describe('summarize', () => {
     describe('findNodesWithNWords', () => {
         const fourSentence = 'one two three four.';
         const fiveSentence = 'one two three four Five!';
-        const tenSentence = 'one two three four Five, six, (seven) eight nine 10.';
+        const tenSentence =
+            'one two three four Five, six, (seven) eight nine 10.';
 
         beforeEach(() => {
             while (document.body.hasChildNodes()) {
@@ -75,13 +80,14 @@ describe('summarize', () => {
             expect(nodes[0]).to.equal(fiveSentence);
             expect(nodes[1]).to.equal(linkText);
             expect(nodes[2]).to.equal(fourSentence);
-
         });
     });
 
     describe('getSentencesFromDocument', () => {
-        const part11Sentence = '*part11Sentence: one two three four five, six, seven eight nine ten eleven*';
-        const full10Sentence = 'one two three four Five, six, (seven) eight nine 10.';
+        const part11Sentence =
+            '*part11Sentence: one two three four five, six, seven eight nine ten eleven*';
+        const full10Sentence =
+            'one two three four Five, six, (seven) eight nine 10.';
 
         beforeEach(() => {
             while (document.body.hasChildNodes()) {
@@ -96,7 +102,9 @@ describe('summarize', () => {
             addPNodesToBody([linkText], 'a');
             addPNodesToBody([full10Sentence]);
 
-            const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(window)).sentences;
+            const sentences = getNlpSentencesBlocks(
+                getTextBlocksFromDom(window)
+            ).sentences;
 
             expect(sentences[0]).to.equal(part11Sentence);
             expect(sentences[1]).to.equal(linkText);
@@ -110,11 +118,13 @@ describe('summarize', () => {
             <body>
                 <p>Pond’s question was not rhetorical. She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are <a href="http://www.forbes.com/sites/wadeshepard/2017/09/27/amazon-com-the-place-where-american-dreams-are-stolen-by-chinese-counterfeiters/" target="_self">having their products knocked-off</a> on major e-commerce platforms by foreign counterfeiters <a href="http://www.forbes.com/sites/wadeshepard/2017/01/12/why-amazon-is-losing-its-battle-against-chinese-counterfeiters/" target="_self">who seemingly operate with impunity</a>.</p>
             </body>`;
-            const testwin = newWindowFromString(html) as any;
+            const testwin = newWindowFromString(html);
             const expected1 = `Pond’s question was not rhetorical.`;
             const expected2 = `She was expressing a sentiment that has become common among business owners and patent holders in countries like the USA, who are having their products knocked-off on major e-commerce platforms by foreign counterfeiters who seemingly operate with impunity.`;
 
-            const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+            const sentences = getNlpSentencesBlocks(
+                getTextBlocksFromDom(testwin)
+            ).sentences;
             expect(sentences[0]).to.equal(expected1);
             expect(sentences[1]).to.equal(expected2);
         });
@@ -130,8 +140,8 @@ enum Site {
 }
 
 class Accuracies {
-    expected: any;
-    results: any;
+    expected: { [key: string]: number };
+    results: { [key: string]: AccuracyResult };
     constructor() {
         this.results = {};
         this.expected = {};
@@ -174,38 +184,56 @@ class Timers {
 
     get(name) {
         const res = this.results.get(name);
-        return (res) ? res : '';
+        return res ? res : '';
     }
 
     _clock() {
         const t = process.hrtime();
-        return Math.round((t[0] * 1000) + (t[1] / 1000000));
+        return Math.round(t[0] * 1000 + t[1] / 1000000);
     }
 }
 
 function printResults(accuracies: Accuracies, timers: Timers) {
-    return `Site\tMatch\tExtra\tTime\n`
-        + `-----------------------------\n`
-        + (<any>Object).entries(accuracies.getResults())
-            .map(([k, v]) => `${k}\t${v.matchExpected}%\t${v.notExpected}%\t${timers.get(k)}ms`)
-            .join('\n');
+    return (
+        `Site\tMatch\tExtra\tTime\n` +
+        `-----------------------------\n` +
+        Object.entries(accuracies.getResults())
+            .map(
+                ([k, v]) =>
+                    `${k}\t${v.matchExpected}%\t${v.notExpected}%\t${timers.get(
+                        k
+                    )}ms`
+            )
+            .join('\n')
+    );
 }
 
 describe('getSentencesFromDocument real article test accuracy', () => {
     const accuracies = new Accuracies();
     const timers = new Timers();
 
-    after(function () {
-        console.log(`\n********************\nSentence extraction accuracies:\n${printResults(accuracies, timers)}\n********************`);
+    after(function() {
+        console.log(
+            `\n********************\nSentence extraction accuracies:\n${printResults(
+                accuracies,
+                timers
+            )}\n********************`
+        );
     });
 
     it('should handle nytimes format', async () => {
         const site = Site.NYTIMES;
-        const testwin = await newWindowFromFile('src/test/testdata/nytimes1.html');
+        const testwin = await newWindowFromFile(
+            'src/test/testdata/nytimes1.html'
+        );
         timers.start(site);
-        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin))
+            .sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/nytimes1.sentences');
+        const accuracy = await rateSentencesMatch(
+            sentences,
+            'src/test/testdata/nytimes1.sentences'
+        );
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -213,11 +241,17 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle medium format', async () => {
         const site = Site.MEDIUM;
-        const testwin = await newWindowFromFile('src/test/testdata/medium1.html');
+        const testwin = await newWindowFromFile(
+            'src/test/testdata/medium1.html'
+        );
         timers.start(site);
-        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin))
+            .sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/medium1.sentences');
+        const accuracy = await rateSentencesMatch(
+            sentences,
+            'src/test/testdata/medium1.sentences'
+        );
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -225,11 +259,17 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle medium format #2', async () => {
         const site = Site.MEDIUM2;
-        const testwin = await newWindowFromFile('src/test/testdata/medium2.html');
+        const testwin = await newWindowFromFile(
+            'src/test/testdata/medium2.html'
+        );
         timers.start(site);
-        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin))
+            .sentences;
         // console.log(`SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/medium2.sentences');
+        const accuracy = await rateSentencesMatch(
+            sentences,
+            'src/test/testdata/medium2.sentences'
+        );
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -237,11 +277,17 @@ describe('getSentencesFromDocument real article test accuracy', () => {
 
     it('should handle verge format', async () => {
         const site = Site.VERGE;
-        const testwin = await newWindowFromFile('src/test/testdata/verge1.html');
+        const testwin = await newWindowFromFile(
+            'src/test/testdata/verge1.html'
+        );
         timers.start(site);
-        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin))
+            .sentences;
         // console.log(`NYTIMES NEW:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/verge1.sentences');
+        const accuracy = await rateSentencesMatch(
+            sentences,
+            'src/test/testdata/verge1.sentences'
+        );
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -251,9 +297,13 @@ describe('getSentencesFromDocument real article test accuracy', () => {
         const site = Site.CBC;
         const testwin = await newWindowFromFile('src/test/testdata/cbc1.html');
         timers.start(site);
-        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin)).sentences;
+        const sentences = getNlpSentencesBlocks(getTextBlocksFromDom(testwin))
+            .sentences;
         // console.log(`CALCULATED SENTENCES:\n${sentences.map((s, i) => `${i}: ${s}`).join('\n')}`);
-        const accuracy = await rateSentencesMatch(sentences, 'src/test/testdata/cbc1.sentences');
+        const accuracy = await rateSentencesMatch(
+            sentences,
+            'src/test/testdata/cbc1.sentences'
+        );
         // console.log(`ACCURACY: ${accuracy}`);
         timers.stop(site);
         accuracies.report(site, accuracy);
@@ -271,25 +321,49 @@ interface AccuracyResult {
     notExpected: number; // Percentage that are not in expected set
 }
 
-async function rateSentencesMatch(sentences: Array<string>, expectedSentencesFilepath: string, ignoreEndPunctuation: boolean = false): Promise<AccuracyResult> {
-    const expectedSentencesRaw = (await readFile(expectedSentencesFilepath)).split('\n');
-    const expectedSentencesSet = (!ignoreEndPunctuation) ? new Set(expectedSentencesRaw) :
-        new Set(expectedSentencesRaw.map(s => {
-            return (s.endsWith('.') || s.endsWith('?') || s.endsWith('!')) ? s.slice(0, s.length - 1) : s;
-        }));
+async function rateSentencesMatch(
+    sentences: Array<string>,
+    expectedSentencesFilepath: string,
+    ignoreEndPunctuation = false
+): Promise<AccuracyResult> {
+    const expectedSentencesRaw = (await readFile(
+        expectedSentencesFilepath
+    )).split('\n');
+    const expectedSentencesSet = !ignoreEndPunctuation
+        ? new Set(expectedSentencesRaw)
+        : new Set(
+              expectedSentencesRaw.map(s => {
+                  return s.endsWith('.') || s.endsWith('?') || s.endsWith('!')
+                      ? s.slice(0, s.length - 1)
+                      : s;
+              })
+          );
 
     const actualSentencesSet = new Set(sentences.map(s => s.trim()));
-    const intersection = new Set(Array.from(expectedSentencesSet).filter(x => actualSentencesSet.has(x)));
+    const intersection = new Set(
+        Array.from(expectedSentencesSet).filter(x => actualSentencesSet.has(x))
+    );
     // console.log(`MISSING FROM EXPECTED SENTENCES:\n${[...expectedSentencesSet].filter(x => !actualSentencesSet.has(x)).join('\n')}`); // DEBUG
-    const notExpectedArr = [...actualSentencesSet].filter(x => !expectedSentencesSet.has(x));
-    const notExpectedPercent = (notExpectedArr.length * 100 / actualSentencesSet.size).toFixed(2);
+    const notExpectedArr = [...actualSentencesSet].filter(
+        x => !expectedSentencesSet.has(x)
+    );
+    const notExpectedPercent = (
+        (notExpectedArr.length * 100) /
+        actualSentencesSet.size
+    ).toFixed(2);
     return {
-        matchExpected: parseFloat((intersection.size * 100 / expectedSentencesSet.size).toFixed(2)),
+        matchExpected: parseFloat(
+            ((intersection.size * 100) / expectedSentencesSet.size).toFixed(2)
+        ),
         notExpected: parseFloat(notExpectedPercent)
     };
 }
 
-function addPNodesToBody(nodeTexts: Array<string>, nodeType: string = 'p', d: Document = document) {
+function addPNodesToBody(
+    nodeTexts: Array<string>,
+    _nodeType = 'p',
+    d: Document = document
+) {
     nodeTexts.forEach(text => {
         const p = d.createElement('p');
         p.textContent = text;
@@ -313,6 +387,8 @@ function newWindowFromString(htmlString: string) {
 // promisified fs.readFile
 function readFile(filename: string): Promise<string> {
     return new Promise<string>((resolve, reject) =>
-        fs.readFile(filename, (err, data) => (err) ? reject(err) : resolve(data.toString('utf-8')))
+        fs.readFile(filename, (err, data) =>
+            err ? reject(err) : resolve(data.toString('utf-8'))
+        )
     );
 }

@@ -1,14 +1,19 @@
 import * as nlp from 'compromise';
 
-import { calculatePageRank, makeGraph } from "./text-rank";
+import { calculatePageRank, makeGraph } from './text-rank';
 import { SummaryData, Timer } from './messages';
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
-export function summarizeTextBlocks(textBlocks: string[], docTitle: string): SummaryData {
+export function summarizeTextBlocks(
+    textBlocks: string[],
+    docTitle: string
+): SummaryData {
     const t = new Timer();
-    const { sentences, nlpBlocks, nlpTimer } = getNlpSentencesBlocks(textBlocks);
+    const { sentences, nlpBlocks, nlpTimer } = getNlpSentencesBlocks(
+        textBlocks
+    );
     t.logTimeAndReset('nlp get sentences');
     const result = summarizeSentences(sentences);
     t.logTimeAndReset('page rank summarize');
@@ -40,10 +45,12 @@ export function summarizeTextBlocks(textBlocks: string[], docTitle: string): Sum
 function getWordStats(nlpBlocks: Array<any>): string {
     const NUM_WORD_STATS = 5;
     function nbSubsetToArr(nlpBlocks, subsetFunc) {
-        const count2d = nlpBlocks.map(nb => subsetFunc(nb).data()
-            .filter(d => d)
-            .map(d => d.normal.trim())
-            .filter(t => t !== '')
+        const count2d = nlpBlocks.map(nb =>
+            subsetFunc(nb)
+                .data()
+                .filter(d => d)
+                .map(d => d.normal.trim())
+                .filter(t => t !== '')
         );
         return Array.prototype.concat(...count2d);
     }
@@ -52,13 +59,18 @@ function getWordStats(nlpBlocks: Array<any>): string {
     const placesArr = nbSubsetToArr(nlpBlocks, a => a.places());
     const nounsArr = nbSubsetToArr(nlpBlocks, a => a.nouns());
     const thingsArr = [...nounsArr]
-        .filter(x => !(new Set(peopleArr).has(x)))
-        .filter(x => !(new Set(placesArr).has(x)));
+        .filter(x => !new Set(peopleArr).has(x))
+        .filter(x => !new Set(placesArr).has(x));
 
-    const topPeople = new StringCounter(peopleArr).topN(NUM_WORD_STATS).join(', ');
-    const topPlaces = new StringCounter(placesArr).topN(NUM_WORD_STATS).join(', ');
-    const topThings = new StringCounter(thingsArr).topN(NUM_WORD_STATS).join(', ');
-
+    const topPeople = new StringCounter(peopleArr)
+        .topN(NUM_WORD_STATS)
+        .join(', ');
+    const topPlaces = new StringCounter(placesArr)
+        .topN(NUM_WORD_STATS)
+        .join(', ');
+    const topThings = new StringCounter(thingsArr)
+        .topN(NUM_WORD_STATS)
+        .join(', ');
 
     return `Top People: ${topPeople}
 Top Places: ${topPlaces}
@@ -78,7 +90,10 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
     const theDocument = theWindow.document;
 
     const t = new Timer();
-    const textBlocks = (selection === '') ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument) : [selection];
+    const textBlocks =
+        selection === ''
+            ? findNodesWithNWords(MIN_WORDS_SENTENCE, theDocument)
+            : [selection];
     t.logTimeAndReset('treeWalk');
     return textBlocks;
 }
@@ -107,19 +122,31 @@ export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {
 
 function summarizeSentences(sentences: Array<string>) {
     const textRankConfig = {
-        "maxIter": 100,
-        "dampingFactor": 0.85,
-        "delta": 0.5
+        maxIter: 100,
+        dampingFactor: 0.85,
+        delta: 0.5
     };
 
     const graph = makeGraph(sentences);
-    const result = calculatePageRank(graph, textRankConfig.maxIter,
-        textRankConfig.dampingFactor, textRankConfig.delta);
+    const result = calculatePageRank(
+        graph,
+        textRankConfig.maxIter,
+        textRankConfig.dampingFactor,
+        textRankConfig.delta
+    );
     return result;
 }
 
 // Skip these element types and all their children
-const ELEMENT_REJECT_BLACKLIST = ['style', 'script', 'button', 'nav', 'img', 'noscript', 'iframe'];
+const ELEMENT_REJECT_BLACKLIST = [
+    'style',
+    'script',
+    'button',
+    'nav',
+    'img',
+    'noscript',
+    'iframe'
+];
 
 class StringCounter {
     private stringCounts: Map<string, number>;
@@ -134,7 +161,7 @@ class StringCounter {
     incr(s: string | null) {
         if (s === null) s = '<<null>>';
         const last = this.stringCounts.get(s);
-        const next = (last) ? last + 1 : 1;
+        const next = last ? last + 1 : 1;
         this.stringCounts.set(s, next);
     }
 
@@ -143,7 +170,6 @@ class StringCounter {
             .sort((a, b) => b[1] - a[1])
             .slice(0, n)
             .map(el => `${el[0]} (${el[1]})`);
-
     }
 
     toString() {
@@ -170,7 +196,10 @@ const SHOW_TEXT = 4;
  * @param minWords
  * @param theDocument
  */
-export function findNodesWithNWords(minWords: number, theDocument: Document): Array<string> {
+export function findNodesWithNWords(
+    minWords: number,
+    theDocument: Document
+): Array<string> {
     const rejectCounter = new StringCounter();
     const acceptCounter = new StringCounter();
     const skipCounter = new StringCounter();
@@ -181,10 +210,18 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
             if (_classBlacklisted(n)) {
                 n.parentNode && _removeTree(n.parentNode);
                 return FILTER_REJECT;
-            } else if (n.parentNode && ELEMENT_REJECT_BLACKLIST.includes(n.parentNode.nodeName.toLowerCase())) {
+            } else if (
+                n.parentNode &&
+                ELEMENT_REJECT_BLACKLIST.includes(
+                    n.parentNode.nodeName.toLowerCase()
+                )
+            ) {
                 rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
                 return FILTER_REJECT;
-            } else if (n.parentNode && ['p'].includes(n.parentNode.nodeName.toLowerCase())) {
+            } else if (
+                n.parentNode &&
+                ['p'].includes(n.parentNode.nodeName.toLowerCase())
+            ) {
                 const pText = n.parentNode.textContent;
                 if (pText && _wordCount(pText) >= minWords) {
                     acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
@@ -201,7 +238,6 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
                 return FILTER_SKIP;
             }
         }
-
     };
     const walker = theDocument.createTreeWalker(
         theDocument.body,
@@ -211,7 +247,7 @@ export function findNodesWithNWords(minWords: number, theDocument: Document): Ar
         false
     );
 
-    while (walker.nextNode()) { 
+    while (walker.nextNode()) {
         // Do Nothing
     }
 
@@ -229,9 +265,13 @@ function _removeTree(node: Node) {
 
 function _classBlacklisted(n: Node | null): boolean {
     if (!n) return false;
-    const el = (n.parentNode as HTMLElement);
+    const el = n.parentNode as HTMLElement;
     // if (el.className) console.log(`CLASSNAME is ${el.className}`);
-    if (el.className !== undefined && el.className.includes && el.className.includes('comments-panel')) {
+    if (
+        el.className !== undefined &&
+        el.className.includes &&
+        el.className.includes('comments-panel')
+    ) {
         // console.log(`BLACKLISTED CLASSNAME is ${el.className}`);
         return true;
     } else {
@@ -242,5 +282,5 @@ function _classBlacklisted(n: Node | null): boolean {
 function _wordCount(s: string | null): number {
     if (s === null || s.trim() === '') return 0;
     const words = s.match(/(\w+)/g);
-    return (words) ? words.length : 0;
+    return words ? words.length : 0;
 }
