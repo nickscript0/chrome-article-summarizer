@@ -23,6 +23,7 @@
 * 1. Create nice large buttons for mobile popup menu instead of hyperlinks
 * 1. Improve fonts
 * 2. Allow seeing the context of a sentence (maybe on left-click it shows more and more sentences before and after, and right click hides them again)
+    a. A possible better/simpler solution is to add a RANK SIDEBAR to the original page and clicking on each moves the page to the ranked and COLORED sentence in the original
 * 5. a. Extract TextRank and <html sentence extraction> to their own repo
 *    b. Add unit tests for TextRank
 * 6. Handle duplicate subset sentences e.g. https://medium.com/sketchdeck-developer-blog/what-i-wish-i-knew-when-i-became-cto-fdc934b790e3
