@@ -10,6 +10,8 @@ import {
     ContextCommands
 } from './messages';
 
+import * as chrono from 'chrono-node';
+
 // key: tab.id, value: url string or null if not in summary mode
 const tabsInSummaryMode: { [tabid: number]: string | undefined } = {};
 let currentTabId;
@@ -47,6 +49,16 @@ function setupListeners() {
                                 `KillStickyMessage dropped queriedTab.id as is undefined`
                             );
                         }
+                    } else if (msg.command === Commands.PopupAddRelativeDates) {
+                        if (queriedTab.id !== currentTabId)
+                            closeTab(currentTabId);
+                        if (queriedTab.id) {
+                            sendAddRelativeDatesToContentScript(queriedTab.id);
+                        } else {
+                            log(
+                                `AddRelativeDates dropped queriedTab.id as is undefined`
+                            );
+                        }
                     }
                 });
             });
@@ -73,6 +85,8 @@ function setupListeners() {
                 sendToggleSummaryMessageToContentScript();
             else if (command === KeyboardCommands.TriggerKillStickies)
                 sendKillStickyMessageToContentScript(currentTabId);
+            else if (command === KeyboardCommands.TriggerAddRelativeDates)
+                sendAddRelativeDatesToContentScript(currentTabId);
             else log(`unnkown keyboard command, doing nothing:`, command);
         });
 
@@ -94,6 +108,10 @@ function setupListeners() {
             sendToggleSummaryMessageToContentScript();
         } else if (info.menuItemId === ContextCommands.TriggerKillStickies) {
             sendKillStickyMessageToContentScript(currentTabId);
+        } else if (
+            info.menuItemId === KeyboardCommands.TriggerAddRelativeDates
+        ) {
+            sendAddRelativeDatesToContentScript(currentTabId);
         }
     });
 }
@@ -103,6 +121,14 @@ function sendKillStickyMessageToContentScript(tabId: number) {
         tabId,
         { command: Commands.PopupKillStickies },
         _r => log(`sent kill-sticky cmd to content-script`)
+    );
+}
+
+function sendAddRelativeDatesToContentScript(tabId: number) {
+    chrome.tabs.sendMessage(
+        tabId,
+        { command: Commands.PopupAddRelativeDates },
+        _r => log(`sent add-relative-dates cmd to content-script`)
     );
 }
 

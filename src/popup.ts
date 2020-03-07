@@ -16,6 +16,14 @@ function main() {
         killStickyButton.addEventListener('click', () =>
             port.postMessage({ command: Commands.PopupKillStickies })
         );
+
+    const addRelDatesButton = document.getElementById(
+        'add-relative-dates-button'
+    );
+    addRelDatesButton &&
+        addRelDatesButton.addEventListener('click', () =>
+            port.postMessage({ command: Commands.PopupAddRelativeDates })
+        );
 }
 
 main();

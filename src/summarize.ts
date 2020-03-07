@@ -205,45 +205,18 @@ export function findNodesWithNWords(
     const skipCounter = new StringCounter();
     const matchedNodes: Set<string> = new Set();
 
-    const filterByWord: NodeFilter = {
-        acceptNode: n => {
-            if (_classBlacklisted(n)) {
-                n.parentNode && _removeTree(n.parentNode);
-                return FILTER_REJECT;
-            } else if (
-                n.parentNode &&
-                ELEMENT_REJECT_BLACKLIST.includes(
-                    n.parentNode.nodeName.toLowerCase()
-                )
-            ) {
-                rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
-                return FILTER_REJECT;
-            } else if (
-                n.parentNode &&
-                ['p'].includes(n.parentNode.nodeName.toLowerCase())
-            ) {
-                const pText = n.parentNode.textContent;
-                if (pText && _wordCount(pText) >= minWords) {
-                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                    matchedNodes.add(pText);
-                }
-                // We are done with this node subtree as n.parentNode.textContent will contain all text in the subtree
-                return FILTER_REJECT;
-            } else if (_wordCount(n.textContent) >= minWords) {
-                acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
-                if (n.textContent) matchedNodes.add(n.textContent);
-                return FILTER_ACCEPT;
-            } else {
-                skipCounter.incr(n.parentNode && n.parentNode.nodeName);
-                return FILTER_SKIP;
-            }
-        }
-    };
     const walker = theDocument.createTreeWalker(
         theDocument.body,
         SHOW_TEXT,
         // SHOW_ALL,
-        filterByWord,
+        getNodeFilter({
+            minWords,
+            rejectCounter,
+            acceptCounter,
+            skipCounter,
+            matchedNodes,
+            skipSubtrees: true
+        }),
         false
     );
 
@@ -255,6 +228,70 @@ export function findNodesWithNWords(
     // console.log(`Skipped Nodes:\n${skipCounter.toString()}`);
     // console.log(`Rejected Nodes:\n${rejectCounter.toString()}`);
     return Array.from(matchedNodes);
+}
+
+interface NodeFilterConfig {
+    minWords: number;
+    rejectCounter?: StringCounter;
+    acceptCounter?: StringCounter;
+    skipCounter?: StringCounter;
+    matchedNodes?: Set<string>;
+    skipSubtrees: boolean;
+}
+
+export function getNodeFilter(config: NodeFilterConfig) {
+    const {
+        minWords,
+        rejectCounter,
+        acceptCounter,
+        skipCounter,
+        matchedNodes,
+        skipSubtrees
+    } = config;
+
+    const filterByWord: NodeFilter = {
+        acceptNode: n => {
+            if (_classBlacklisted(n)) {
+                n.parentNode && _removeTree(n.parentNode);
+                return FILTER_REJECT;
+            } else if (
+                n.parentNode &&
+                ELEMENT_REJECT_BLACKLIST.includes(
+                    n.parentNode.nodeName.toLowerCase()
+                )
+            ) {
+                rejectCounter &&
+                    rejectCounter.incr(n.parentNode.nodeName.toLowerCase());
+                return FILTER_REJECT;
+            } else if (
+                skipSubtrees &&
+                n.parentNode &&
+                ['p'].includes(n.parentNode.nodeName.toLowerCase())
+            ) {
+                const pText = n.parentNode.textContent;
+                if (pText && _wordCount(pText) >= minWords) {
+                    acceptCounter &&
+                        acceptCounter.incr(
+                            n.parentNode && n.parentNode.nodeName
+                        );
+                    matchedNodes && matchedNodes.add(pText);
+                }
+                // We are done with this node subtree as n.parentNode.textContent will contain all text in the subtree
+                return FILTER_REJECT;
+            } else if (_wordCount(n.textContent) >= minWords) {
+                acceptCounter &&
+                    acceptCounter.incr(n.parentNode && n.parentNode.nodeName);
+                if (n.textContent)
+                    matchedNodes && matchedNodes.add(n.textContent);
+                return FILTER_ACCEPT;
+            } else {
+                skipCounter &&
+                    skipCounter.incr(n.parentNode && n.parentNode.nodeName);
+                return FILTER_SKIP;
+            }
+        }
+    };
+    return filterByWord;
 }
 
 function _removeTree(node: Node) {

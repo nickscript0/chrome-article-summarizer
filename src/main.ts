@@ -34,8 +34,10 @@
 import { getTextBlocksFromDom } from './summarize';
 import { Commands, InputPayload, Timer } from './messages';
 import { killStickyHeaders } from './kill-sticky-headers';
+import { addRelativeDatesToDocument } from './add-relative-dates';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log(`maint.ts COMMAND IS`, request.command);
     if (request.command === Commands.ToggleSummarize) {
         const startTime = Date.now();
         const t = new Timer();
@@ -54,5 +56,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
     } else if (request.command === Commands.PopupKillStickies) {
         killStickyHeaders();
+    } else if (request.command === Commands.PopupAddRelativeDates) {
+        addRelativeDatesToDocument();
     }
 });

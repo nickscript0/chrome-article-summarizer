@@ -7,24 +7,14 @@
     },
     "content_scripts": [
         {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "dist/main.bundle.js"
-            ]
+            "matches": ["<all_urls>"],
+            "js": ["dist/main.bundle.js"]
         }
     ],
     "background": {
-        "scripts": [
-            "dist/background.bundle.js"
-        ]
+        "scripts": ["dist/background.bundle.js"]
     },
-    "permissions": [
-        "tabs",
-        "tabHide",
-        "contextMenus"
-    ],
+    "permissions": ["tabs", "tabHide", "contextMenus"],
     "commands": {
         "toggle-page-summary": {
             "suggested_key": {
@@ -39,6 +29,13 @@
                 "mac": "Command+Shift+K"
             },
             "description": "Kill Sticky Headers"
+        },
+        "add-relative-dates": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+R",
+                "mac": "Command+Shift+R"
+            },
+            "description": "Add Relative Dates"
         }
     },
     "applications": {

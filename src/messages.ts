@@ -6,13 +6,15 @@ export enum Commands {
     DisplayTabReady = 'DisplayTabReady',
     AssignId = 'AssignId',
     PopupKillStickies = 'popup-kill-sticky-headers',
-    PopupToggleSummarize = 'popup-toggle-summarize'
+    PopupToggleSummarize = 'popup-toggle-summarize',
+    PopupAddRelativeDates = 'popup-add-relative-dates'
 }
 
 // This must match the strings defined in manifest.json "commands" section
 export enum KeyboardCommands {
     ToggleSummarize = 'toggle-page-summary',
-    TriggerKillStickies = 'trigger-kill-sticky'
+    TriggerKillStickies = 'trigger-kill-sticky',
+    TriggerAddRelativeDates = 'add-relative-dates'
 }
 
 export enum ContextCommands {
