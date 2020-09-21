@@ -45,7 +45,7 @@ function convert(currentElement: HTMLElement) {
         const start = currentText.slice(0, parsed.index + parsed.text.length);
         const end = currentText.slice(parsed.index + parsed.text.length);
         // const newText = `${currentText} (${dayjs(res).fromNow()})`;
-        const newText = `${start} (${dayjs(res).fromNow()}) ${end}`;
+        const newText = `${start} (${dayjs(res).fromNow()})${end}`;
 
         // TODO: I think I could split this into 3 text nodes (same way summarizer does) and then the relative time could have font, bold, color...
         currentElement.textContent = newText;
