@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+// Using @nem035's version due to this open issue running in the browser https://github.com/latitudegames/GPT-3-Encoder/issues/32
 import { encode } from '@nem035/gpt-3-encoder';
 import { GptPrice, GptPrices } from './messages';
 

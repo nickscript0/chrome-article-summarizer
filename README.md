@@ -1,5 +1,11 @@
 # Article Summarizer Browser Extension
 
+## Usage
+```bash
+npm run build
+# Then load the extension in your browser.
+```
+
 ## Firefox build and publish with web-ext
 ```bash
 # Test the extension in a browser
