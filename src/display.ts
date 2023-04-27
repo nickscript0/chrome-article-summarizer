@@ -165,6 +165,10 @@ function buildRender(state: State, data: SummaryData, _startTime: number) {
         ['Toggle Stats']
     );
 
+    const gptStatsText = h('pre.stats-text', [
+        [JSON.stringify(data.gptStats, null, 2)].join('\n')
+    ]);
+
     // Add Details Section
     const total: number = data.timing.reduce((n, el) => n + el.value, 0);
     const generatedTimeText = `Summarized in ${total.toFixed(1)} ms`;
@@ -296,6 +300,7 @@ function buildRender(state: State, data: SummaryData, _startTime: number) {
                 .filter(s => s.rank < state._showNumSentences + 1)
                 .map(s => _createParagraphH(s, false)),
             h('br'),
+            [h('h3', ['GPT Stats']), gptStatsText],
             h('div.footer', [
                 numSentenceButtons,
                 separator(1),

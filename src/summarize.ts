@@ -2,6 +2,7 @@ import * as nlp from 'compromise';
 
 import { calculatePageRank, makeGraph } from './text-rank';
 import { SummaryData, Timer } from './messages';
+import { calculatePrices, getNumTokens } from './gpt-calculations';
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
@@ -30,6 +31,13 @@ export function summarizeTextBlocks(
     tsub.logTimeAndReset('-->allPageRanks');
     const numSummarySentences = NUM_SUMMARY_SENTENCES;
     t.logTimeAndReset('get stats');
+
+    // GPT Stats
+    const entireText = sentences.join(' ');
+    const words = entireText.split(' ');
+    const numTokens = getNumTokens(entireText);
+    const gptPrices = calculatePrices(numTokens);
+
     return {
         title,
         sentences: sentencesR,
@@ -38,7 +46,13 @@ export function summarizeTextBlocks(
         pageRanks,
         numSummarySentences,
         timing: t.serialize(),
-        nlpTiming: nlpTimer.serialize()
+        nlpTiming: nlpTimer.serialize(),
+        gptStats: {
+            numberOfCharacters: entireText.length,
+            numberOfWords: words.length,
+            numTokens,
+            prices: gptPrices
+        }
     };
 }
 
@@ -216,8 +230,7 @@ export function findNodesWithNWords(
             skipCounter,
             matchedNodes,
             skipSubtrees: true
-        }),
-        false
+        })
     );
 
     while (walker.nextNode()) {

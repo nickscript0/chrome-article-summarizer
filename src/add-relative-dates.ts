@@ -25,7 +25,7 @@ interface ParsedResult {
     start: {
         knownValues: any;
         impliedValues: any;
-    }
+    };
 }
 
 function convert(currentElement: HTMLElement) {
@@ -60,8 +60,7 @@ function textNodes(doc: Document) {
         walk = document.createTreeWalker(
             doc,
             NodeFilter.SHOW_TEXT,
-            getNodeFilter({ minWords: 2, skipSubtrees: false }),
-            false
+            getNodeFilter({ minWords: 2, skipSubtrees: false })
         );
     while ((n = walk.nextNode())) textNodes.push(n);
     return textNodes;
