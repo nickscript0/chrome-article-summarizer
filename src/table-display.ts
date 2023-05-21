@@ -28,7 +28,7 @@ function replaceKeys<T extends Record<string, any>>(
     return newObj as T;
 }
 
-function renderGptStatsTableFirst(data: GptStats) {
+function renderGptStatsTableFirst(title: string, data: GptStats) {
     // Creating an array of keys and values from the data object
     const stats = pick(data, [
         'numTokens',
@@ -79,7 +79,7 @@ function renderGptStatsTableFirst(data: GptStats) {
                             style:
                                 'border: 1px solid #e0e0e0; padding: 10px; background-color: #f0f0f0; color: black; font-family: Arial; font-size: 20px; font-weight: bold; border-radius: 10px 10px 0 0;'
                         },
-                        ['GPT Stats']
+                        [title]
                     )
                 ])
             ]),
@@ -144,11 +144,18 @@ function renderGptStatsTableSecond(data: GptStats) {
     return table;
 }
 
-export function renderGptStatsTable(data: GptStats) {
+export function renderGptStatsTable(
+    data: GptStats,
+    readabilityStats: GptStats
+) {
     // Creating an array of keys and values from the data.prices object
     return h('div', [
-        renderGptStatsTableFirst(data),
+        renderGptStatsTableFirst('GPT Stats', data),
         h('br'),
-        renderGptStatsTableSecond(data)
+        renderGptStatsTableSecond(data),
+        h('br'),
+        renderGptStatsTableFirst('Readability GPT Stats', readabilityStats),
+        h('br'),
+        renderGptStatsTableSecond(readabilityStats)
     ]);
 }

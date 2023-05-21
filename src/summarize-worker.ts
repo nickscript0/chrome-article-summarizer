@@ -12,8 +12,13 @@ onmessage = function(event) {
         const payload: InputPayload = ipCommand.payload;
         const textBlocks = payload.textBlocks;
         const pageTitle = payload.title;
-        const summaryData = summarizeTextBlocks(textBlocks, pageTitle);
+        const summaryData = summarizeTextBlocks(
+            textBlocks,
+            pageTitle,
+            payload.readabilityText
+        );
         summaryData.timing = summaryData.timing.concat(payload.timings);
+
         const workerPayload: WorkerPayload = {
             type: Commands.Display,
             payload: summaryData,

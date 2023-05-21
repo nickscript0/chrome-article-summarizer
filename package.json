@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@mozilla/readability": "^0.4.4",
     "@nem035/gpt-3-encoder": "^1.1.7",
     "chart.js": "^2.7.2",
     "chrono-node": "^1.4.3",

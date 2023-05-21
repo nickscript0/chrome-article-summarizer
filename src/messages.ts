@@ -38,6 +38,7 @@ export interface InputPayloadCommand {
 
 export interface InputPayload {
     textBlocks: string[];
+    readabilityText: string;
     title: string;
     startTime: number;
     url: string;
@@ -85,6 +86,7 @@ export interface SummaryData {
     timing: Timings;
     nlpTiming: Timings;
     gptStats: GptStats;
+    readabilityGptStats: GptStats;
 }
 
 export interface Sentence {

@@ -31,7 +31,7 @@
 * 11. Consider using document.querySelectorAll("body *") etc.. instead of treeWalker, is this more efficient??
 */
 
-import { getTextBlocksFromDom } from './summarize';
+import { getReadabilityFromDom, getTextBlocksFromDom } from './summarize';
 import { Commands, InputPayload, Timer } from './messages';
 import { killStickyHeaders } from './kill-sticky-headers';
 import { addRelativeDatesToDocument } from './add-relative-dates';
@@ -43,8 +43,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const t = new Timer();
         const textBlocks = getTextBlocksFromDom(window);
         t.logTimeAndReset('text from dom');
+        const readabilityText = getReadabilityFromDom(window) || '';
+        t.logTimeAndReset('mozilla readability text from dom');
+
         const payload: InputPayload = {
             textBlocks: textBlocks,
+            readabilityText,
             title: document.title,
             startTime: startTime,
             url: document.location ? document.location.href : '',

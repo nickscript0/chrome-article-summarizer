@@ -3,13 +3,15 @@ import * as nlp from 'compromise';
 import { calculatePageRank, makeGraph } from './text-rank';
 import { SummaryData, Timer } from './messages';
 import { calculatePrices, getNumTokens } from './gpt-calculations';
+import * as readability from '@mozilla/readability';
 
 const NUM_SUMMARY_SENTENCES = 5;
 const MIN_WORDS_SENTENCE = 10;
 
 export function summarizeTextBlocks(
     textBlocks: string[],
-    docTitle: string
+    docTitle: string,
+    readabilityText: string
 ): SummaryData {
     const t = new Timer();
     const { sentences, nlpBlocks, nlpTimer } = getNlpSentencesBlocks(
@@ -32,11 +34,19 @@ export function summarizeTextBlocks(
     const numSummarySentences = NUM_SUMMARY_SENTENCES;
     t.logTimeAndReset('get stats');
 
-    // GPT Stats
+    // GPT Stats for my home grown text extraction
     const entireText = sentences.join(' ');
     const words = entireText.split(' ');
     const numTokens = getNumTokens(entireText);
     const gptPrices = calculatePrices(numTokens);
+
+    // GPT Stats for Mozilla's Readability
+    let readabilityNumTokens = 0;
+    try {
+        readabilityNumTokens = getNumTokens(readabilityText);
+    } catch (e) {
+        console.error('Error getting readability num tokens', e);
+    }
 
     return {
         title,
@@ -52,6 +62,12 @@ export function summarizeTextBlocks(
             numberOfWords: words.length,
             numTokens,
             prices: gptPrices
+        },
+        readabilityGptStats: {
+            numberOfCharacters: readabilityText.length,
+            numberOfWords: readabilityText.split(' ').length,
+            numTokens: readabilityNumTokens,
+            prices: calculatePrices(readabilityNumTokens)
         }
     };
 }
@@ -110,6 +126,12 @@ export function getTextBlocksFromDom(theWindow: Window): string[] {
             : [selection];
     t.logTimeAndReset('treeWalk');
     return textBlocks;
+}
+
+export function getReadabilityFromDom(theWindow: Window) {
+    const theDocument = theWindow.document;
+    const article = new readability.Readability(theDocument).parse();
+    return article ? article.textContent : null;
 }
 
 export function getNlpSentencesBlocks(textBlocks: string[]): NlpSubsets {

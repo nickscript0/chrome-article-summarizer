@@ -309,7 +309,7 @@ function buildRender(state: State, data: SummaryData, _startTime: number) {
                 separator(2),
                 sentenceOrderControl
             ]),
-            renderGptStatsTable(data.gptStats),
+            renderGptStatsTable(data.gptStats, data.readabilityGptStats),
             detailsSection
         ]);
         return rootDiv;
