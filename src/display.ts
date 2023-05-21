@@ -301,7 +301,7 @@ function buildRender(state: State, data: SummaryData, _startTime: number) {
                 .filter(s => s.rank < state._showNumSentences + 1)
                 .map(s => _createParagraphH(s, false)),
             h('br'),
-            [h('h3', ['GPT Stats']), gptStatsText],
+            [h('h3', ['GPT Stats'])],
             h('div.footer', [
                 numSentenceButtons,
                 separator(1),

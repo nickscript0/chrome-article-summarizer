@@ -48,14 +48,19 @@ function renderGptStatsTableFirst(data: GptStats) {
             h(
                 'td',
                 {
-                    style: 'border: 1px solid black; padding: 10px;',
-                    width: '25%'
+                    style:
+                        'border: 1px solid #e0e0e0; padding: 10px; width: 35%; font-family: Arial; font-size: 16px; font-weight: bold;'
                 },
                 [k]
             ),
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
-                v.toLocaleString()
-            ])
+            h(
+                'td',
+                {
+                    style:
+                        'border: 1px solid #e0e0e0; padding: 10px; font-family: Arial; font-size: 16px;'
+                },
+                [v.toLocaleString()]
+            )
         ]);
     });
 
@@ -70,8 +75,9 @@ function renderGptStatsTableFirst(data: GptStats) {
                     h(
                         'th',
                         {
-                            style: 'border: 1px solid black; padding: 10px;',
-                            colspan: '2'
+                            colspan: '2',
+                            style:
+                                'border: 1px solid #e0e0e0; padding: 10px; background-color: #2196F3; color: white; font-family: Arial; font-size: 20px; font-weight: bold; border-radius: 10px 10px 0 0;'
                         },
                         ['GPT Stats']
                     )
