@@ -56,6 +56,7 @@ export interface GptPrice {
     percentOfTokenLimit: string;
     requestsUntilTenDollars: string;
     requestsUntilOneDollar: string;
+    modelName: string;
 }
 export interface GptPrices {
     gpt35turbo: GptPrice;

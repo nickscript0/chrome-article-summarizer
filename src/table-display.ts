@@ -97,59 +97,43 @@ function renderGptStatsTableSecond(data: GptStats) {
     const keys = data.prices ? Object.keys(data.prices) : [];
     const values = data.prices ? Object.values(data.prices) : [];
 
+    const tdStyle =
+        'border: 1px solid #e0e0e0; padding: 10px; font-family: Arial; font-size: 16px;';
     // Creating an array of table rows from the keys and values
     const rows = keys.map((key, index) => {
         return h('tr', [
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
-                key
+            h('td', { style: `${tdStyle} width: 30%;` }, [
+                values[index].modelName
             ]),
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
+            h('td', { style: tdStyle }, [
                 `$${values[index].totalPriceDollars.toLocaleString()}`
             ]),
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
+            h('td', { style: tdStyle }, [
                 `${values[index].percentOfTokenLimit}%`
             ]),
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
-                values[index].requestsUntilTenDollars
+            h('td', { style: tdStyle }, [
+                parseInt(values[index].requestsUntilTenDollars).toLocaleString()
             ]),
-            h('td', { style: 'border: 1px solid black; padding: 10px;' }, [
-                values[index].requestsUntilOneDollar
+            h('td', { style: tdStyle }, [
+                parseInt(values[index].requestsUntilOneDollar).toLocaleString()
             ])
         ]);
     });
 
     // Creating the table element with the rows
+    const headerStyle =
+        'border: 1px solid #e0e0e0; padding: 10px; background-color: #f0f0f0; color: black; font-family: Arial; font-size: 15px; font-weight: bold; border-radius: 10px 10px 0 0;';
     const table = h(
         'table',
         { style: 'border-collapse: collapse; width: 100%;' },
         [
             h('thead', [
                 h('tr', [
-                    h(
-                        'th',
-                        { style: 'border: 1px solid black; padding: 10px;' },
-                        ['Model']
-                    ),
-                    h(
-                        'th',
-                        { style: 'border: 1px solid black; padding: 10px;' },
-                        ['Total Price (USD)']
-                    ),
-                    h(
-                        'th',
-                        { style: 'border: 1px solid black; padding: 10px;' },
-                        ['Percent of Token Limit']
-                    ),
-                    h(
-                        'th',
-                        { style: 'border: 1px solid black; padding: 10px;' },
-                        ['Requests Until $10']
-                    ),
-                    h(
-                        'th',
-                        { style: 'border: 1px solid black; padding: 10px;' },
-                        ['Requests Until $1']
-                    )
+                    h('th', { style: headerStyle }, ['Model']),
+                    h('th', { style: headerStyle }, ['Total Price (USD)']),
+                    h('th', { style: headerStyle }, ['Percent of Token Limit']),
+                    h('th', { style: headerStyle }, ['Requests Until $10']),
+                    h('th', { style: headerStyle }, ['Requests Until $1'])
                 ])
             ]),
             h('tbody', rows)

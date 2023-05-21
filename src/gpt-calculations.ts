@@ -28,7 +28,8 @@ export function calculatePrices(
     function calcStats(
         pricePerToken: number,
         numTokens: number,
-        tokenLimit: number
+        tokenLimit: number,
+        modelName: string
     ): GptPrice {
         const percentOfTokenLimit = ((numTokens / tokenLimit) * 100).toFixed(1);
         return {
@@ -37,7 +38,10 @@ export function calculatePrices(
             requestsUntilTenDollars: (10 / (numTokens * pricePerToken)).toFixed(
                 0
             ),
-            requestsUntilOneDollar: (1 / (numTokens * pricePerToken)).toFixed(0)
+            requestsUntilOneDollar: (1 / (numTokens * pricePerToken)).toFixed(
+                0
+            ),
+            modelName
         };
     }
 
@@ -45,17 +49,20 @@ export function calculatePrices(
         gpt35turbo: calcStats(
             gpt35TurboPricePerToken,
             numTokens,
-            tokenLimits.gpt35turbo
+            tokenLimits.gpt35turbo,
+            'GPT-3.5 Turbo'
         ),
         gpt4_8kContext: calcStats(
             gpt4_8kContext_pricePerToken,
             numTokens,
-            tokenLimits.gpt4_8kContext
+            tokenLimits.gpt4_8kContext,
+            'GPT-4 8k-context'
         ),
         gpt4_32kContext: calcStats(
             gpt4_32kContext_pricePerToken,
             numTokens,
-            tokenLimits.gpt4_32kContext
+            tokenLimits.gpt4_32kContext,
+            'GPT-4 32k-context'
         )
     };
 }
