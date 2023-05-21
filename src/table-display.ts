@@ -77,7 +77,7 @@ function renderGptStatsTableFirst(data: GptStats) {
                         {
                             colspan: '2',
                             style:
-                                'border: 1px solid #e0e0e0; padding: 10px; background-color: #2196F3; color: white; font-family: Arial; font-size: 20px; font-weight: bold; border-radius: 10px 10px 0 0;'
+                                'border: 1px solid #e0e0e0; padding: 10px; background-color: #f0f0f0; color: black; font-family: Arial; font-size: 20px; font-weight: bold; border-radius: 10px 10px 0 0;'
                         },
                         ['GPT Stats']
                     )
