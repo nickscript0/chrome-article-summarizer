@@ -63,6 +63,17 @@ export interface GptPrices {
     gpt4_32kContext: GptPrice;
 }
 
+export interface GptStats {
+    numberOfWords: number;
+    numberOfCharacters: number;
+    numTokens: number;
+    prices?: {
+        gpt35turbo: GptPrice;
+        gpt4_8kContext: GptPrice;
+        gpt4_32kContext: GptPrice;
+    };
+}
+
 export interface SummaryData {
     title: string;
     sentences: Sentence[];
@@ -72,16 +83,7 @@ export interface SummaryData {
     numSummarySentences: number;
     timing: Timings;
     nlpTiming: Timings;
-    gptStats: {
-        numberOfWords: number;
-        numberOfCharacters: number;
-        numTokens: number;
-        prices?: {
-            gpt35turbo: GptPrice;
-            gpt4_8kContext: GptPrice;
-            gpt4_32kContext: GptPrice;
-        };
-    };
+    gptStats: GptStats;
 }
 
 export interface Sentence {

@@ -3,6 +3,7 @@
 import { h, createProjector, Projector } from 'maquette';
 import { SummaryData, Sentence, WorkerPayload } from './messages';
 import { createChart, createProfilingChart } from './display-charts';
+import { renderGptStatsTable } from './table-display';
 
 function setupListeners() {
     chrome.runtime.onMessage.addListener(onMessageListener);
@@ -308,7 +309,7 @@ function buildRender(state: State, data: SummaryData, _startTime: number) {
                 separator(2),
                 sentenceOrderControl
             ]),
-
+            renderGptStatsTable(data.gptStats),
             detailsSection
         ]);
         return rootDiv;
