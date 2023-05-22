@@ -28,13 +28,15 @@ function replaceKeys<T extends Record<string, any>>(
     return newObj as T;
 }
 
-function renderGptStatsTableFirst(title: string, data: GptStats) {
+function renderGptStatsTableFirst(data: GptStats, readabilityStats: GptStats) {
     // Creating an array of keys and values from the data object
-    const stats = pick(data, [
+    const desiredKeys: Array<keyof GptStats> = [
         'numTokens',
         'numberOfCharacters',
         'numberOfWords'
-    ]);
+    ];
+    const stats = pick(data, desiredKeys);
+    const readabilityStatsSubset = pick(readabilityStats, desiredKeys);
 
     const humanReadableStats = replaceKeys(stats, {
         numTokens: 'Number of Tokens',
@@ -42,8 +44,21 @@ function renderGptStatsTableFirst(title: string, data: GptStats) {
         numberOfWords: 'Number of Words'
     });
 
+    const humanReadabilityStats = replaceKeys(readabilityStatsSubset, {
+        numTokens: 'Number of Tokens',
+        numberOfCharacters: 'Number of Characters',
+        numberOfWords: 'Number of Words'
+    });
+
+    const readabilityStyle = 'color: #4287f5; padding-left: 10px;';
+
     // Creating an array of table rows from the keys and values
     const rows = Object.entries(humanReadableStats).map(([k, v]) => {
+        const readabilityValue = h('div', { style: readabilityStyle }, [
+            humanReadabilityStats[k]
+                ? `(${humanReadabilityStats[k].toLocaleString()})`
+                : `Unknown`
+        ]);
         return h('tr', [
             h(
                 'td',
@@ -57,9 +72,9 @@ function renderGptStatsTableFirst(title: string, data: GptStats) {
                 'td',
                 {
                     style:
-                        'border: 1px solid #e0e0e0; padding: 10px; font-family: Arial; font-size: 16px;'
+                        'border: 1px solid #e0e0e0; padding: 10px; font-family: Arial; font-size: 16px; display: flex;'
                 },
-                [v.toLocaleString()]
+                [v.toLocaleString(), readabilityValue]
             )
         ]);
     });
@@ -79,7 +94,12 @@ function renderGptStatsTableFirst(title: string, data: GptStats) {
                             style:
                                 'border: 1px solid #e0e0e0; padding: 10px; background-color: #f0f0f0; color: black; font-family: Arial; font-size: 20px; font-weight: bold; border-radius: 10px 10px 0 0;'
                         },
-                        [title]
+                        [
+                            `GPT Stats`,
+                            h('span', { style: readabilityStyle }, [
+                                '(Readability)'
+                            ])
+                        ]
                     )
                 ])
             ]),
@@ -150,12 +170,8 @@ export function renderGptStatsTable(
 ) {
     // Creating an array of keys and values from the data.prices object
     return h('div', [
-        renderGptStatsTableFirst('GPT Stats', data),
+        renderGptStatsTableFirst(data, readabilityStats),
         h('br'),
-        renderGptStatsTableSecond(data),
-        h('br'),
-        renderGptStatsTableFirst('Readability GPT Stats', readabilityStats),
-        h('br'),
-        renderGptStatsTableSecond(readabilityStats)
+        renderGptStatsTableSecond(data)
     ]);
 }
