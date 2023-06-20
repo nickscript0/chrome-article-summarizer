@@ -5,6 +5,7 @@ import { GptPrice, GptPrices } from './messages';
 
 const tokenLimits = {
     gpt35turbo: 4000,
+    gpt35turbo_16kContext: 16000,
     gpt4_8kContext: 8000,
     gpt4_32kContext: 32000
 };
@@ -21,9 +22,15 @@ export function calculatePrices(
         return undefined;
     }
 
-    const gpt35TurboPricePerToken = 0.002 / 1000;
-    const gpt4_8kContext_pricePerToken = 0.06 / 1000;
-    const gpt4_32kContext_pricePerToken = 0.12 / 1000;
+    /**
+     * NOTE: only using Input prices here
+     * The actual price would be slightly higher as 10% or less of the request is usually output, and OpenAI's
+     * output prices are about double their input prices https://openai.com/pricing
+     */
+    const gpt35TurboPricePerToken = 0.0015 / 1000;
+    const gpt35Turbo_16kCtonext_privatePerToken = 0.003 / 1000;
+    const gpt4_8kContext_pricePerToken = 0.03 / 1000;
+    const gpt4_32kContext_pricePerToken = 0.06 / 1000;
 
     function calcStats(
         pricePerToken: number,
@@ -50,7 +57,13 @@ export function calculatePrices(
             gpt35TurboPricePerToken,
             numTokens,
             tokenLimits.gpt35turbo,
-            'GPT-3.5 Turbo'
+            'GPT-3.5 4k-context'
+        ),
+        gpt35turbo_16kContext: calcStats(
+            gpt35Turbo_16kCtonext_privatePerToken,
+            numTokens,
+            tokenLimits.gpt35turbo_16kContext,
+            'GPT-3.5 16k-context'
         ),
         gpt4_8kContext: calcStats(
             gpt4_8kContext_pricePerToken,

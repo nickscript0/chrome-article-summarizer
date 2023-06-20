@@ -61,6 +61,7 @@ export interface GptPrice {
 }
 export interface GptPrices {
     gpt35turbo: GptPrice;
+    gpt35turbo_16kContext: GptPrice
     gpt4_8kContext: GptPrice;
     gpt4_32kContext: GptPrice;
 }
@@ -69,11 +70,7 @@ export interface GptStats {
     numberOfWords: number;
     numberOfCharacters: number;
     numTokens: number;
-    prices?: {
-        gpt35turbo: GptPrice;
-        gpt4_8kContext: GptPrice;
-        gpt4_32kContext: GptPrice;
-    };
+    prices?: GptPrices;
 }
 
 export interface SummaryData {
