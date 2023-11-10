@@ -64,6 +64,7 @@ export interface GptPrices {
     gpt35turbo_16kContext: GptPrice
     gpt4_8kContext: GptPrice;
     gpt4_32kContext: GptPrice;
+    gpt4turbo_128kContext: GptPrice;
 }
 
 export interface GptStats {

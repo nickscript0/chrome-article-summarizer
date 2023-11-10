@@ -7,7 +7,8 @@ const tokenLimits = {
     gpt35turbo: 4000,
     gpt35turbo_16kContext: 16000,
     gpt4_8kContext: 8000,
-    gpt4_32kContext: 32000
+    gpt4_32kContext: 32000,
+    gpt4turbo_128kContext: 128000
 };
 
 export function calculatePrices(
@@ -31,6 +32,7 @@ export function calculatePrices(
     const gpt35Turbo_16kCtonext_privatePerToken = 0.003 / 1000;
     const gpt4_8kContext_pricePerToken = 0.03 / 1000;
     const gpt4_32kContext_pricePerToken = 0.06 / 1000;
+    const gpt4turbo_128kContext_pricePerToken = 0.01 / 1000;
 
     function calcStats(
         pricePerToken: number,
@@ -76,6 +78,12 @@ export function calculatePrices(
             numTokens,
             tokenLimits.gpt4_32kContext,
             'GPT-4 32k-context'
+        ),
+        gpt4turbo_128kContext: calcStats(
+            gpt4turbo_128kContext_pricePerToken,
+            numTokens,
+            tokenLimits.gpt4turbo_128kContext,
+            'GPT-4 Turbo 128k-context'
         )
     };
 }
